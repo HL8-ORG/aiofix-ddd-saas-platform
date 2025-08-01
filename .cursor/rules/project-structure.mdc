@@ -1,0 +1,270 @@
+---
+description: project-structure
+globs:
+  - "**/*.ts"          # 所有 TypeScript 文件
+  - "**/*.tsx"         # 所有 TSX 文件
+  - "**/*.js"          # 所有 JavaScript 文件
+  - "**/*.jsx"         # 所有 JSX 文件
+alwaysApply: true
+---
+
+description: project-structure
+globs:
+
+  - "**/*.ts"          # 所有 TypeScript 文件
+  - "**/*.tsx"         # 所有 TSX 文件
+  - "**/*.js"          # 所有 JavaScript 文件
+  - "**/*.jsx"         # 所有 JSX 文件
+    alwaysApply: true
+
+---
+
+这是一个前后端分离的全栈项目，前端（客户端）基于`Next.js`框架开发，后端（服务端）基于`NestJS`框架开发，前后端均使用`TypeScript`作为主要开发语言。
+
+# API Project Structure
+
+```
+这个README.md文件包含了完整的DDD + Clean Architecture文件结构方案，包括：
+
+1. **架构设计原则** - 明确的设计理念
+2. **详细的文件结构** - 完整的目录组织
+3. **各层职责说明** - 清晰的分层定义
+4. **迁移策略** - 渐进式重构计划
+5. **开发指南** - 实用的开发指导
+6. **最佳实践** - 推荐的开发规范
+```
+
+
+
+## 概述
+
+本项目采用DDD（领域驱动设计）+ Clean Architecture（清洁架构）设计模式，实现高度模块化、可维护、可扩展的后端API架构。
+
+## 架构设计原则
+
+### 1. 分层架构 (Layered Architecture)
+
+- **Domain Layer** - 纯业务逻辑，无外部依赖
+- **Application Layer** - 业务用例协调
+- **Infrastructure Layer** - 技术实现细节
+- **Presentation Layer** - 用户界面和API
+
+### 2. 模块化设计 (Modular Design)
+
+- 每个业务模块独立，包含完整的四层架构
+- 模块间通过接口通信，降低耦合
+- 共享层提供通用功能
+
+### 3. 依赖倒置 (Dependency Inversion)
+
+- 高层模块不依赖低层模块
+- 抽象不依赖具体实现
+- 通过依赖注入实现解耦
+
+### 4. 单一职责 (Single Responsibility)
+
+- 每个类/模块只负责一个功能
+- 清晰的职责边界
+- 易于测试和维护
+
+## 文件结构
+
+```
+apps/api/src/
+├── main.ts                          # 应用入口
+├── app.module.ts                    # 根模块
+├── app.controller.ts                 # 根控制器
+├── app.service.ts                    # 根服务
+│
+├── shared/                          # 共享层
+│   ├── domain/                      # 共享领域
+│   │   ├── entities/                # 共享实体
+│   │   │   └── base.entity.ts      # 基础实体
+│   │   ├── value-objects/           # 值对象
+│   │   ├── events/                  # 领域事件
+│   │   └── exceptions/              # 领域异常
+│   │
+│   ├── infrastructure/              # 共享基础设施
+│   │   ├── database/                # 数据库配置
+│   │   │   ├── config/             # 数据库配置
+│   │   │   ├── migrations/         # 数据库迁移
+│   │   │   └── seeders/            # 数据种子
+│   │   ├── logging/                # 日志配置
+│   │   ├── auth/                   # 认证配置
+│   │   └── cache/                  # 缓存配置
+│   │
+│   ├── application/                 # 共享应用服务
+│   │   ├── interfaces/             # 应用接口
+│   │   ├── dto/                   # 共享DTO
+│   │   └── validators/            # 共享校验器
+│   │
+│   └── presentation/               # 共享表现层
+│       ├── decorators/            # 自定义装饰器
+│       ├── guards/                # 守卫
+│       ├── interceptors/          # 拦截器
+│       ├── filters/               # 异常过滤器
+│       └── middlewares/           # 中间件
+│
+├── modules/                        # 业务模块
+│   ├── jobs/                      # 任务模块 (已实现)
+│   │   ├── domain/                # 领域层
+│   │   │   ├── entities/          # 领域实体
+│   │   │   ├── value-objects/     # 值对象
+│   │   │   ├── repositories/      # 仓储接口
+│   │   │   ├── services/          # 领域服务
+│   │   │   └── events/            # 领域事件
+│   │   │
+│   │   ├── application/           # 应用层
+│   │   │   ├── services/          # 应用服务
+│   │   │   ├── dto/              # DTO
+│   │   │   ├── interfaces/        # 应用接口
+│   │   │   └── validators/        # 应用校验器
+│   │   │
+│   │   ├── infrastructure/        # 基础设施层
+│   │   │   ├── entities/          # ORM实体
+│   │   │   │   ├── mikro-orm/     # MikroORM实体
+│   │   │   │   └── mongoose/      # Mongoose实体
+│   │   │   ├── repositories/      # 仓储实现
+│   │   │   │   ├── mikro-orm/     # MikroORM仓储
+│   │   │   │   └── mongoose/      # Mongoose仓储
+│   │   │   └── external/          # 外部服务
+│   │   │
+│   │   ├── presentation/          # 表现层
+│   │   │   ├── controllers/       # 控制器
+│   │   │   ├── dto/              # 表现层DTO
+│   │   │   └── validators/        # 表现层校验器
+│   │   │
+│   │   ├── jobs.module.ts         # 模块定义
+│   │   ├── jobs.integration.spec.ts # 集成测试
+│   │   └── README.md              # 模块文档
+│   │
+│   ├── users/                     # 用户模块 (示例)
+│   │   ├── domain/
+│   │   ├── application/
+│   │   ├── infrastructure/
+│   │   ├── presentation/
+│   │   └── users.module.ts
+│   │
+│   ├── auth/                      # 认证模块 (示例)
+│   │   ├── domain/
+│   │   ├── application/
+│   │   ├── infrastructure/
+│   │   ├── presentation/
+│   │   └── auth.module.ts
+│   │
+│   └── tenants/                   # 租户模块 (示例)
+│       ├── domain/
+│       ├── application/
+│       ├── infrastructure/
+│       ├── presentation/
+│       └── tenants.module.ts
+│
+├── config/                        # 配置层
+│   ├── database.config.ts         # 数据库配置
+│   ├── auth.config.ts             # 认证配置
+│   ├── logging.config.ts          # 日志配置
+│   └── app.config.ts              # 应用配置
+│
+└── tests/                         # 测试配置
+    ├── jest.setup.ts              # Jest设置
+    ├── fixtures/                  # 测试数据
+    └── helpers/                   # 测试工具
+```
+
+## 各层职责说明
+
+### Domain Layer (领域层)
+
+- **Entities**: 领域实体，包含业务逻辑和状态
+- **Value Objects**: 值对象，不可变的数据结构
+- **Repositories**: 仓储接口，定义数据访问抽象
+- **Services**: 领域服务，处理跨实体的业务逻辑
+- **Events**: 领域事件，用于模块间通信
+
+### Application Layer (应用层)
+
+- **Services**: 应用服务，协调领域对象完成业务用例
+- **DTOs**: 数据传输对象，定义API接口数据结构
+- **Interfaces**: 应用接口，定义服务契约
+- **Validators**: 应用校验器，验证业务规则
+
+### Infrastructure Layer (基础设施层)
+
+- **Entities**: ORM实体，数据库映射对象
+- **Repositories**: 仓储实现，具体的数据访问逻辑
+- **External**: 外部服务集成，如第三方API
+
+### Presentation Layer (表现层)
+
+- **Controllers**: 控制器，处理HTTP请求和响应
+- **DTOs**: 表现层DTO，定义API响应格式
+- **Validators**: 表现层校验器，验证请求参数
+
+## 迁移策略
+
+### 阶段1: 创建新结构
+
+1. 创建 `shared/` 目录，移动通用代码
+2. 创建 `modules/` 目录，重组业务模块
+3. 创建 `config/` 目录，整理配置文件
+
+### 阶段2: 重构现有代码
+
+1. 将 `entities/` 移动到 `shared/domain/entities/`
+2. 将 `common/` 内容分散到对应层
+3. 将 `database/` 移动到 `shared/infrastructure/database/`
+
+### 阶段3: 模块化迁移
+
+1. 将Job模块移动到 `modules/jobs/`
+2. 创建其他业务模块模板
+3. 更新模块间的依赖关系
+
+## 实施原则
+
+1. **渐进式迁移** - 不破坏现有功能
+2. **保持向后兼容** - 逐步替换，确保平滑过渡
+3. **测试驱动** - 每个重构步骤都有测试保障
+4. **文档更新** - 同步更新README和API文档
+
+## 技术栈
+
+- **Framework**: NestJS
+- **Language**: TypeScript
+- **Database**: PostgreSQL (MikroORM)
+- **Authentication**: JWT
+- **Logging**: Pino
+- **Testing**: Jest
+- **Documentation**: Swagger
+
+## 开发指南
+
+### 添加新模块
+
+1. 在 `modules/` 下创建新模块目录
+2. 按照四层架构创建相应目录结构
+3. 实现领域实体、应用服务、仓储和控制器
+4. 创建模块定义文件
+5. 在根模块中注册新模块
+
+### 添加新功能
+
+1. 在对应层添加新文件
+2. 遵循单一职责原则
+3. 编写单元测试和集成测试
+4. 更新相关文档
+
+### 测试策略
+
+- **单元测试**: 测试单个类或方法
+- **集成测试**: 测试模块间的交互
+- **端到端测试**: 测试完整的业务流程
+
+## 最佳实践
+
+1. **依赖注入**: 使用NestJS的依赖注入容器
+2. **接口隔离**: 定义清晰的接口边界
+3. **错误处理**: 统一的异常处理机制
+4. **日志记录**: 结构化日志记录
+5. **配置管理**: 环境变量和配置文件分离
+6. **安全考虑**: 输入验证、认证授权、数据加密
