@@ -1,7 +1,7 @@
 ---
 description:根据选中的代码画出示意图
 globs:
-alwaysApply: false
+alwaysApply: true
 ---
 
 - 请根据选中的代码画出示意图，使用Mermaid语法输出。

@@ -1,0 +1,107 @@
+---
+description: 开发文档_技术选型与要求
+globs: 
+alwaysApply: false
+---
+# 技术选型与要求
+
+- **编程语言**：使用`TypeScript`作为主要开发语言。
+- **系统架构**：基于`node.js`开发，前后端分离，前端使用`Next.js`作为框架，后端使用`NestJS`作为框架。
+- **开发模式**：基于领域驱动设计（Domain-Driven Design）和整洁架构（Clean Architecture）模式开发
+- **权限控制**：集成CASL的RBAC用户权限控制
+- **数据库**：默认为`PostgresQL`，考虑可扩展到`MongoDB`（预留适配器，目前暂时不需要具体实现）。
+- **ORM**：默认使用`MikroORM`适配关系型数据库，如：`PostgresQL`。
+- **RESTful**：每个领域及子领域均按照`RESTful`风格实现API。
+- **CQRS**：视具体情况决定是否采用。
+- **事件朔源（Event Sourcing）**：视具体情况决定是否实现。
+
+# 基于 DDD（领域驱动设计） 和 Clean Architecture（清洁架构） 的分层设计:
+
+## 1. 表现层（Presentation Layer）
+- 职责：  
+  - 处理外部交互（HTTP API、CLI、WebSocket 等）。  
+  - 接收请求，调用应用层服务，返回响应。  
+  - 不包含业务逻辑，仅做协议适配（如 HTTP → DTO）。  
+- 主要内容：  
+  - controllers/：定义路由，调用 CommandBus 或 QueryBus。  
+  - middlewares/：请求预处理（如认证、日志）。  
+  - filters/：异常处理。  
+  - 不直接依赖领域层，仅依赖应用层 DTO。
+    
+## 2. 应用层（Application Layer）
+- 职责：  
+  - 协调领域对象完成业务用例（如“创建权限”）。  
+  - 定义用例的输入/输出（DTO 和 Command/Query）。  
+  - 处理事务、日志、权限校验等横切关注点。
+- 主要内容：  
+  - commands/ 和 queries/：用例的输入（CQRS 模式）。  
+  - handlers/：执行 Command/Query，调用领域服务。  
+  - dto/：输入/输出的数据结构（如 PermissionResponseDto）。  
+  - 不包含核心业务逻辑，仅编排领域层。
+    
+## 3. 领域层（Domain Layer）
+- 职责：  
+  - 封装核心业务逻辑和规则。  
+  - 定义领域模型（实体、值对象、聚合根）。
+  - 处理领域事件和业务状态变更。
+- 主要内容：  
+  - entities/：领域实体（如 Permission）。  
+  - value-objects/：不可变的值对象（如 PermissionName）。  
+  - repositories/：仓储接口（定义数据访问抽象）。  
+  - services/：领域服务（跨实体的业务逻辑）。  
+  - events/：领域事件（如 PermissionCreatedEvent）。  
+  - 不依赖其他层，保持纯净。
+    
+## 4. 基础设施层（Infrastructure Layer）
+- 职责：  
+  - 实现技术细节（数据库、缓存、消息队列等）。  
+  - 提供领域层依赖的外部实现（如仓储实现）。  
+- 主要内容：  
+  - repositories/：仓储的具体实现（如 TypeOrmPermissionRepository）。  
+  - database/：ORM 实体、迁移脚本。  
+  - external/：第三方服务集成（如 Auth0、S3）。  
+  - 依赖领域层，实现其接口。
+    
+## 5. 共享层（Shared Kernel）
+- 职责：  
+  - 提供跨模块的通用工具或基础组件。  
+  - 避免重复代码。  
+- 主要内容：  
+  - common/：工具类、异常基类、日志等。  
+  - interfaces/：跨模块的抽象接口。  
+
+# 代码组织结构
+
+```
+├── application/            # 应用层
+│   ├── commands/           # 写操作
+│   ├── queries/            # 读操作
+│   ├── dto/                # 输入输出数据结构
+│   └── handlers/           # 用例协调
+├── domain/                 # 领域层
+│   ├── entities/           # 聚合根和实体
+│   ├── value-objects/      # 值对象
+│   ├── repositories/       # 仓储接口
+│   └── services/           # 领域服务
+├── infrastructure/         # 基础设施层
+│   ├── repositories/       # 仓储实现
+│   └── database/           # ORM 实体
+└── presentation/           # 表现层
+    ├── controllers/        # 路由
+    └── middlewares/        # 横切逻辑
+```
+
+# 关键设计原则
+
+## 1. 依赖方向：  
+表现层 → 应用层 → 领域层 ← 基础设施层
+  - 领域层是核心，其他层依赖它，但领域层不依赖其他层。
+
+## 2. 解耦方式：  
+  - 通过接口隔离技术细节（如仓储接口）。  
+  - 使用依赖注入（DI）实现运行时依赖。
+
+## 3. 测试策略：  
+  - 领域层：单元测试（纯业务逻辑）。  
+  - 应用层：集成测试（验证用例流程）。  
+  - 表现层：E2E 测试（模拟 HTTP 请求）。

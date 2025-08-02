@@ -24,7 +24,7 @@ globs:
 # API Project Structure
 
 ```
-这个README.md文件包含了完整的DDD + Clean Architecture文件结构方案，包括：
+提纲：
 
 1. **架构设计原则** - 明确的设计理念
 2. **详细的文件结构** - 完整的目录组织
@@ -38,7 +38,7 @@ globs:
 
 ## 概述
 
-本项目采用DDD（领域驱动设计）+ Clean Architecture（清洁架构）设计模式，实现高度模块化、可维护、可扩展的后端API架构。
+本项目采用DDD（领域驱动设计）+ Clean Architecture（整洁架构）设计模式，实现高度模块化、可维护、可扩展的后端API架构。
 
 ## 架构设计原则
 
@@ -106,37 +106,6 @@ apps/api/src/
 │       └── middlewares/           # 中间件
 │
 ├── modules/                        # 业务模块
-│   ├── jobs/                      # 任务模块 (已实现)
-│   │   ├── domain/                # 领域层
-│   │   │   ├── entities/          # 领域实体
-│   │   │   ├── value-objects/     # 值对象
-│   │   │   ├── repositories/      # 仓储接口
-│   │   │   ├── services/          # 领域服务
-│   │   │   └── events/            # 领域事件
-│   │   │
-│   │   ├── application/           # 应用层
-│   │   │   ├── services/          # 应用服务
-│   │   │   ├── dto/              # DTO
-│   │   │   ├── interfaces/        # 应用接口
-│   │   │   └── validators/        # 应用校验器
-│   │   │
-│   │   ├── infrastructure/        # 基础设施层
-│   │   │   ├── entities/          # ORM实体
-│   │   │   │   ├── mikro-orm/     # MikroORM实体
-│   │   │   │   └── mongoose/      # Mongoose实体
-│   │   │   ├── repositories/      # 仓储实现
-│   │   │   │   ├── mikro-orm/     # MikroORM仓储
-│   │   │   │   └── mongoose/      # Mongoose仓储
-│   │   │   └── external/          # 外部服务
-│   │   │
-│   │   ├── presentation/          # 表现层
-│   │   │   ├── controllers/       # 控制器
-│   │   │   ├── dto/              # 表现层DTO
-│   │   │   └── validators/        # 表现层校验器
-│   │   │
-│   │   ├── jobs.module.ts         # 模块定义
-│   │   ├── jobs.integration.spec.ts # 集成测试
-│   │   └── README.md              # 模块文档
 │   │
 │   ├── users/                     # 用户模块 (示例)
 │   │   ├── domain/
@@ -158,17 +127,6 @@ apps/api/src/
 │       ├── infrastructure/
 │       ├── presentation/
 │       └── tenants.module.ts
-│
-├── config/                        # 配置层
-│   ├── database.config.ts         # 数据库配置
-│   ├── auth.config.ts             # 认证配置
-│   ├── logging.config.ts          # 日志配置
-│   └── app.config.ts              # 应用配置
-│
-└── tests/                         # 测试配置
-    ├── jest.setup.ts              # Jest设置
-    ├── fixtures/                  # 测试数据
-    └── helpers/                   # 测试工具
 ```
 
 ## 各层职责说明
@@ -200,25 +158,8 @@ apps/api/src/
 - **DTOs**: 表现层DTO，定义API响应格式
 - **Validators**: 表现层校验器，验证请求参数
 
-## 迁移策略
 
-### 阶段1: 创建新结构
 
-1. 创建 `shared/` 目录，移动通用代码
-2. 创建 `modules/` 目录，重组业务模块
-3. 创建 `config/` 目录，整理配置文件
-
-### 阶段2: 重构现有代码
-
-1. 将 `entities/` 移动到 `shared/domain/entities/`
-2. 将 `common/` 内容分散到对应层
-3. 将 `database/` 移动到 `shared/infrastructure/database/`
-
-### 阶段3: 模块化迁移
-
-1. 将Job模块移动到 `modules/jobs/`
-2. 创建其他业务模块模板
-3. 更新模块间的依赖关系
 
 ## 实施原则
 

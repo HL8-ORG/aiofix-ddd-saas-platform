@@ -1,52 +1,86 @@
-import {
-  BigIntType,
-  OptionalProps,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { IsDate, IsOptional, IsUUID } from 'class-validator';
+import { Expose, Transform } from 'class-transformer';
 
 /**
- * @abstract
- * @class CustomBaseEntity
+ * @abstract class BaseEntity
  * @description
- * 所有实体的基础抽象类，统一定义主键、自带创建与更新时间戳字段，便于继承和扩展。
- *
- * 原理与机制说明：
- * 1. 通过@PrimaryKey装饰器定义id为主键，类型为bigint，确保主键自增且支持大数据量。
- * 2. createdAt字段使用@Property装饰，类型为date，默认值为当前时间，自动记录实体创建时间。
- * 3. updatedAt字段同样使用@Property装饰，类型为date，并通过onUpdate钩子在每次实体更新时自动刷新为当前时间，实现更新时间追踪。
- * 4. [OptionalProps]声明createdAt、updatedAt、tenant为可选属性，便于MikroORM在插入和更新时自动处理这些字段，无需手动赋值。
- * 5. 该基类可被所有业务实体继承，实现主键与时间戳字段的统一管理，提升开发效率与一致性。
+ * 基础实体类，为所有领域实体提供通用属性和方法。
+ * 这是一个纯领域对象，不包含任何ORM装饰器或数据库依赖。
+ * 
+ * 主要原理与机制：
+ * 1. 使用class-validator装饰器进行数据校验，确保数据完整性
+ * 2. 使用class-transformer装饰器控制序列化安全性
+ * 3. 提供通用的实体生命周期管理方法
+ * 4. 所有实体继承此类，确保领域对象的一致性
+ * 5. 通过Expose装饰器控制序列化时哪些字段会被包含
  */
-export abstract class CustomBaseEntity {
-  /**
-   * @property [OptionalProps]
-   * @description
-   * 声明createdAt、updatedAt、tenant为可选属性，便于MikroORM自动处理。
-   */
-  [OptionalProps]?: 'createdAt' | 'updatedAt' | 'tenant';
-
+export abstract class BaseEntity {
   /**
    * @property id
-   * @description
-   * 实体主键，自增bigint类型，保证唯一性和扩展性。
+   * @description 实体主键，使用UUID格式
    */
-  @PrimaryKey({ type: new BigIntType('bigint') })
-  id: number;
+  @IsUUID()
+  @Expose()
+  id: string;
 
   /**
    * @property createdAt
-   * @description
-   * 实体创建时间，插入时自动赋值为当前时间。
+   * @description 创建时间
    */
-  @Property({ type: 'date' })
-  createdAt = new Date();
+  @IsDate()
+  @Expose()
+  @Transform(({ value }) => value instanceof Date ? value : new Date(value))
+  createdAt: Date;
 
   /**
    * @property updatedAt
-   * @description
-   * 实体更新时间，每次更新时自动刷新为当前时间。
+   * @description 更新时间
    */
-  @Property({ onUpdate: () => new Date(), type: 'date' })
-  updatedAt = new Date();
+  @IsDate()
+  @Expose()
+  @Transform(({ value }) => value instanceof Date ? value : new Date(value))
+  updatedAt: Date;
+
+  /**
+   * @property deletedAt
+   * @description 软删除时间，用于软删除功能
+   */
+  @IsOptional()
+  @IsDate()
+  @Expose()
+  @Transform(({ value }) => value ? (value instanceof Date ? value : new Date(value)) : undefined)
+  deletedAt?: Date;
+
+  /**
+   * @method isDeleted
+   * @description 检查实体是否已被软删除
+   * @returns {boolean} 如果已删除返回true，否则返回false
+   */
+  isDeleted(): boolean {
+    return this.deletedAt !== null && this.deletedAt !== undefined;
+  }
+
+  /**
+   * @method softDelete
+   * @description 软删除实体，设置删除时间但不物理删除数据
+   */
+  softDelete(): void {
+    this.deletedAt = new Date();
+  }
+
+  /**
+   * @method restore
+   * @description 恢复软删除的实体，清除删除时间
+   */
+  restore(): void {
+    this.deletedAt = undefined;
+  }
+
+  /**
+   * @method updateTimestamp
+   * @description 更新实体的时间戳
+   */
+  updateTimestamp(): void {
+    this.updatedAt = new Date();
+  }
 }
