@@ -5,6 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ClsModule } from 'nestjs-cls';
 import { LoggerModule } from '@libs/pino-nestjs';
 import pinoLoggerConfig from 'src/shared/infrastructure/config/pino-logger.config';
+import { UsersModule } from './modules/iam/users/users.module';
 
 /**
  * @module AppModule
@@ -51,6 +52,8 @@ import pinoLoggerConfig from 'src/shared/infrastructure/config/pino-logger.confi
     }),
     // 日志模块
     LoggerModule.forRootAsync(pinoLoggerConfig.asProvider()),
+    // 业务模块
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [

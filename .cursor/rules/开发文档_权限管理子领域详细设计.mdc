@@ -1,0 +1,505 @@
+---
+description: 开发文档_权限管理子领域的详细设计
+alwaysApply: false
+---
+# 权限管理子领域的详细设计
+
+本节详细说明IAM系统中“权限管理”子领域的核心设计，包括领域实体、聚合、用例流程、接口规范及审计要求等，确保多租户架构下的权限管理安全性、可扩展性与合规性。
+
+---
+
+## 一、权限领域实体设计
+
+### 1.1 权限（Permission）领域实体
+
+> 设计要求：权限实体为纯领域对象，不包含任何ORM装饰器或数据库依赖。序列化安全性通过`class-transformer`控制，数据校验通过`class-validator`实现。集成CASL权限管理库，支持声明式权限和条件权限。
+
+- **属性定义**：
+  - `id`：权限唯一标识（UUID）
+  - `name`：权限名称（唯一，必填）
+  - `code`：权限代码（唯一，必填，用于系统识别）
+  - `description`：权限描述（可选）
+  - `type`：权限类型（菜单、按钮、API、数据等）
+  - `status`：权限状态（激活、禁用、已删除等）
+  - `tenantId`：所属租户ID（必填，实现数据隔离）
+  - `resource`：关联资源（如菜单、接口、数据表等，支持多类型）
+  - `action`：操作类型（create、read、update、delete、manage等）
+  - `conditions`：权限条件（CASL条件表达式，支持动态权限）
+  - `fields`：字段权限（指定可访问的字段列表）
+  - `parentPermissionId`：父权限ID（可选，支持权限树结构）
+  - `childPermissionIds`：子权限ID列表（可选）
+  - `createdAt`：创建时间
+  - `updatedAt`：更新时间
+  - `deletedAt`：软删除时间（可选）
+
+- **领域规则**：
+  - 权限名称、代码在租户内唯一。
+  - 权限必须归属于某个租户，实现数据软隔离。
+  - 支持权限树结构，父子权限层级不限。
+  - 权限删除采用软删除策略，保留数据以便审计。
+  - 权限状态变更需记录审计日志。
+  - 权限类型、资源类型需符合系统预设规范。
+  - **所有与权限相关的业务数据均需通过租户ID进行隔离，确保不同租户间数据互不干扰。**
+
+### 1.2 权限聚合根
+
+- 权限（Permission）为聚合根，聚合内可包含子权限、资源引用等子实体的引用，但不直接持有其数据，仅通过ID或外键关联。
+- **所有聚合内的子实体均需包含租户ID字段，作为软隔离的关键标识。应用层和基础设施层在查询、操作数据时，必须基于当前租户ID进行过滤，防止数据越权访问。**
+
+### 1.3 权限值对象
+
+#### 1.3.1 权限名称（PermissionName）
+- 长度限制：2-50个字符
+- 字符限制：仅允许字母、数字、下划线、连字符、中文
+- 唯一性：在租户内唯一
+
+#### 1.3.2 权限代码（PermissionCode）
+- 长度限制：3-30个字符
+- 字符限制：仅允许大写字母、数字、下划线
+- 唯一性：在租户内唯一
+
+#### 1.3.3 权限类型（PermissionType）
+- 枚举值：MENU（菜单）、BUTTON（按钮）、API（接口）、DATA（数据）
+- 业务影响：不同类型权限的分配和校验方式不同
+
+#### 1.3.4 权限操作（PermissionAction）
+- 枚举值：CREATE（创建）、READ（读取）、UPDATE（更新）、DELETE（删除）、MANAGE（管理）
+- 支持CASL操作类型，便于权限校验
+
+#### 1.3.5 权限状态（PermissionStatus）
+- 枚举值：ACTIVE（激活）、SUSPENDED（禁用）、DELETED（已删除）
+- 状态转换规则：定义各状态间的合法转换
+
+#### 1.3.6 权限条件（PermissionCondition）
+- 支持CASL条件表达式
+- 支持时间条件（开始时间、结束时间）
+- 支持范围条件（数据范围、地理位置等）
+- 支持逻辑条件（AND、OR、NOT等）
+
+---
+
+## 二、核心用例流程
+
+### 2.1 权限创建
+
+1. 管理员提交权限创建申请（填写名称、代码、类型、资源等）。
+2. 系统校验权限名称、代码在租户内的唯一性。
+3. 验证权限类型、资源类型符合规范。
+4. 创建权限实体，状态为“激活”。
+5. 记录审计日志。
+6. **所有与新权限相关的业务数据，均需绑定租户ID，实现数据软隔离。**
+
+### 2.2 权限信息修改
+
+- 仅租户管理员或系统管理员可修改权限信息。
+- 修改权限名称、代码需重新验证唯一性。
+- 修改操作需记录审计日志。
+- **修改操作仅限于当前租户ID下的数据，防止跨租户操作。**
+
+### 2.3 权限激活/禁用
+
+- 支持权限的激活、禁用操作，禁用后权限无法分配给新角色。
+- 状态变更需记录审计日志。
+- **激活/禁用操作需基于租户ID进行，确保只影响目标租户及其下属数据。**
+
+### 2.4 权限软删除与恢复
+
+- 删除操作为软删除，标记`deletedAt`时间。
+- 支持权限恢复，恢复后状态为“禁用”。
+- 删除与恢复均需记录审计日志。
+- **软删除与恢复操作需基于租户ID进行，且相关业务数据（如角色分配等）也应同步标记或处理，确保数据隔离一致性。**
+
+### 2.5 权限分配与回收
+
+- 支持为角色分配、移除权限。
+- 权限分配仅能由租户管理员进行。
+- 支持批量权限操作。
+- 权限分配操作需记录审计日志。
+
+### 2.6 条件权限管理
+
+- 支持基于条件的动态权限分配。
+- 条件权限支持复杂逻辑表达式。
+- 条件权限支持时间限制和范围限制。
+- 条件权限变更需重新评估用户权限。
+
+### 2.7 字段级权限控制
+
+- 支持字段级别的细粒度权限控制。
+- 支持敏感字段的权限保护。
+- 支持动态字段权限配置。
+- 字段权限变更需重新构建用户能力。
+
+---
+
+## 三、接口与API设计（RESTful）
+
+- `POST /api/permissions`：创建权限
+- `GET /api/permissions/{id}`：查询权限详情
+- `PUT /api/permissions/{id}`：更新权限信息
+- `PATCH /api/permissions/{id}/status`：变更权限状态（激活/禁用）
+- `DELETE /api/permissions/{id}`：软删除权限
+- `POST /api/permissions/{id}/restore`：恢复权限
+- `GET /api/permissions`：分页查询权限列表
+- `GET /api/permissions/tree`：查询权限树结构
+- `POST /api/roles/{roleId}/permissions`：为角色分配权限
+- `DELETE /api/roles/{roleId}/permissions/{permissionId}`：移除角色权限
+- `POST /api/permissions/{id}/conditions`：设置权限条件
+- `DELETE /api/permissions/{id}/conditions`：移除权限条件
+- `POST /api/permissions/{id}/fields`：设置字段权限
+- `DELETE /api/permissions/{id}/fields`：移除字段权限
+- `POST /api/permissions/check`：权限校验接口
+- `GET /api/users/{userId}/abilities`：获取用户能力列表
+- `POST /api/permissions/filter`：权限数据过滤接口
+
+> **接口实现要求：**
+> - 所有与权限相关的API请求，均需携带或自动注入租户ID，后端服务需基于租户ID进行数据过滤和权限校验，防止数据越权访问，实现软隔离。
+
+---
+
+## 四、安全与合规
+
+### 4.1 权限安全
+
+- 权限分配需验证操作者权限。
+- 系统预置权限受保护，不可删除。
+- 权限分配变更需二次确认。
+- 权限分配操作需记录安全审计日志。
+
+### 4.2 权限隔离
+
+- 权限严格按租户隔离。
+- 防止跨租户权限泄露。
+- 权限树结构需验证租户边界。
+- 权限冲突解决机制。
+
+### 4.3 数据保护
+
+- 权限敏感信息加密存储。
+- 支持权限数据导出和删除（GDPR合规）。
+- 审计日志保留期限：7年。
+- 数据备份和恢复机制。
+
+---
+
+## 五、审计与合规
+
+- 所有权限相关操作（创建、修改、状态变更、删除、恢复、分配等）均需记录详细审计日志，包含操作人、时间、变更内容等。
+- 审计日志需支持追溯和合规导出。
+- **审计日志中需包含租户ID字段，便于多租户环境下的合规追溯和隔离分析。**
+
+---
+
+## 六、示意图（Mermaid）
+
+### 6.1 权限实体关系图
+
+```mermaid
+graph TD
+    A[Permission] --> B[Tenant]
+    A --> C[Resource]
+    A --> D[Parent Permission]
+    A --> E[Child Permission]
+    A --> F[Role]
+    F --> G[User]
+    B --> H[Tenant Admin]
+
+    classDef permission fill:#e3f2fd,stroke:#1565c0,stroke-width:2px
+    classDef tenant fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px
+    classDef resource fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px
+    classDef role fill:#fff3e0,stroke:#ef6c00,stroke-width:2px
+
+    class A,D,E permission
+    class B,H tenant
+    class C resource
+    class F,G role
+```
+
+### 6.2 权限状态转换图
+
+```mermaid
+stateDiagram-v2
+    [*] --> ACTIVE: 权限创建
+    ACTIVE --> SUSPENDED: 管理员禁用
+    SUSPENDED --> ACTIVE: 管理员激活
+    ACTIVE --> DELETED: 软删除
+    DELETED --> SUSPENDED: 恢复权限
+    DELETED --> [*]: 硬删除
+
+    note right of ACTIVE: 正常使用状态
+    note right of SUSPENDED: 禁用状态
+    note right of DELETED: 已删除状态
+```
+
+### 6.3 权限校验流程图
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant P as Permission Service
+    participant C as CASL Checker
+    participant A as Ability Builder
+    participant DB as Database
+
+    U->>P: 请求操作
+    P->>A: 构建用户能力
+    A->>DB: 获取用户权限
+    DB-->>A: 返回权限数据
+    A-->>P: 返回用户能力
+    P->>C: 校验权限
+    C->>C: 检查操作权限
+    C->>C: 检查条件权限
+    C->>C: 检查字段权限
+    C-->>P: 返回校验结果
+    P-->>U: 返回操作结果
+```
+
+### 6.4 条件权限示例图
+
+```mermaid
+graph TD
+    A[用户请求] --> B{检查基础权限}
+    B -->|通过| C{检查条件权限}
+    B -->|失败| D[拒绝访问]
+    C -->|时间条件| E{检查时间范围}
+    C -->|数据条件| F{检查数据范围}
+    C -->|逻辑条件| G{检查逻辑表达式}
+    E -->|通过| H[允许访问]
+    E -->|失败| D
+    F -->|通过| H
+    F -->|失败| D
+    G -->|通过| H
+    G -->|失败| D
+```
+
+---
+
+## 七、扩展性考虑
+
+### 7.1 多租户隔离
+
+- 所有权限操作必须基于租户ID进行过滤。
+- 权限数据在数据库层面通过租户ID进行分区。
+- 缓存策略需考虑租户隔离。
+
+### 7.2 性能优化
+
+- 权限查询支持分页和搜索。
+- 权限树结构缓存。
+- 权限分配关系缓存。
+
+### 7.3 集成能力
+
+- 支持RBAC/ABAC模型扩展。
+- 支持第三方权限同步（如LDAP、OAuth2.0）。
+- 支持Webhook权限变更通知。
+
+---
+
+## 八、监控与运维
+
+### 8.1 关键指标
+
+- 权限创建成功率
+- 权限分配成功率
+- 权限变更频率
+- 权限冲突率
+- 系统预置权限使用率
+
+### 8.2 告警机制
+
+- 异常权限操作告警
+- 批量权限变更告警
+- 权限冲突告警
+- 安全事件告警
+
+### 8.3 运维工具
+
+- 权限数据导入导出
+- 批量权限操作
+- 权限分配分析
+- 审计日志分析
+
+---
+
+## 九、最佳实践
+
+- 权限设计应遵循最小权限原则。
+- 权限命名应规范、易于理解和维护。
+- 权限变更需有审批和审计流程。
+- 定期审查和清理无用权限。
+- 预置权限应只读保护，防止误操作。
+
+---
+
+## 十、技术实现要点
+
+### 10.1 CASL权限管理集成
+
+#### 10.1.1 CASL核心概念
+- **Ability**: 定义用户的能力，包含操作、资源、条件
+- **Action**: 操作类型（create、read、update、delete、manage）
+- **Subject**: 操作对象（User、Role、Permission等）
+- **Conditions**: 权限条件，支持复杂逻辑表达式
+- **Fields**: 字段级权限控制
+
+#### 10.1.2 权限能力定义
+```typescript
+// 用户权限能力定义
+interface UserAbility {
+  action: 'create' | 'read' | 'update' | 'delete' | 'manage';
+  subject: 'User' | 'Role' | 'Permission' | 'Tenant';
+  conditions?: Record<string, any>;
+  fields?: string[];
+  inverted?: boolean;
+}
+
+// CASL能力构建器
+class PermissionAbilityBuilder {
+  static buildForUser(user: User, tenantId: string): Ability;
+  static buildForRole(role: Role, tenantId: string): Ability;
+  static buildForPermission(permission: Permission): Ability;
+}
+```
+
+#### 10.1.3 权限校验服务
+```typescript
+class PermissionCheckService {
+  // 检查用户是否有指定权限
+  static can(user: User, action: string, subject: any, field?: string): boolean;
+  
+  // 检查用户是否有指定条件权限
+  static canWithConditions(user: User, action: string, subject: any, conditions: any): boolean;
+  
+  // 获取用户所有权限
+  static getAbilities(user: User): Ability[];
+  
+  // 过滤用户可访问的数据
+  static filterData(user: User, data: any[], action: string): any[];
+}
+```
+
+#### 10.1.4 权限装饰器
+```typescript
+// 方法级权限装饰器
+@RequirePermission('read', 'User')
+async getUser(id: string): Promise<User> { }
+
+// 字段级权限装饰器
+@RequireFieldPermission('email')
+async getUserEmail(id: string): Promise<string> { }
+
+// 条件权限装饰器
+@RequireConditionalPermission('update', 'User', 'owner')
+async updateUser(id: string, data: any): Promise<void> { }
+```
+
+#### 10.1.5 权限中间件
+```typescript
+// 权限校验中间件
+class PermissionMiddleware {
+  static checkPermission(action: string, subject: string): RequestHandler;
+  static checkFieldPermission(fields: string[]): RequestHandler;
+  static checkConditionalPermission(conditions: any): RequestHandler;
+}
+```
+
+### 10.2 领域事件设计
+
+- `PermissionCreatedEvent`：权限创建事件
+- `PermissionActivatedEvent`：权限激活事件
+- `PermissionSuspendedEvent`：权限禁用事件
+- `PermissionDeletedEvent`：权限删除事件
+- `PermissionRestoredEvent`：权限恢复事件
+- `PermissionInfoUpdatedEvent`：权限信息更新事件
+- `PermissionAssignedToRoleEvent`：权限分配到角色事件
+- `PermissionRemovedFromRoleEvent`：权限从角色移除事件
+
+### 10.2 值对象设计
+
+- `PermissionName`：权限名称值对象
+- `PermissionCode`：权限代码值对象
+- `PermissionTypeValue`：权限类型值对象
+- `PermissionStatusValue`：权限状态值对象
+
+### 10.3 仓储接口设计
+
+```typescript
+abstract class PermissionRepository {
+  abstract findById(id: string, tenantId: string): Promise<Permission | null>;
+  abstract findByCode(code: string, tenantId: string): Promise<Permission | null>;
+  abstract findByName(name: string, tenantId: string): Promise<Permission | null>;
+  abstract findByTenant(tenantId: string): Promise<Permission[]>;
+  abstract findByRole(roleId: string, tenantId: string): Promise<Permission[]>;
+  abstract findByType(type: string, tenantId: string): Promise<Permission[]>;
+  abstract findTree(tenantId: string): Promise<Permission[]>;
+  abstract save(permission: Permission): Promise<void>;
+  abstract delete(id: string, tenantId: string): Promise<void>;
+  abstract exists(id: string, tenantId: string): Promise<boolean>;
+  abstract countByTenant(tenantId: string): Promise<number>;
+}
+```
+
+### 10.4 应用服务设计
+
+```typescript
+class PermissionService {
+  async createPermission(createPermissionDto: CreatePermissionDto): Promise<Permission>;
+  async updatePermission(id: string, updatePermissionDto: UpdatePermissionDto): Promise<Permission>;
+  async activatePermission(id: string): Promise<void>;
+  async suspendPermission(id: string): Promise<void>;
+  async deletePermission(id: string): Promise<void>;
+  async restorePermission(id: string): Promise<void>;
+  async assignToRole(permissionId: string, roleId: string): Promise<void>;
+  async removeFromRole(permissionId: string, roleId: string): Promise<void>;
+}
+```
+
+---
+
+## 十一、测试策略
+
+- 权限实体业务逻辑测试
+- 值对象验证测试
+- 领域事件测试
+- 仓储接口测试
+- 权限分配与回收流程测试
+- 多租户隔离测试
+- 性能压力测试
+
+---
+
+## 十二、部署与运维
+
+- 权限数据定期备份
+- 权限配置版本管理
+- 权限数据恢复流程
+- 灾难恢复预案
+
+---
+
+## 十三、总结
+
+权限管理子领域是IAM系统的基础组件，承担着系统安全边界的核心职责。通过集成CASL权限管理库，实现了：
+
+### 13.1 CASL集成优势
+- **声明式权限**：通过简洁的声明定义复杂权限规则
+- **条件权限**：支持基于时间、数据范围、逻辑表达式的动态权限
+- **字段级权限**：实现细粒度的数据访问控制
+- **性能优化**：CASL的高效权限校验算法
+- **类型安全**：TypeScript原生支持，编译时权限检查
+
+### 13.2 技术特点
+- 严格的多租户隔离机制
+- 完善的审计和合规功能
+- 灵活的权限扩展能力
+- 高性能的权限校验
+- 支持复杂业务场景的权限需求
+
+### 13.3 应用场景
+- **企业级应用**：支持复杂的组织架构和权限层级
+- **SaaS平台**：多租户环境下的权限隔离
+- **微服务架构**：分布式系统的权限管理
+- **实时权限**：动态权限变更和实时生效
+
+本设计文档为权限管理子领域的开发提供了全面的指导，涵盖了从领域建模到技术实现的各个方面，特别是CASL权限管理库的深度集成，为后续的开发工作奠定了坚实的基础。

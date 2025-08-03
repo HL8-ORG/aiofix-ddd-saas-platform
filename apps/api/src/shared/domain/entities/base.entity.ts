@@ -19,7 +19,7 @@ export abstract class BaseEntity {
    * @property id
    * @description 实体主键，使用UUID格式
    */
-  @IsUUID()
+  @IsUUID('4', { message: 'ID必须是有效的UUID v4格式' })
   @Expose()
   id: string;
 

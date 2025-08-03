@@ -11,12 +11,15 @@
     "test": "turbo run test",
     "test:e2e": "turbo run test:e2e",
     "lint": "turbo run lint",
-    "clean": "git clean -xdf node_modules",
     "libs:fix": "pnpm dlx sherif@latest --fix",
     "preinstall": "husky install",
     "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
     "docs": "cd ./tools/docs && mintlify dev",
-    "setup-env": "./scripts/setup-env.sh"
+    "setup-env": "./scripts/setup-env.sh",
+    "check": "biome check",
+    "check:errors": "biome check --diagnostic-level=error",
+    "clean": "rimraf dist node_modules",
+    "typecheck": "tsc --noEmit"
   },
   "config": {
     "commitizen": {
@@ -37,6 +40,7 @@
     "cz-customizable": "^7.4.0",
     "husky": "^8.0.3",
     "turbo": "^2.5.5",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "rimraf": "^6.0.1"
   }
 }
