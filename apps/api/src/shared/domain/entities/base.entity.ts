@@ -1,12 +1,12 @@
-import { IsDate, IsOptional, IsUUID } from 'class-validator';
-import { Expose, Transform } from 'class-transformer';
+import { Expose, Transform } from 'class-transformer'
+import { IsDate, IsOptional, IsUUID } from 'class-validator'
 
 /**
  * @abstract class BaseEntity
  * @description
  * 基础实体类，为所有领域实体提供通用属性和方法。
  * 这是一个纯领域对象，不包含任何ORM装饰器或数据库依赖。
- * 
+ *
  * 主要原理与机制：
  * 1. 使用class-validator装饰器进行数据校验，确保数据完整性
  * 2. 使用class-transformer装饰器控制序列化安全性
@@ -21,7 +21,7 @@ export abstract class BaseEntity {
    */
   @IsUUID('4', { message: 'ID必须是有效的UUID v4格式' })
   @Expose()
-  id: string;
+  id: string
 
   /**
    * @property createdAt
@@ -29,8 +29,8 @@ export abstract class BaseEntity {
    */
   @IsDate()
   @Expose()
-  @Transform(({ value }) => value instanceof Date ? value : new Date(value))
-  createdAt: Date;
+  @Transform(({ value }) => (value instanceof Date ? value : new Date(value)))
+  createdAt: Date
 
   /**
    * @property updatedAt
@@ -38,8 +38,8 @@ export abstract class BaseEntity {
    */
   @IsDate()
   @Expose()
-  @Transform(({ value }) => value instanceof Date ? value : new Date(value))
-  updatedAt: Date;
+  @Transform(({ value }) => (value instanceof Date ? value : new Date(value)))
+  updatedAt: Date
 
   /**
    * @property deletedAt
@@ -48,8 +48,10 @@ export abstract class BaseEntity {
   @IsOptional()
   @IsDate()
   @Expose()
-  @Transform(({ value }) => value ? (value instanceof Date ? value : new Date(value)) : undefined)
-  deletedAt?: Date;
+  @Transform(({ value }) =>
+    value ? (value instanceof Date ? value : new Date(value)) : undefined,
+  )
+  deletedAt?: Date
 
   /**
    * @method isDeleted
@@ -57,7 +59,7 @@ export abstract class BaseEntity {
    * @returns {boolean} 如果已删除返回true，否则返回false
    */
   isDeleted(): boolean {
-    return this.deletedAt !== null && this.deletedAt !== undefined;
+    return this.deletedAt !== null && this.deletedAt !== undefined
   }
 
   /**
@@ -65,7 +67,7 @@ export abstract class BaseEntity {
    * @description 软删除实体，设置删除时间但不物理删除数据
    */
   softDelete(): void {
-    this.deletedAt = new Date();
+    this.deletedAt = new Date()
   }
 
   /**
@@ -73,7 +75,7 @@ export abstract class BaseEntity {
    * @description 恢复软删除的实体，清除删除时间
    */
   restore(): void {
-    this.deletedAt = undefined;
+    this.deletedAt = undefined
   }
 
   /**
@@ -81,6 +83,6 @@ export abstract class BaseEntity {
    * @description 更新实体的时间戳
    */
   updateTimestamp(): void {
-    this.updatedAt = new Date();
+    this.updatedAt = new Date()
   }
 }

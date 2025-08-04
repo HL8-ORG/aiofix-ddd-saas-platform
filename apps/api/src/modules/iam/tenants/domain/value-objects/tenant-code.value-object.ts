@@ -1,13 +1,22 @@
-import { IsNotEmpty, IsString, MaxLength, MinLength, Matches } from 'class-validator';
-import { Expose } from 'class-transformer';
-import { normalizeIdentifier, validateIdentifier } from '../../../../../shared/domain/utils/identifier.util';
+import { Expose } from 'class-transformer'
+import {
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator'
+import {
+  normalizeIdentifier,
+  validateIdentifier,
+} from '../../../../../shared/domain/utils/identifier.util'
 
 /**
  * @class TenantCode
  * @description
  * 租户编码值对象，封装租户编码的业务规则和约束。
  * 使用shared层的identifier.util工具进行标准化和校验。
- * 
+ *
  * 主要原理与机制：
  * 1. 值对象是不可变的，一旦创建就不能修改
  * 2. 通过构造函数确保数据的有效性
@@ -24,9 +33,11 @@ export class TenantCode {
   @IsString({ message: '租户编码必须是字符串' })
   @MinLength(3, { message: '租户编码至少3个字符' })
   @MaxLength(50, { message: '租户编码不能超过50个字符' })
-  @Matches(/^[a-z0-9_-]+$/, { message: '租户编码只能包含小写字母、数字、下划线和连字符' })
+  @Matches(/^[a-z0-9_-]+$/, {
+    message: '租户编码只能包含小写字母、数字、下划线和连字符',
+  })
   @Expose()
-  private readonly _value: string;
+  private readonly _value: string
 
   /**
    * @constructor
@@ -36,13 +47,13 @@ export class TenantCode {
    */
   constructor(value: string) {
     // 使用shared层的工具进行标准化和校验
-    this._value = normalizeIdentifier(value);
+    this._value = normalizeIdentifier(value)
     validateIdentifier(this._value, {
       minLength: 3,
       maxLength: 50,
       allowConsecutiveHyphens: false, // 不允许连续连字符
-      errorPrefix: '租户编码'
-    });
+      errorPrefix: '租户编码',
+    })
   }
 
   /**
@@ -51,7 +62,7 @@ export class TenantCode {
    * @returns {string} 租户编码
    */
   get value(): string {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -60,7 +71,7 @@ export class TenantCode {
    * @returns {string} 租户编码
    */
   toString(): string {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -70,8 +81,8 @@ export class TenantCode {
    * @returns {boolean} 如果相等返回true，否则返回false
    */
   equals(other: TenantCode): boolean {
-    if (!other) return false;
-    return this._value === other._value;
+    if (!other) return false
+    return this._value === other._value
   }
 
   /**
@@ -80,7 +91,7 @@ export class TenantCode {
    * @returns {string} 大写的租户编码
    */
   toUpperCase(): string {
-    return this._value.toUpperCase();
+    return this._value.toUpperCase()
   }
 
   /**
@@ -89,7 +100,7 @@ export class TenantCode {
    * @returns {string} 小写的租户编码
    */
   toLowerCase(): string {
-    return this._value.toLowerCase();
+    return this._value.toLowerCase()
   }
 
   /**
@@ -98,6 +109,6 @@ export class TenantCode {
    * @returns {string} URL友好的编码格式
    */
   toSlug(): string {
-    return this._value.replace(/_/g, '-');
+    return this._value.replace(/_/g, '-')
   }
-} 
+}

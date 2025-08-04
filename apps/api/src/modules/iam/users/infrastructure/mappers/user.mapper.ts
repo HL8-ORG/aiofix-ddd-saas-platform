@@ -1,15 +1,18 @@
-import { User } from '../../domain/entities/user.entity';
-import { UserOrmEntity } from '../entities/user.orm.entity';
-import { UserStatusValue, UserStatus } from '../../domain/value-objects/user-status.value-object';
-import { Username } from '../../domain/value-objects/username.value-object';
-import { Email } from '../../domain/value-objects/email.value-object';
-import { Phone } from '../../domain/value-objects/phone.value-object';
+import { User } from '../../domain/entities/user.entity'
+import { Email } from '../../domain/value-objects/email.value-object'
+import { Phone } from '../../domain/value-objects/phone.value-object'
+import {
+  type UserStatus,
+  UserStatusValue,
+} from '../../domain/value-objects/user-status.value-object'
+import { Username } from '../../domain/value-objects/username.value-object'
+import { UserOrmEntity } from '../entities/user.orm.entity'
 
 /**
  * @class UserMapper
  * @description
  * 用户映射器，专门负责领域实体与数据库实体之间的转换。
- * 
+ *
  * 主要原理与机制：
  * 1. 遵循单一职责原则，只负责映射转换
  * 2. 处理值对象的序列化和反序列化
@@ -40,35 +43,35 @@ export class UserMapper {
       ormEntity.avatar,
       ormEntity.organizationIds,
       ormEntity.roleIds,
-      ormEntity.preferences
-    );
+      ormEntity.preferences,
+    )
 
     // 设置状态
-    user.status = new UserStatusValue(ormEntity.status as UserStatus);
+    user.status = new UserStatusValue(ormEntity.status as UserStatus)
 
     // 设置时间戳
-    user.createdAt = ormEntity.createdAt;
-    user.updatedAt = ormEntity.updatedAt;
+    user.createdAt = ormEntity.createdAt
+    user.updatedAt = ormEntity.updatedAt
     if (ormEntity.deletedAt) {
-      user.deletedAt = ormEntity.deletedAt;
+      user.deletedAt = ormEntity.deletedAt
     }
 
     // 设置其他字段
     if (ormEntity.lastLoginAt) {
-      user.lastLoginAt = ormEntity.lastLoginAt;
+      user.lastLoginAt = ormEntity.lastLoginAt
     }
-    user.loginAttempts = ormEntity.loginAttempts;
+    user.loginAttempts = ormEntity.loginAttempts
     if (ormEntity.lockedUntil) {
-      user.lockedUntil = ormEntity.lockedUntil;
+      user.lockedUntil = ormEntity.lockedUntil
     }
-    user.emailVerified = ormEntity.emailVerified;
-    user.phoneVerified = ormEntity.phoneVerified;
-    user.twoFactorEnabled = ormEntity.twoFactorEnabled;
+    user.emailVerified = ormEntity.emailVerified
+    user.phoneVerified = ormEntity.phoneVerified
+    user.twoFactorEnabled = ormEntity.twoFactorEnabled
     if (ormEntity.twoFactorSecret) {
-      user.twoFactorSecret = ormEntity.twoFactorSecret;
+      user.twoFactorSecret = ormEntity.twoFactorSecret
     }
 
-    return user;
+    return user
   }
 
   /**
@@ -78,35 +81,35 @@ export class UserMapper {
    * @returns {UserOrmEntity} 数据库实体
    */
   static toOrm(user: User): UserOrmEntity {
-    const ormEntity = new UserOrmEntity();
+    const ormEntity = new UserOrmEntity()
 
-    ormEntity.id = user.id;
-    ormEntity.username = user.getUsername();
-    ormEntity.email = user.getEmail();
-    ormEntity.firstName = user.firstName;
-    ormEntity.lastName = user.lastName;
-    ormEntity.tenantId = user.tenantId;
-    ormEntity.adminUserId = user.adminUserId;
-    ormEntity.passwordHash = user.passwordHash;
-    ormEntity.phone = user.getPhone();
-    ormEntity.displayName = user.displayName;
-    ormEntity.avatar = user.avatar;
-    ormEntity.status = user.getStatus();
-    ormEntity.organizationIds = user.organizationIds;
-    ormEntity.roleIds = user.roleIds;
-    ormEntity.lastLoginAt = user.lastLoginAt;
-    ormEntity.loginAttempts = user.loginAttempts;
-    ormEntity.lockedUntil = user.lockedUntil;
-    ormEntity.emailVerified = user.emailVerified;
-    ormEntity.phoneVerified = user.phoneVerified;
-    ormEntity.twoFactorEnabled = user.twoFactorEnabled;
-    ormEntity.twoFactorSecret = user.twoFactorSecret;
-    ormEntity.preferences = user.preferences;
-    ormEntity.createdAt = user.createdAt;
-    ormEntity.updatedAt = user.updatedAt;
-    ormEntity.deletedAt = user.deletedAt;
+    ormEntity.id = user.id
+    ormEntity.username = user.getUsername()
+    ormEntity.email = user.getEmail()
+    ormEntity.firstName = user.firstName
+    ormEntity.lastName = user.lastName
+    ormEntity.tenantId = user.tenantId
+    ormEntity.adminUserId = user.adminUserId
+    ormEntity.passwordHash = user.passwordHash
+    ormEntity.phone = user.getPhone()
+    ormEntity.displayName = user.displayName
+    ormEntity.avatar = user.avatar
+    ormEntity.status = user.getStatus()
+    ormEntity.organizationIds = user.organizationIds
+    ormEntity.roleIds = user.roleIds
+    ormEntity.lastLoginAt = user.lastLoginAt
+    ormEntity.loginAttempts = user.loginAttempts
+    ormEntity.lockedUntil = user.lockedUntil
+    ormEntity.emailVerified = user.emailVerified
+    ormEntity.phoneVerified = user.phoneVerified
+    ormEntity.twoFactorEnabled = user.twoFactorEnabled
+    ormEntity.twoFactorSecret = user.twoFactorSecret
+    ormEntity.preferences = user.preferences
+    ormEntity.createdAt = user.createdAt
+    ormEntity.updatedAt = user.updatedAt
+    ormEntity.deletedAt = user.deletedAt
 
-    return ormEntity;
+    return ormEntity
   }
 
   /**
@@ -116,26 +119,26 @@ export class UserMapper {
    * @param user 领域实体
    */
   static updateOrm(ormEntity: UserOrmEntity, user: User): void {
-    ormEntity.username = user.getUsername();
-    ormEntity.email = user.getEmail();
-    ormEntity.firstName = user.firstName;
-    ormEntity.lastName = user.lastName;
-    ormEntity.phone = user.getPhone();
-    ormEntity.displayName = user.displayName;
-    ormEntity.avatar = user.avatar;
-    ormEntity.status = user.getStatus();
-    ormEntity.organizationIds = user.organizationIds;
-    ormEntity.roleIds = user.roleIds;
-    ormEntity.lastLoginAt = user.lastLoginAt;
-    ormEntity.loginAttempts = user.loginAttempts;
-    ormEntity.lockedUntil = user.lockedUntil;
-    ormEntity.emailVerified = user.emailVerified;
-    ormEntity.phoneVerified = user.phoneVerified;
-    ormEntity.twoFactorEnabled = user.twoFactorEnabled;
-    ormEntity.twoFactorSecret = user.twoFactorSecret;
-    ormEntity.preferences = user.preferences;
-    ormEntity.updatedAt = user.updatedAt;
-    ormEntity.deletedAt = user.deletedAt;
+    ormEntity.username = user.getUsername()
+    ormEntity.email = user.getEmail()
+    ormEntity.firstName = user.firstName
+    ormEntity.lastName = user.lastName
+    ormEntity.phone = user.getPhone()
+    ormEntity.displayName = user.displayName
+    ormEntity.avatar = user.avatar
+    ormEntity.status = user.getStatus()
+    ormEntity.organizationIds = user.organizationIds
+    ormEntity.roleIds = user.roleIds
+    ormEntity.lastLoginAt = user.lastLoginAt
+    ormEntity.loginAttempts = user.loginAttempts
+    ormEntity.lockedUntil = user.lockedUntil
+    ormEntity.emailVerified = user.emailVerified
+    ormEntity.phoneVerified = user.phoneVerified
+    ormEntity.twoFactorEnabled = user.twoFactorEnabled
+    ormEntity.twoFactorSecret = user.twoFactorSecret
+    ormEntity.preferences = user.preferences
+    ormEntity.updatedAt = user.updatedAt
+    ormEntity.deletedAt = user.deletedAt
   }
 
   /**
@@ -145,7 +148,7 @@ export class UserMapper {
    * @returns {User[]} 领域实体列表
    */
   static toDomainList(ormEntities: UserOrmEntity[]): User[] {
-    return ormEntities.map(ormEntity => this.toDomain(ormEntity));
+    return ormEntities.map((ormEntity) => this.toDomain(ormEntity))
   }
 
   /**
@@ -155,7 +158,7 @@ export class UserMapper {
    * @returns {UserOrmEntity[]} 数据库实体列表
    */
   static toOrmList(users: User[]): UserOrmEntity[] {
-    return users.map(user => this.toOrm(user));
+    return users.map((user) => this.toOrm(user))
   }
 
   /**
@@ -186,7 +189,7 @@ export class UserMapper {
       preferences: user.preferences,
       updatedAt: user.updatedAt,
       deletedAt: user.deletedAt,
-    };
+    }
   }
 
   /**
@@ -208,7 +211,7 @@ export class UserMapper {
       ormEntity.status &&
       ormEntity.createdAt &&
       ormEntity.updatedAt
-    );
+    )
   }
 
   /**
@@ -231,10 +234,10 @@ export class UserMapper {
         user.getStatus() &&
         user.createdAt &&
         user.updatedAt
-      );
+      )
     } catch (error) {
       // 如果验证过程中抛出异常，说明实体无效
-      return false;
+      return false
     }
   }
-} 
+}

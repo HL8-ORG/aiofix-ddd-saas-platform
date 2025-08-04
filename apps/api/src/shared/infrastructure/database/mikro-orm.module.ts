@@ -1,22 +1,22 @@
-import { Module } from '@nestjs/common';
-import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MigrationService } from './migration.service';
-import { DatabaseHealthCheckService } from './health-check.service';
-import config from '../config/mikro-orm.config';
+import { MikroOrmModule } from '@mikro-orm/nestjs'
+import { Module } from '@nestjs/common'
+import { ConfigModule, ConfigService } from '@nestjs/config'
+import config from '../config/mikro-orm.config'
+import { DatabaseHealthCheckService } from './health-check.service'
+import { MigrationService } from './migration.service'
 
 /**
  * @description MikroORM基础设施模块
- * 
+ *
  * 该模块提供数据库连接和ORM功能，为所有业务模块提供数据持久化能力。
- * 
+ *
  * 主要功能：
  * 1. 数据库连接管理
  * 2. 实体发现和注册
  * 3. 事务管理
  * 4. 连接池配置
  * 5. 迁移和种子数据支持
- * 
+ *
  * 使用方式：
  * 1. 在业务模块中导入此模块
  * 2. 通过依赖注入使用EntityManager
@@ -62,4 +62,4 @@ import config from '../config/mikro-orm.config';
   providers: [MigrationService, DatabaseHealthCheckService],
   exports: [MigrationService, DatabaseHealthCheckService],
 })
-export class DatabaseModule { } 
+export class DatabaseModule {}

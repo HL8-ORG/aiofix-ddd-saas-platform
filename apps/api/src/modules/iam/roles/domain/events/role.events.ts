@@ -1,10 +1,10 @@
-import { Role } from '../entities/role.entity';
+import type { Role } from '../entities/role.entity'
 
 /**
  * @abstract RoleDomainEvent
  * @description
  * 角色领域事件抽象基类，定义角色相关领域事件的通用结构。
- * 
+ *
  * 主要原理与机制：
  * 1. 提供角色领域事件的统一接口
  * 2. 包含事件发生时间和角色信息
@@ -16,37 +16,37 @@ export abstract class RoleDomainEvent {
    * @property eventId
    * @description 事件唯一标识
    */
-  readonly eventId: string;
+  readonly eventId: string
 
   /**
    * @property eventType
    * @description 事件类型
    */
-  readonly eventType: string;
+  readonly eventType: string
 
   /**
    * @property occurredOn
    * @description 事件发生时间
    */
-  readonly occurredOn: Date;
+  readonly occurredOn: Date
 
   /**
    * @property roleId
    * @description 角色ID
    */
-  readonly roleId: string;
+  readonly roleId: string
 
   /**
    * @property tenantId
    * @description 租户ID
    */
-  readonly tenantId: string;
+  readonly tenantId: string
 
   /**
    * @property roleData
    * @description 角色数据快照
    */
-  readonly roleData: any;
+  readonly roleData: any
 
   /**
    * @constructor
@@ -54,11 +54,11 @@ export abstract class RoleDomainEvent {
    * @param role 角色实体
    */
   constructor(role: Role) {
-    this.eventId = `${role.id}_${Date.now()}`;
-    this.eventType = this.constructor.name;
-    this.occurredOn = new Date();
-    this.roleId = role.id;
-    this.tenantId = role.tenantId;
+    this.eventId = `${role.id}_${Date.now()}`
+    this.eventType = this.constructor.name
+    this.occurredOn = new Date()
+    this.roleId = role.id
+    this.tenantId = role.tenantId
     this.roleData = {
       id: role.id,
       name: role.getName(),
@@ -80,7 +80,7 @@ export abstract class RoleDomainEvent {
       createdAt: role.createdAt,
       updatedAt: role.updatedAt,
       deletedAt: role.deletedAt,
-    };
+    }
   }
 
   /**
@@ -96,7 +96,7 @@ export abstract class RoleDomainEvent {
       roleId: this.roleId,
       tenantId: this.tenantId,
       roleData: this.roleData,
-    };
+    }
   }
 }
 
@@ -106,7 +106,7 @@ export abstract class RoleDomainEvent {
  */
 export class RoleCreatedEvent extends RoleDomainEvent {
   constructor(role: Role) {
-    super(role);
+    super(role)
   }
 }
 
@@ -116,7 +116,7 @@ export class RoleCreatedEvent extends RoleDomainEvent {
  */
 export class RoleActivatedEvent extends RoleDomainEvent {
   constructor(role: Role) {
-    super(role);
+    super(role)
   }
 }
 
@@ -126,7 +126,7 @@ export class RoleActivatedEvent extends RoleDomainEvent {
  */
 export class RoleSuspendedEvent extends RoleDomainEvent {
   constructor(role: Role) {
-    super(role);
+    super(role)
   }
 }
 
@@ -136,7 +136,7 @@ export class RoleSuspendedEvent extends RoleDomainEvent {
  */
 export class RoleDeletedEvent extends RoleDomainEvent {
   constructor(role: Role) {
-    super(role);
+    super(role)
   }
 }
 
@@ -146,7 +146,7 @@ export class RoleDeletedEvent extends RoleDomainEvent {
  */
 export class RoleRestoredEvent extends RoleDomainEvent {
   constructor(role: Role) {
-    super(role);
+    super(role)
   }
 }
 
@@ -160,31 +160,41 @@ export class RoleInfoUpdatedEvent extends RoleDomainEvent {
    * @description 更新前的角色信息
    */
   readonly oldInfo: {
-    name: string;
-    code: string;
-    description?: string;
-    priority: number;
-  };
+    name: string
+    code: string
+    description?: string
+    priority: number
+  }
 
   /**
    * @property newInfo
    * @description 更新后的角色信息
    */
   readonly newInfo: {
-    name: string;
-    code: string;
-    description?: string;
-    priority: number;
-  };
+    name: string
+    code: string
+    description?: string
+    priority: number
+  }
 
   constructor(
     role: Role,
-    oldInfo: { name: string; code: string; description?: string; priority: number },
-    newInfo: { name: string; code: string; description?: string; priority: number }
+    oldInfo: {
+      name: string
+      code: string
+      description?: string
+      priority: number
+    },
+    newInfo: {
+      name: string
+      code: string
+      description?: string
+      priority: number
+    },
   ) {
-    super(role);
-    this.oldInfo = oldInfo;
-    this.newInfo = newInfo;
+    super(role)
+    this.oldInfo = oldInfo
+    this.newInfo = newInfo
   }
 
   toJSON(): object {
@@ -192,7 +202,7 @@ export class RoleInfoUpdatedEvent extends RoleDomainEvent {
       ...super.toJSON(),
       oldInfo: this.oldInfo,
       newInfo: this.newInfo,
-    };
+    }
   }
 }
 
@@ -205,18 +215,18 @@ export class RolePermissionAssignedEvent extends RoleDomainEvent {
    * @property permissionId
    * @description 分配的权限ID
    */
-  readonly permissionId: string;
+  readonly permissionId: string
 
   constructor(role: Role, permissionId: string) {
-    super(role);
-    this.permissionId = permissionId;
+    super(role)
+    this.permissionId = permissionId
   }
 
   toJSON(): object {
     return {
       ...super.toJSON(),
       permissionId: this.permissionId,
-    };
+    }
   }
 }
 
@@ -229,18 +239,18 @@ export class RolePermissionRemovedEvent extends RoleDomainEvent {
    * @property permissionId
    * @description 移除的权限ID
    */
-  readonly permissionId: string;
+  readonly permissionId: string
 
   constructor(role: Role, permissionId: string) {
-    super(role);
-    this.permissionId = permissionId;
+    super(role)
+    this.permissionId = permissionId
   }
 
   toJSON(): object {
     return {
       ...super.toJSON(),
       permissionId: this.permissionId,
-    };
+    }
   }
 }
 
@@ -253,18 +263,18 @@ export class RoleUserAssignedEvent extends RoleDomainEvent {
    * @property userId
    * @description 分配的用户ID
    */
-  readonly userId: string;
+  readonly userId: string
 
   constructor(role: Role, userId: string) {
-    super(role);
-    this.userId = userId;
+    super(role)
+    this.userId = userId
   }
 
   toJSON(): object {
     return {
       ...super.toJSON(),
       userId: this.userId,
-    };
+    }
   }
 }
 
@@ -277,18 +287,18 @@ export class RoleUserRemovedEvent extends RoleDomainEvent {
    * @property userId
    * @description 移除的用户ID
    */
-  readonly userId: string;
+  readonly userId: string
 
   constructor(role: Role, userId: string) {
-    super(role);
-    this.userId = userId;
+    super(role)
+    this.userId = userId
   }
 
   toJSON(): object {
     return {
       ...super.toJSON(),
       userId: this.userId,
-    };
+    }
   }
 }
 
@@ -301,18 +311,22 @@ export class RoleInheritanceSetEvent extends RoleDomainEvent {
    * @property oldParentRoleId
    * @description 之前的父角色ID
    */
-  readonly oldParentRoleId?: string;
+  readonly oldParentRoleId?: string
 
   /**
    * @property newParentRoleId
    * @description 新的父角色ID
    */
-  readonly newParentRoleId: string;
+  readonly newParentRoleId: string
 
-  constructor(role: Role, oldParentRoleId: string | undefined, newParentRoleId: string) {
-    super(role);
-    this.oldParentRoleId = oldParentRoleId;
-    this.newParentRoleId = newParentRoleId;
+  constructor(
+    role: Role,
+    oldParentRoleId: string | undefined,
+    newParentRoleId: string,
+  ) {
+    super(role)
+    this.oldParentRoleId = oldParentRoleId
+    this.newParentRoleId = newParentRoleId
   }
 
   toJSON(): object {
@@ -320,7 +334,7 @@ export class RoleInheritanceSetEvent extends RoleDomainEvent {
       ...super.toJSON(),
       oldParentRoleId: this.oldParentRoleId,
       newParentRoleId: this.newParentRoleId,
-    };
+    }
   }
 }
 
@@ -333,17 +347,17 @@ export class RoleInheritanceRemovedEvent extends RoleDomainEvent {
    * @property removedParentRoleId
    * @description 移除的父角色ID
    */
-  readonly removedParentRoleId: string;
+  readonly removedParentRoleId: string
 
   constructor(role: Role, removedParentRoleId: string) {
-    super(role);
-    this.removedParentRoleId = removedParentRoleId;
+    super(role)
+    this.removedParentRoleId = removedParentRoleId
   }
 
   toJSON(): object {
     return {
       ...super.toJSON(),
       removedParentRoleId: this.removedParentRoleId,
-    };
+    }
   }
-} 
+}

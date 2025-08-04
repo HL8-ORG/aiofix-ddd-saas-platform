@@ -1,11 +1,11 @@
-import { IsNumber, Min, Max } from 'class-validator';
-import { ValueObject } from '@/shared/domain/value-objects/value-object.base';
+import { ValueObject } from '@/shared/domain/value-objects/value-object.base'
+import { IsNumber, Max, Min } from 'class-validator'
 
 /**
  * @class RolePriority
  * @description
  * 角色优先级值对象，封装角色优先级的验证规则和业务逻辑。
- * 
+ *
  * 主要原理与机制：
  * 1. 继承ValueObject基类，确保值对象的不可变性
  * 2. 实现角色优先级的验证规则（数值范围、默认值等）
@@ -17,49 +17,49 @@ export class RolePriority extends ValueObject<number> {
    * @constant DEFAULT_PRIORITY
    * @description 默认优先级值
    */
-  static readonly DEFAULT_PRIORITY = 100;
+  static readonly DEFAULT_PRIORITY = 100
 
   /**
    * @constant MIN_PRIORITY
    * @description 最小优先级值
    */
-  static readonly MIN_PRIORITY = 1;
+  static readonly MIN_PRIORITY = 1
 
   /**
    * @constant MAX_PRIORITY
    * @description 最大优先级值
    */
-  static readonly MAX_PRIORITY = 1000;
+  static readonly MAX_PRIORITY = 1000
 
   /**
    * @constant SYSTEM_ADMIN_PRIORITY
    * @description 系统管理员优先级值
    */
-  static readonly SYSTEM_ADMIN_PRIORITY = 1;
+  static readonly SYSTEM_ADMIN_PRIORITY = 1
 
   /**
    * @constant TENANT_ADMIN_PRIORITY
    * @description 租户管理员优先级值
    */
-  static readonly TENANT_ADMIN_PRIORITY = 10;
+  static readonly TENANT_ADMIN_PRIORITY = 10
 
   /**
    * @constant ORG_ADMIN_PRIORITY
    * @description 组织管理员优先级值
    */
-  static readonly ORG_ADMIN_PRIORITY = 50;
+  static readonly ORG_ADMIN_PRIORITY = 50
 
   /**
    * @constant USER_PRIORITY
    * @description 普通用户优先级值
    */
-  static readonly USER_PRIORITY = 100;
+  static readonly USER_PRIORITY = 100
 
   /**
    * @constant GUEST_PRIORITY
    * @description 访客用户优先级值
    */
-  static readonly GUEST_PRIORITY = 200;
+  static readonly GUEST_PRIORITY = 200
 
   /**
    * @constructor
@@ -68,8 +68,8 @@ export class RolePriority extends ValueObject<number> {
    * @throws {Error} 当角色优先级不符合验证规则时抛出异常
    */
   constructor(priority: number) {
-    super();
-    this._value = this.validatePriority(priority);
+    super()
+    this._value = this.validatePriority(priority)
   }
 
   /**
@@ -78,7 +78,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {number} 角色优先级
    */
   getValue(): number {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -88,15 +88,15 @@ export class RolePriority extends ValueObject<number> {
    */
   getDisplayPriority(): string {
     if (this._value <= RolePriority.SYSTEM_ADMIN_PRIORITY) {
-      return '系统级';
+      return '系统级'
     } else if (this._value <= RolePriority.TENANT_ADMIN_PRIORITY) {
-      return '租户级';
+      return '租户级'
     } else if (this._value <= RolePriority.ORG_ADMIN_PRIORITY) {
-      return '组织级';
+      return '组织级'
     } else if (this._value <= RolePriority.USER_PRIORITY) {
-      return '用户级';
+      return '用户级'
     } else {
-      return '访客级';
+      return '访客级'
     }
   }
 
@@ -107,15 +107,15 @@ export class RolePriority extends ValueObject<number> {
    */
   getDescription(): string {
     if (this._value <= RolePriority.SYSTEM_ADMIN_PRIORITY) {
-      return '系统级角色，拥有最高权限，可管理所有租户';
+      return '系统级角色，拥有最高权限，可管理所有租户'
     } else if (this._value <= RolePriority.TENANT_ADMIN_PRIORITY) {
-      return '租户级角色，拥有租户内最高权限，可管理租户内所有资源';
+      return '租户级角色，拥有租户内最高权限，可管理租户内所有资源'
     } else if (this._value <= RolePriority.ORG_ADMIN_PRIORITY) {
-      return '组织级角色，拥有组织内管理权限，可管理组织内资源';
+      return '组织级角色，拥有组织内管理权限，可管理组织内资源'
     } else if (this._value <= RolePriority.USER_PRIORITY) {
-      return '用户级角色，拥有基本操作权限，可进行日常业务操作';
+      return '用户级角色，拥有基本操作权限，可进行日常业务操作'
     } else {
-      return '访客级角色，拥有只读权限，仅可查看部分信息';
+      return '访客级角色，拥有只读权限，仅可查看部分信息'
     }
   }
 
@@ -125,7 +125,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {boolean} 是否为系统级优先级
    */
   isSystemLevel(): boolean {
-    return this._value <= RolePriority.SYSTEM_ADMIN_PRIORITY;
+    return this._value <= RolePriority.SYSTEM_ADMIN_PRIORITY
   }
 
   /**
@@ -134,8 +134,10 @@ export class RolePriority extends ValueObject<number> {
    * @returns {boolean} 是否为租户级优先级
    */
   isTenantLevel(): boolean {
-    return this._value > RolePriority.SYSTEM_ADMIN_PRIORITY &&
-      this._value <= RolePriority.TENANT_ADMIN_PRIORITY;
+    return (
+      this._value > RolePriority.SYSTEM_ADMIN_PRIORITY &&
+      this._value <= RolePriority.TENANT_ADMIN_PRIORITY
+    )
   }
 
   /**
@@ -144,8 +146,10 @@ export class RolePriority extends ValueObject<number> {
    * @returns {boolean} 是否为组织级优先级
    */
   isOrgLevel(): boolean {
-    return this._value > RolePriority.TENANT_ADMIN_PRIORITY &&
-      this._value <= RolePriority.ORG_ADMIN_PRIORITY;
+    return (
+      this._value > RolePriority.TENANT_ADMIN_PRIORITY &&
+      this._value <= RolePriority.ORG_ADMIN_PRIORITY
+    )
   }
 
   /**
@@ -154,8 +158,10 @@ export class RolePriority extends ValueObject<number> {
    * @returns {boolean} 是否为用户级优先级
    */
   isUserLevel(): boolean {
-    return this._value > RolePriority.ORG_ADMIN_PRIORITY &&
-      this._value <= RolePriority.USER_PRIORITY;
+    return (
+      this._value > RolePriority.ORG_ADMIN_PRIORITY &&
+      this._value <= RolePriority.USER_PRIORITY
+    )
   }
 
   /**
@@ -164,7 +170,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {boolean} 是否为访客级优先级
    */
   isGuestLevel(): boolean {
-    return this._value > RolePriority.USER_PRIORITY;
+    return this._value > RolePriority.USER_PRIORITY
   }
 
   /**
@@ -175,9 +181,9 @@ export class RolePriority extends ValueObject<number> {
    */
   isHigherThan(other: RolePriority): boolean {
     if (!other) {
-      return false;
+      return false
     }
-    return this._value < other._value; // 数值越小优先级越高
+    return this._value < other._value // 数值越小优先级越高
   }
 
   /**
@@ -188,9 +194,9 @@ export class RolePriority extends ValueObject<number> {
    */
   isLowerThan(other: RolePriority): boolean {
     if (!other) {
-      return false;
+      return false
     }
-    return this._value > other._value; // 数值越大优先级越低
+    return this._value > other._value // 数值越大优先级越低
   }
 
   /**
@@ -201,32 +207,32 @@ export class RolePriority extends ValueObject<number> {
    */
   equals(other: RolePriority): boolean {
     if (!other) {
-      return false;
+      return false
     }
-    return this._value === other._value;
+    return this._value === other._value
   }
 
   /**
    * @method validatePriority
    * @description 验证角色优先级
-   * 
+   *
    * @param priority - 角色优先级
    * @returns 验证后的优先级
    * @throws Error 当优先级无效时
    */
   private validatePriority(priority: number): number {
-    const validator = new RolePriorityValidator();
-    validator.value = priority;
+    const validator = new RolePriorityValidator()
+    validator.value = priority
 
-    const errors = validator.validateSync();
+    const errors = validator.validateSync()
     if (errors && errors.length > 0) {
-      const errorMessages = errors.map(error =>
-        Object.values(error.constraints || {}).join(', ')
-      ).join('; ');
-      throw new Error(errorMessages);
+      const errorMessages = errors
+        .map((error) => Object.values(error.constraints || {}).join(', '))
+        .join('; ')
+      throw new Error(errorMessages)
     }
 
-    return validator.value;
+    return validator.value
   }
 
   /**
@@ -235,7 +241,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {string} 角色优先级字符串
    */
   toString(): string {
-    return this._value.toString();
+    return this._value.toString()
   }
 
   /**
@@ -244,7 +250,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {RolePriority} 默认优先级值对象
    */
   static getDefault(): RolePriority {
-    return new RolePriority(RolePriority.DEFAULT_PRIORITY);
+    return new RolePriority(RolePriority.DEFAULT_PRIORITY)
   }
 
   /**
@@ -253,7 +259,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {RolePriority} 系统管理员优先级值对象
    */
   static getSystemAdmin(): RolePriority {
-    return new RolePriority(RolePriority.SYSTEM_ADMIN_PRIORITY);
+    return new RolePriority(RolePriority.SYSTEM_ADMIN_PRIORITY)
   }
 
   /**
@@ -262,7 +268,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {RolePriority} 租户管理员优先级值对象
    */
   static getTenantAdmin(): RolePriority {
-    return new RolePriority(RolePriority.TENANT_ADMIN_PRIORITY);
+    return new RolePriority(RolePriority.TENANT_ADMIN_PRIORITY)
   }
 
   /**
@@ -271,7 +277,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {RolePriority} 组织管理员优先级值对象
    */
   static getOrgAdmin(): RolePriority {
-    return new RolePriority(RolePriority.ORG_ADMIN_PRIORITY);
+    return new RolePriority(RolePriority.ORG_ADMIN_PRIORITY)
   }
 
   /**
@@ -280,7 +286,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {RolePriority} 普通用户优先级值对象
    */
   static getUser(): RolePriority {
-    return new RolePriority(RolePriority.USER_PRIORITY);
+    return new RolePriority(RolePriority.USER_PRIORITY)
   }
 
   /**
@@ -289,7 +295,7 @@ export class RolePriority extends ValueObject<number> {
    * @returns {RolePriority} 访客用户优先级值对象
    */
   static getGuest(): RolePriority {
-    return new RolePriority(RolePriority.GUEST_PRIORITY);
+    return new RolePriority(RolePriority.GUEST_PRIORITY)
   }
 
   /**
@@ -297,7 +303,7 @@ export class RolePriority extends ValueObject<number> {
    * @description 从数字创建RolePriority值对象
    */
   static fromNumber(value: number): RolePriority {
-    return new RolePriority(value);
+    return new RolePriority(value)
   }
 
   /**
@@ -306,12 +312,12 @@ export class RolePriority extends ValueObject<number> {
    */
   static isValid(value: number): boolean {
     try {
-      const validator = new RolePriorityValidator();
-      validator.value = value;
-      const errors = validator.validateSync();
-      return !errors || errors.length === 0;
+      const validator = new RolePriorityValidator()
+      validator.value = value
+      const errors = validator.validateSync()
+      return !errors || errors.length === 0
     } catch {
-      return false;
+      return false
     }
   }
 
@@ -321,20 +327,20 @@ export class RolePriority extends ValueObject<number> {
    */
   static validate(value: number): { isValid: boolean; errors: string[] } {
     try {
-      const validator = new RolePriorityValidator();
-      validator.value = value;
-      const errors = validator.validateSync();
+      const validator = new RolePriorityValidator()
+      validator.value = value
+      const errors = validator.validateSync()
 
       if (!errors || errors.length === 0) {
-        return { isValid: true, errors: [] };
+        return { isValid: true, errors: [] }
       }
 
-      const errorMessages = errors.map(error =>
-        Object.values(error.constraints || {}).join(', ')
-      );
-      return { isValid: false, errors: errorMessages };
+      const errorMessages = errors.map((error) =>
+        Object.values(error.constraints || {}).join(', '),
+      )
+      return { isValid: false, errors: errorMessages }
     } catch (error) {
-      return { isValid: false, errors: ['角色优先级验证失败'] };
+      return { isValid: false, errors: ['角色优先级验证失败'] }
     }
   }
 }
@@ -347,10 +353,10 @@ class RolePriorityValidator {
   @IsNumber({}, { message: '角色优先级必须是数字' })
   @Min(1, { message: '角色优先级不能小于1' })
   @Max(1000, { message: '角色优先级不能大于1000' })
-  value!: number;
+  value!: number
 
   validateSync(): any[] {
-    const { validateSync } = require('class-validator');
-    return validateSync(this);
+    const { validateSync } = require('class-validator')
+    return validateSync(this)
   }
-} 
+}

@@ -9,10 +9,10 @@
  *    防止明文密码泄露和暴力破解。
  * 3. 该常量统一配置，便于后续根据安全需求灵活调整加密强度，提升系统整体安全性。
  */
-export const SALT_ROUNDS = 10;
+export const SALT_ROUNDS = 10
 
 /**
  * 请求ID头部字段名
  * @description 用于从HTTP头中获取或设置请求ID
  */
-export const REQUEST_ID_HEADER = 'x-request-id';
+export const REQUEST_ID_HEADER = 'x-request-id'

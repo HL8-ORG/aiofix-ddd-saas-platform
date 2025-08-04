@@ -1,7 +1,7 @@
 {
-  "name": "api",
+  "name": "example",
   "version": "1.0.0",
-  "description": "Saas API",
+  "description": "Example",
   "license": "MIT",
   "mikro-orm": {
     "configPaths": [

@@ -1,17 +1,20 @@
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
-import { Expose, Transform } from 'class-transformer';
-import { BaseEntity } from '../../../../../shared/domain/entities/base.entity';
-import { TenantName } from '../value-objects/tenant-name.value-object';
-import { TenantCode } from '../value-objects/tenant-code.value-object';
-import { TenantStatusValue, TenantStatus } from '../value-objects/tenant-status.value-object';
+import { Expose, Transform } from 'class-transformer'
+import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator'
+import { BaseEntity } from '../../../../../shared/domain/entities/base.entity'
 import {
-  TenantDomainEvent,
-  TenantCreatedEvent,
   TenantActivatedEvent,
-  TenantSuspendedEvent,
+  TenantCreatedEvent,
   TenantDeletedEvent,
-  TenantSettingsUpdatedEvent
-} from '../events/tenant.events';
+  type TenantDomainEvent,
+  TenantSettingsUpdatedEvent,
+  TenantSuspendedEvent,
+} from '../events/tenant.events'
+import { TenantCode } from '../value-objects/tenant-code.value-object'
+import { TenantName } from '../value-objects/tenant-name.value-object'
+import {
+  TenantStatus,
+  TenantStatusValue,
+} from '../value-objects/tenant-status.value-object'
 
 /**
  * @class Tenant
@@ -19,7 +22,7 @@ import {
  * 租户领域实体，代表系统中的租户。
  * 这是一个纯领域对象，不包含任何ORM装饰器或数据库依赖。
  * 使用值对象来封装业务概念，提升领域模型的表达力。
- * 
+ *
  * 主要原理与机制：
  * 1. 继承BaseEntity获得通用属性和方法
  * 2. 使用值对象封装业务概念（名称、编码、状态）
@@ -33,28 +36,28 @@ export class Tenant extends BaseEntity {
    * @property domainEvents
    * @description 领域事件集合
    */
-  private _domainEvents: TenantDomainEvent[] = [];
+  private _domainEvents: TenantDomainEvent[] = []
 
   /**
    * @property name
    * @description 租户名称值对象
    */
   @Expose()
-  name: TenantName;
+  name: TenantName
 
   /**
    * @property code
    * @description 租户编码值对象
    */
   @Expose()
-  code: TenantCode;
+  code: TenantCode
 
   /**
    * @property status
    * @description 租户状态值对象
    */
   @Expose()
-  status: TenantStatusValue;
+  status: TenantStatusValue
 
   /**
    * @property adminUserId
@@ -62,7 +65,7 @@ export class Tenant extends BaseEntity {
    */
   @IsUUID('4', { message: '管理员用户ID必须是有效的UUID v4格式' })
   @Expose()
-  adminUserId: string;
+  adminUserId: string
 
   /**
    * @property description
@@ -72,7 +75,7 @@ export class Tenant extends BaseEntity {
   @IsString({ message: '租户描述必须是字符串' })
   @MaxLength(500, { message: '租户描述不能超过500个字符' })
   @Expose()
-  description?: string;
+  description?: string
 
   /**
    * @property settings
@@ -83,14 +86,14 @@ export class Tenant extends BaseEntity {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       try {
-        return JSON.parse(value);
+        return JSON.parse(value)
       } catch {
-        return {};
+        return {}
       }
     }
-    return value || {};
+    return value || {}
   })
-  settings: Record<string, any>;
+  settings: Record<string, any>
 
   /**
    * @constructor
@@ -102,21 +105,21 @@ export class Tenant extends BaseEntity {
     code: string,
     adminUserId: string,
     description?: string,
-    settings?: Record<string, any>
+    settings?: Record<string, any>,
   ) {
-    super();
-    this.id = id;
-    this.name = new TenantName(name);
-    this.code = new TenantCode(code);
-    this.status = new TenantStatusValue(TenantStatus.PENDING);
-    this.adminUserId = adminUserId;
-    this.description = description;
-    this.settings = settings || {};
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
+    super()
+    this.id = id
+    this.name = new TenantName(name)
+    this.code = new TenantCode(code)
+    this.status = new TenantStatusValue(TenantStatus.PENDING)
+    this.adminUserId = adminUserId
+    this.description = description
+    this.settings = settings || {}
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
 
     // 添加租户创建事件
-    this.addDomainEvent(new TenantCreatedEvent(this));
+    this.addDomainEvent(new TenantCreatedEvent(this))
   }
 
   /**
@@ -126,13 +129,13 @@ export class Tenant extends BaseEntity {
    */
   activate(): void {
     if (!this.status.canActivate()) {
-      throw new Error(`租户当前状态为${this.status.getDisplayName()}，无法激活`);
+      throw new Error(`租户当前状态为${this.status.getDisplayName()}，无法激活`)
     }
-    this.status = new TenantStatusValue(TenantStatus.ACTIVE);
-    this.updateTimestamp();
+    this.status = new TenantStatusValue(TenantStatus.ACTIVE)
+    this.updateTimestamp()
 
     // 添加租户激活事件
-    this.addDomainEvent(new TenantActivatedEvent(this));
+    this.addDomainEvent(new TenantActivatedEvent(this))
   }
 
   /**
@@ -142,13 +145,13 @@ export class Tenant extends BaseEntity {
    */
   suspend(): void {
     if (!this.status.canSuspend()) {
-      throw new Error(`租户当前状态为${this.status.getDisplayName()}，无法禁用`);
+      throw new Error(`租户当前状态为${this.status.getDisplayName()}，无法禁用`)
     }
-    this.status = new TenantStatusValue(TenantStatus.SUSPENDED);
-    this.updateTimestamp();
+    this.status = new TenantStatusValue(TenantStatus.SUSPENDED)
+    this.updateTimestamp()
 
     // 添加租户暂停事件
-    this.addDomainEvent(new TenantSuspendedEvent(this));
+    this.addDomainEvent(new TenantSuspendedEvent(this))
   }
 
   /**
@@ -157,7 +160,7 @@ export class Tenant extends BaseEntity {
    * @returns {boolean} 如果租户激活返回true，否则返回false
    */
   isActive(): boolean {
-    return this.status.isActive() && !this.isDeleted();
+    return this.status.isActive() && !this.isDeleted()
   }
 
   /**
@@ -166,7 +169,7 @@ export class Tenant extends BaseEntity {
    * @returns {boolean} 如果租户被禁用返回true，否则返回false
    */
   isSuspended(): boolean {
-    return this.status.isSuspended();
+    return this.status.isSuspended()
   }
 
   /**
@@ -175,12 +178,14 @@ export class Tenant extends BaseEntity {
    * @param settings 新的配置对象
    */
   updateSettings(settings: Record<string, any>): void {
-    const oldSettings = { ...this.settings };
-    this.settings = { ...this.settings, ...settings };
-    this.updateTimestamp();
+    const oldSettings = { ...this.settings }
+    this.settings = { ...this.settings, ...settings }
+    this.updateTimestamp()
 
     // 添加租户配置更新事件
-    this.addDomainEvent(new TenantSettingsUpdatedEvent(this, oldSettings, this.settings));
+    this.addDomainEvent(
+      new TenantSettingsUpdatedEvent(this, oldSettings, this.settings),
+    )
   }
 
   /**
@@ -191,21 +196,21 @@ export class Tenant extends BaseEntity {
    * @returns 配置值或默认值
    */
   getSetting<T>(key: string, defaultValue?: T): T | undefined {
-    if (!key) return defaultValue;
+    if (!key) return defaultValue
 
     // 处理嵌套路径，如 'ui.theme' 或 'features.notifications.email'
-    const keys = key.split('.');
-    let value: any = this.settings;
+    const keys = key.split('.')
+    let value: any = this.settings
 
     for (const k of keys) {
       if (value && typeof value === 'object' && k in value) {
-        value = value[k];
+        value = value[k]
       } else {
-        return defaultValue;
+        return defaultValue
       }
     }
 
-    return value !== undefined ? value : defaultValue;
+    return value !== undefined ? value : defaultValue
   }
 
   /**
@@ -216,10 +221,10 @@ export class Tenant extends BaseEntity {
    * @param description 租户描述
    */
   updateInfo(name: string, code: string, description?: string): void {
-    this.name = new TenantName(name);
-    this.code = new TenantCode(code);
-    this.description = description;
-    this.updateTimestamp();
+    this.name = new TenantName(name)
+    this.code = new TenantCode(code)
+    this.description = description
+    this.updateTimestamp()
   }
 
   /**
@@ -229,13 +234,13 @@ export class Tenant extends BaseEntity {
    */
   markAsDeleted(): void {
     if (!this.status.canDelete()) {
-      throw new Error(`租户当前状态为${this.status.getDisplayName()}，无法删除`);
+      throw new Error(`租户当前状态为${this.status.getDisplayName()}，无法删除`)
     }
-    this.status = new TenantStatusValue(TenantStatus.DELETED);
-    this.softDelete();
+    this.status = new TenantStatusValue(TenantStatus.DELETED)
+    this.softDelete()
 
     // 添加租户删除事件
-    this.addDomainEvent(new TenantDeletedEvent(this));
+    this.addDomainEvent(new TenantDeletedEvent(this))
   }
 
   /**
@@ -245,10 +250,10 @@ export class Tenant extends BaseEntity {
    */
   restore(): void {
     if (!this.status.canRestore()) {
-      throw new Error(`租户当前状态为${this.status.getDisplayName()}，无法恢复`);
+      throw new Error(`租户当前状态为${this.status.getDisplayName()}，无法恢复`)
     }
-    this.status = new TenantStatusValue(TenantStatus.SUSPENDED);
-    super.restore();
+    this.status = new TenantStatusValue(TenantStatus.SUSPENDED)
+    super.restore()
   }
 
   /**
@@ -257,7 +262,7 @@ export class Tenant extends BaseEntity {
    * @returns {string} 租户名称
    */
   getName(): string {
-    return this.name.value;
+    return this.name.value
   }
 
   /**
@@ -266,7 +271,7 @@ export class Tenant extends BaseEntity {
    * @returns {string} 租户编码
    */
   getCode(): string {
-    return this.code.value;
+    return this.code.value
   }
 
   /**
@@ -275,7 +280,7 @@ export class Tenant extends BaseEntity {
    * @returns {string} 租户状态
    */
   getStatus(): string {
-    return this.status.value;
+    return this.status.value
   }
 
   /**
@@ -284,7 +289,7 @@ export class Tenant extends BaseEntity {
    * @returns {string} 状态的显示名称
    */
   getStatusDisplayName(): string {
-    return this.status.getDisplayName();
+    return this.status.getDisplayName()
   }
 
   /**
@@ -293,7 +298,7 @@ export class Tenant extends BaseEntity {
    * @returns {string} 状态的描述信息
    */
   getStatusDescription(): string {
-    return this.status.getDescription();
+    return this.status.getDescription()
   }
 
   /**
@@ -302,7 +307,7 @@ export class Tenant extends BaseEntity {
    * @param event 领域事件
    */
   addDomainEvent(event: TenantDomainEvent): void {
-    this._domainEvents.push(event);
+    this._domainEvents.push(event)
   }
 
   /**
@@ -310,7 +315,7 @@ export class Tenant extends BaseEntity {
    * @description 清空领域事件集合
    */
   clearDomainEvents(): void {
-    this._domainEvents = [];
+    this._domainEvents = []
   }
 
   /**
@@ -319,7 +324,7 @@ export class Tenant extends BaseEntity {
    * @returns {TenantDomainEvent[]} 领域事件数组
    */
   getDomainEvents(): TenantDomainEvent[] {
-    return [...this._domainEvents];
+    return [...this._domainEvents]
   }
 
   /**
@@ -328,6 +333,6 @@ export class Tenant extends BaseEntity {
    * @returns {boolean} 如果有领域事件返回true，否则返回false
    */
   hasDomainEvents(): boolean {
-    return this._domainEvents.length > 0;
+    return this._domainEvents.length > 0
   }
-} 
+}

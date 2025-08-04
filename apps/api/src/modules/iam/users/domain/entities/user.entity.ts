@@ -1,39 +1,48 @@
-import { Expose, Transform } from 'class-transformer';
-import { IsUUID, IsOptional, IsString, MaxLength, IsBoolean } from 'class-validator';
-import { BaseEntity } from '@/shared/domain/entities/base.entity';
-import { Username } from '../value-objects/username.value-object';
-import { Email } from '../value-objects/email.value-object';
-import { Phone } from '../value-objects/phone.value-object';
-import { UserStatusValue, UserStatus } from '../value-objects/user-status.value-object';
-import { generateUuid } from '@/shared/domain/utils/uuid.util';
+import { BaseEntity } from '@/shared/domain/entities/base.entity'
+import { generateUuid } from '@/shared/domain/utils/uuid.util'
+import { Expose, Transform } from 'class-transformer'
 import {
-  UserCreatedEvent,
+  IsBoolean,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator'
+import {
   UserActivatedEvent,
-  UserSuspendedEvent,
-  UserDeletedEvent,
-  UserRestoredEvent,
-  UserInfoUpdatedEvent,
-  UserContactInfoUpdatedEvent,
-  UserPasswordUpdatedEvent,
-  UserLoginSuccessEvent,
-  UserLoginFailureEvent,
-  UserEmailVerifiedEvent,
-  UserPhoneVerifiedEvent,
-  UserTwoFactorEnabledEvent,
-  UserTwoFactorDisabledEvent,
-  UserPreferencesUpdatedEvent,
   UserAssignedToOrganizationEvent,
+  UserContactInfoUpdatedEvent,
+  UserCreatedEvent,
+  UserDeletedEvent,
+  UserEmailVerifiedEvent,
+  UserInfoUpdatedEvent,
+  UserLoginFailureEvent,
+  UserLoginSuccessEvent,
+  UserPasswordUpdatedEvent,
+  UserPhoneVerifiedEvent,
+  UserPreferencesUpdatedEvent,
   UserRemovedFromOrganizationEvent,
+  UserRestoredEvent,
   UserRoleAssignedEvent,
   UserRoleRemovedEvent,
-} from '../events/user.events';
+  UserSuspendedEvent,
+  UserTwoFactorDisabledEvent,
+  UserTwoFactorEnabledEvent,
+} from '../events/user.events'
+import { Email } from '../value-objects/email.value-object'
+import { Phone } from '../value-objects/phone.value-object'
+import {
+  UserStatus,
+  UserStatusValue,
+} from '../value-objects/user-status.value-object'
+import { Username } from '../value-objects/username.value-object'
 
 /**
  * @class User
  * @description
  * 用户领域实体，作为用户聚合的根实体。
  * 封装用户的核心业务逻辑、状态管理和生命周期。
- * 
+ *
  * 主要原理与机制：
  * 1. 遵循DDD聚合根设计原则，管理用户相关的所有业务规则
  * 2. 通过值对象封装用户名、邮箱、手机号等属性
@@ -48,21 +57,21 @@ export class User extends BaseEntity {
    * @description 用户名，在租户内唯一
    */
   @Expose()
-  username: Username;
+  username: Username
 
   /**
    * @property email
    * @description 邮箱地址，在租户内唯一
    */
   @Expose()
-  email: Email;
+  email: Email
 
   /**
    * @property phone
    * @description 手机号码，可选
    */
   @Expose()
-  phone?: Phone;
+  phone?: Phone
 
   /**
    * @property firstName
@@ -71,7 +80,7 @@ export class User extends BaseEntity {
   @IsString({ message: '名必须是字符串' })
   @MaxLength(50, { message: '名不能超过50个字符' })
   @Expose()
-  firstName: string;
+  firstName: string
 
   /**
    * @property lastName
@@ -80,7 +89,7 @@ export class User extends BaseEntity {
   @IsString({ message: '姓必须是字符串' })
   @MaxLength(50, { message: '姓不能超过50个字符' })
   @Expose()
-  lastName: string;
+  lastName: string
 
   /**
    * @property displayName
@@ -90,7 +99,7 @@ export class User extends BaseEntity {
   @IsString({ message: '显示名称必须是字符串' })
   @MaxLength(100, { message: '显示名称不能超过100个字符' })
   @Expose()
-  displayName?: string;
+  displayName?: string
 
   /**
    * @property avatar
@@ -100,14 +109,14 @@ export class User extends BaseEntity {
   @IsString({ message: '头像URL必须是字符串' })
   @MaxLength(500, { message: '头像URL不能超过500个字符' })
   @Expose()
-  avatar?: string;
+  avatar?: string
 
   /**
    * @property status
    * @description 用户状态
    */
   @Expose()
-  status: UserStatusValue;
+  status: UserStatusValue
 
   /**
    * @property tenantId
@@ -115,7 +124,7 @@ export class User extends BaseEntity {
    */
   @IsUUID('4', { message: '租户ID必须是有效的UUID v4格式' })
   @Expose()
-  tenantId: string;
+  tenantId: string
 
   /**
    * @property organizationIds
@@ -123,7 +132,7 @@ export class User extends BaseEntity {
    */
   @IsOptional()
   @Expose()
-  organizationIds: string[] = [];
+  organizationIds: string[] = []
 
   /**
    * @property roleIds
@@ -131,7 +140,7 @@ export class User extends BaseEntity {
    */
   @IsOptional()
   @Expose()
-  roleIds: string[] = [];
+  roleIds: string[] = []
 
   /**
    * @property adminUserId
@@ -139,14 +148,14 @@ export class User extends BaseEntity {
    */
   @IsUUID('4', { message: '管理员用户ID必须是有效的UUID v4格式' })
   @Expose()
-  adminUserId: string;
+  adminUserId: string
 
   /**
    * @property passwordHash
    * @description 密码哈希，加密存储
    */
   @IsString({ message: '密码哈希必须是字符串' })
-  passwordHash: string;
+  passwordHash: string
 
   /**
    * @property lastLoginAt
@@ -154,41 +163,41 @@ export class User extends BaseEntity {
    */
   @IsOptional()
   @Expose()
-  lastLoginAt?: Date;
+  lastLoginAt?: Date
 
   /**
    * @property loginAttempts
    * @description 登录失败次数
    */
-  loginAttempts: number = 0;
+  loginAttempts = 0
 
   /**
    * @property lockedUntil
    * @description 锁定截止时间
    */
   @IsOptional()
-  lockedUntil?: Date;
+  lockedUntil?: Date
 
   /**
    * @property emailVerified
    * @description 邮箱验证状态
    */
   @IsBoolean({ message: '邮箱验证状态必须是布尔值' })
-  emailVerified: boolean = false;
+  emailVerified = false
 
   /**
    * @property phoneVerified
    * @description 手机验证状态
    */
   @IsBoolean({ message: '手机验证状态必须是布尔值' })
-  phoneVerified: boolean = false;
+  phoneVerified = false
 
   /**
    * @property twoFactorEnabled
    * @description 二步验证启用状态
    */
   @IsBoolean({ message: '二步验证启用状态必须是布尔值' })
-  twoFactorEnabled: boolean = false;
+  twoFactorEnabled = false
 
   /**
    * @property twoFactorSecret
@@ -196,7 +205,7 @@ export class User extends BaseEntity {
    */
   @IsOptional()
   @IsString({ message: '二步验证密钥必须是字符串' })
-  twoFactorSecret?: string;
+  twoFactorSecret?: string
 
   /**
    * @property preferences
@@ -207,20 +216,20 @@ export class User extends BaseEntity {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       try {
-        return JSON.parse(value);
+        return JSON.parse(value)
       } catch {
-        return {};
+        return {}
       }
     }
-    return value || {};
+    return value || {}
   })
-  preferences: Record<string, any> = {};
+  preferences: Record<string, any> = {}
 
   /**
    * @property _domainEvents
    * @description 领域事件列表
    */
-  private _domainEvents: any[] = [];
+  private _domainEvents: any[] = []
 
   /**
    * @constructor
@@ -254,47 +263,47 @@ export class User extends BaseEntity {
     avatar?: string,
     organizationIds?: string[],
     roleIds?: string[],
-    preferences?: Record<string, any>
+    preferences?: Record<string, any>,
   ) {
-    super();
-    this.id = id;
-    this.username = new Username(username);
-    this.email = new Email(email);
-    this.firstName = firstName;
-    this.lastName = lastName;
-    this.tenantId = tenantId;
-    this.adminUserId = adminUserId;
-    this.passwordHash = passwordHash;
-    this.status = UserStatusValue.pending();
-    this.loginAttempts = 0;
-    this.emailVerified = false;
-    this.phoneVerified = false;
-    this.twoFactorEnabled = false;
-    this.preferences = preferences || {};
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
+    super()
+    this.id = id
+    this.username = new Username(username)
+    this.email = new Email(email)
+    this.firstName = firstName
+    this.lastName = lastName
+    this.tenantId = tenantId
+    this.adminUserId = adminUserId
+    this.passwordHash = passwordHash
+    this.status = UserStatusValue.pending()
+    this.loginAttempts = 0
+    this.emailVerified = false
+    this.phoneVerified = false
+    this.twoFactorEnabled = false
+    this.preferences = preferences || {}
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
 
     // 设置可选字段
     if (phone) {
-      this.phone = new Phone(phone);
+      this.phone = new Phone(phone)
     }
     if (displayName) {
-      this.displayName = displayName;
+      this.displayName = displayName
     } else {
-      this.displayName = `${firstName} ${lastName}`;
+      this.displayName = `${firstName} ${lastName}`
     }
     if (avatar) {
-      this.avatar = avatar;
+      this.avatar = avatar
     }
     if (organizationIds) {
-      this.organizationIds = organizationIds;
+      this.organizationIds = organizationIds
     }
     if (roleIds) {
-      this.roleIds = roleIds;
+      this.roleIds = roleIds
     }
 
     // 添加用户创建事件
-    this.addDomainEvent(new UserCreatedEvent(this));
+    this.addDomainEvent(new UserCreatedEvent(this))
   }
 
   /**
@@ -304,13 +313,13 @@ export class User extends BaseEntity {
    */
   activate(): void {
     if (!this.status.canActivate()) {
-      throw new Error(`用户当前状态为${this.status.getDisplayName()}，无法激活`);
+      throw new Error(`用户当前状态为${this.status.getDisplayName()}，无法激活`)
     }
-    this.status = UserStatusValue.active();
-    this.updateUserTimestamp();
+    this.status = UserStatusValue.active()
+    this.updateUserTimestamp()
 
     // 添加用户激活事件
-    this.addDomainEvent(new UserActivatedEvent(this));
+    this.addDomainEvent(new UserActivatedEvent(this))
   }
 
   /**
@@ -320,13 +329,13 @@ export class User extends BaseEntity {
    */
   suspend(): void {
     if (!this.status.canSuspend()) {
-      throw new Error(`用户当前状态为${this.status.getDisplayName()}，无法禁用`);
+      throw new Error(`用户当前状态为${this.status.getDisplayName()}，无法禁用`)
     }
-    this.status = UserStatusValue.suspended();
-    this.updateUserTimestamp();
+    this.status = UserStatusValue.suspended()
+    this.updateUserTimestamp()
 
     // 添加用户禁用事件
-    this.addDomainEvent(new UserSuspendedEvent(this));
+    this.addDomainEvent(new UserSuspendedEvent(this))
   }
 
   /**
@@ -336,14 +345,14 @@ export class User extends BaseEntity {
    */
   markAsDeleted(): void {
     if (!this.status.canDelete()) {
-      throw new Error(`用户当前状态为${this.status.getDisplayName()}，无法删除`);
+      throw new Error(`用户当前状态为${this.status.getDisplayName()}，无法删除`)
     }
-    this.status = UserStatusValue.deleted();
-    this.deletedAt = new Date();
-    this.updateUserTimestamp();
+    this.status = UserStatusValue.deleted()
+    this.deletedAt = new Date()
+    this.updateUserTimestamp()
 
     // 添加用户删除事件
-    this.addDomainEvent(new UserDeletedEvent(this));
+    this.addDomainEvent(new UserDeletedEvent(this))
   }
 
   /**
@@ -353,14 +362,14 @@ export class User extends BaseEntity {
    */
   restore(): void {
     if (!this.status.canRestore()) {
-      throw new Error(`用户当前状态为${this.status.getDisplayName()}，无法恢复`);
+      throw new Error(`用户当前状态为${this.status.getDisplayName()}，无法恢复`)
     }
-    this.status = UserStatusValue.suspended();
-    this.deletedAt = undefined;
-    this.updateUserTimestamp();
+    this.status = UserStatusValue.suspended()
+    this.deletedAt = undefined
+    this.updateUserTimestamp()
 
     // 添加用户恢复事件
-    this.addDomainEvent(new UserRestoredEvent(this));
+    this.addDomainEvent(new UserRestoredEvent(this))
   }
 
   /**
@@ -371,35 +380,40 @@ export class User extends BaseEntity {
    * @param displayName 显示名称，可选
    * @param avatar 头像URL，可选
    */
-  updateInfo(firstName: string, lastName: string, displayName?: string, avatar?: string): void {
+  updateInfo(
+    firstName: string,
+    lastName: string,
+    displayName?: string,
+    avatar?: string,
+  ): void {
     const oldInfo = {
       firstName: this.firstName,
       lastName: this.lastName,
       displayName: this.displayName,
       avatar: this.avatar,
-    };
+    }
 
-    this.firstName = firstName;
-    this.lastName = lastName;
+    this.firstName = firstName
+    this.lastName = lastName
     if (displayName) {
-      this.displayName = displayName;
+      this.displayName = displayName
     } else {
-      this.displayName = `${firstName} ${lastName}`;
+      this.displayName = `${firstName} ${lastName}`
     }
     if (avatar) {
-      this.avatar = avatar;
+      this.avatar = avatar
     }
-    this.updateUserTimestamp();
+    this.updateUserTimestamp()
 
     const newInfo = {
       firstName: this.firstName,
       lastName: this.lastName,
       displayName: this.displayName,
       avatar: this.avatar,
-    };
+    }
 
     // 添加用户信息更新事件
-    this.addDomainEvent(new UserInfoUpdatedEvent(this, oldInfo, newInfo));
+    this.addDomainEvent(new UserInfoUpdatedEvent(this, oldInfo, newInfo))
   }
 
   /**
@@ -412,21 +426,23 @@ export class User extends BaseEntity {
     const oldContactInfo = {
       email: this.getEmail(),
       phone: this.getPhone(),
-    };
-
-    this.email = new Email(email);
-    if (phone) {
-      this.phone = new Phone(phone);
     }
-    this.updateUserTimestamp();
+
+    this.email = new Email(email)
+    if (phone) {
+      this.phone = new Phone(phone)
+    }
+    this.updateUserTimestamp()
 
     const newContactInfo = {
       email: this.getEmail(),
       phone: this.getPhone(),
-    };
+    }
 
     // 添加用户联系信息更新事件
-    this.addDomainEvent(new UserContactInfoUpdatedEvent(this, oldContactInfo, newContactInfo));
+    this.addDomainEvent(
+      new UserContactInfoUpdatedEvent(this, oldContactInfo, newContactInfo),
+    )
   }
 
   /**
@@ -435,13 +451,13 @@ export class User extends BaseEntity {
    * @param passwordHash 新的密码哈希
    */
   updatePassword(passwordHash: string): void {
-    this.passwordHash = passwordHash;
-    this.loginAttempts = 0;
-    this.lockedUntil = undefined;
-    this.updateUserTimestamp();
+    this.passwordHash = passwordHash
+    this.loginAttempts = 0
+    this.lockedUntil = undefined
+    this.updateUserTimestamp()
 
     // 添加密码更新事件
-    this.addDomainEvent(new UserPasswordUpdatedEvent(this));
+    this.addDomainEvent(new UserPasswordUpdatedEvent(this))
   }
 
   /**
@@ -449,13 +465,13 @@ export class User extends BaseEntity {
    * @description 记录登录成功
    */
   recordLoginSuccess(): void {
-    this.lastLoginAt = new Date();
-    this.loginAttempts = 0;
-    this.lockedUntil = undefined;
-    this.updateUserTimestamp();
+    this.lastLoginAt = new Date()
+    this.loginAttempts = 0
+    this.lockedUntil = undefined
+    this.updateUserTimestamp()
 
     // 添加登录成功事件
-    this.addDomainEvent(new UserLoginSuccessEvent(this));
+    this.addDomainEvent(new UserLoginSuccessEvent(this))
   }
 
   /**
@@ -463,17 +479,17 @@ export class User extends BaseEntity {
    * @description 记录登录失败
    */
   recordLoginFailure(): void {
-    this.loginAttempts++;
+    this.loginAttempts++
 
     // 如果失败次数达到5次，锁定账户30分钟
     if (this.loginAttempts >= 5) {
-      this.lockedUntil = new Date(Date.now() + 30 * 60 * 1000); // 30分钟
+      this.lockedUntil = new Date(Date.now() + 30 * 60 * 1000) // 30分钟
     }
 
-    this.updateUserTimestamp();
+    this.updateUserTimestamp()
 
     // 添加登录失败事件
-    this.addDomainEvent(new UserLoginFailureEvent(this));
+    this.addDomainEvent(new UserLoginFailureEvent(this))
   }
 
   /**
@@ -481,11 +497,11 @@ export class User extends BaseEntity {
    * @description 验证邮箱
    */
   verifyEmail(): void {
-    this.emailVerified = true;
-    this.updateUserTimestamp();
+    this.emailVerified = true
+    this.updateUserTimestamp()
 
     // 添加邮箱验证事件
-    this.addDomainEvent(new UserEmailVerifiedEvent(this));
+    this.addDomainEvent(new UserEmailVerifiedEvent(this))
   }
 
   /**
@@ -493,11 +509,11 @@ export class User extends BaseEntity {
    * @description 验证手机号
    */
   verifyPhone(): void {
-    this.phoneVerified = true;
-    this.updateUserTimestamp();
+    this.phoneVerified = true
+    this.updateUserTimestamp()
 
     // 添加手机号验证事件
-    this.addDomainEvent(new UserPhoneVerifiedEvent(this));
+    this.addDomainEvent(new UserPhoneVerifiedEvent(this))
   }
 
   /**
@@ -506,12 +522,12 @@ export class User extends BaseEntity {
    * @param secret 二步验证密钥
    */
   enableTwoFactor(secret: string): void {
-    this.twoFactorEnabled = true;
-    this.twoFactorSecret = secret;
-    this.updateUserTimestamp();
+    this.twoFactorEnabled = true
+    this.twoFactorSecret = secret
+    this.updateUserTimestamp()
 
     // 添加二步验证启用事件
-    this.addDomainEvent(new UserTwoFactorEnabledEvent(this));
+    this.addDomainEvent(new UserTwoFactorEnabledEvent(this))
   }
 
   /**
@@ -519,12 +535,12 @@ export class User extends BaseEntity {
    * @description 禁用二步验证
    */
   disableTwoFactor(): void {
-    this.twoFactorEnabled = false;
-    this.twoFactorSecret = undefined;
-    this.updateUserTimestamp();
+    this.twoFactorEnabled = false
+    this.twoFactorSecret = undefined
+    this.updateUserTimestamp()
 
     // 添加二步验证禁用事件
-    this.addDomainEvent(new UserTwoFactorDisabledEvent(this));
+    this.addDomainEvent(new UserTwoFactorDisabledEvent(this))
   }
 
   /**
@@ -533,12 +549,14 @@ export class User extends BaseEntity {
    * @param preferences 新的偏好设置
    */
   updatePreferences(preferences: Record<string, any>): void {
-    const oldPreferences = { ...this.preferences };
-    this.preferences = { ...this.preferences, ...preferences };
-    this.updateUserTimestamp();
+    const oldPreferences = { ...this.preferences }
+    this.preferences = { ...this.preferences, ...preferences }
+    this.updateUserTimestamp()
 
     // 添加偏好设置更新事件
-    this.addDomainEvent(new UserPreferencesUpdatedEvent(this, oldPreferences, this.preferences));
+    this.addDomainEvent(
+      new UserPreferencesUpdatedEvent(this, oldPreferences, this.preferences),
+    )
   }
 
   /**
@@ -548,11 +566,13 @@ export class User extends BaseEntity {
    */
   assignToOrganization(organizationId: string): void {
     if (!this.organizationIds.includes(organizationId)) {
-      this.organizationIds.push(organizationId);
-      this.updateUserTimestamp();
+      this.organizationIds.push(organizationId)
+      this.updateUserTimestamp()
 
       // 添加组织分配事件
-      this.addDomainEvent(new UserAssignedToOrganizationEvent(this, organizationId));
+      this.addDomainEvent(
+        new UserAssignedToOrganizationEvent(this, organizationId),
+      )
     }
   }
 
@@ -564,24 +584,26 @@ export class User extends BaseEntity {
   removeFromOrganization(organizationId?: string): void {
     if (organizationId) {
       // 移除指定组织
-      const index = this.organizationIds.indexOf(organizationId);
+      const index = this.organizationIds.indexOf(organizationId)
       if (index > -1) {
-        this.organizationIds.splice(index, 1);
-        this.updateUserTimestamp();
+        this.organizationIds.splice(index, 1)
+        this.updateUserTimestamp()
 
         // 添加组织移除事件
-        this.addDomainEvent(new UserRemovedFromOrganizationEvent(this, organizationId));
+        this.addDomainEvent(
+          new UserRemovedFromOrganizationEvent(this, organizationId),
+        )
       }
     } else {
       // 移除所有组织
-      const removedOrganizations = [...this.organizationIds];
-      this.organizationIds = [];
-      this.updateUserTimestamp();
+      const removedOrganizations = [...this.organizationIds]
+      this.organizationIds = []
+      this.updateUserTimestamp()
 
       // 为每个移除的组织添加事件
-      removedOrganizations.forEach(orgId => {
-        this.addDomainEvent(new UserRemovedFromOrganizationEvent(this, orgId));
-      });
+      removedOrganizations.forEach((orgId) => {
+        this.addDomainEvent(new UserRemovedFromOrganizationEvent(this, orgId))
+      })
     }
   }
 
@@ -592,7 +614,7 @@ export class User extends BaseEntity {
    * @returns {boolean} 是否属于该组织
    */
   isInOrganization(organizationId: string): boolean {
-    return this.organizationIds.includes(organizationId);
+    return this.organizationIds.includes(organizationId)
   }
 
   /**
@@ -601,7 +623,7 @@ export class User extends BaseEntity {
    * @returns {string[]} 组织ID列表
    */
   getOrganizationIds(): string[] {
-    return [...this.organizationIds];
+    return [...this.organizationIds]
   }
 
   /**
@@ -611,11 +633,11 @@ export class User extends BaseEntity {
    */
   assignRole(roleId: string): void {
     if (!this.roleIds.includes(roleId)) {
-      this.roleIds.push(roleId);
-      this.updateUserTimestamp();
+      this.roleIds.push(roleId)
+      this.updateUserTimestamp()
 
       // 添加角色分配事件
-      this.addDomainEvent(new UserRoleAssignedEvent(this, roleId));
+      this.addDomainEvent(new UserRoleAssignedEvent(this, roleId))
     }
   }
 
@@ -627,24 +649,24 @@ export class User extends BaseEntity {
   removeRole(roleId?: string): void {
     if (roleId) {
       // 移除指定角色
-      const index = this.roleIds.indexOf(roleId);
+      const index = this.roleIds.indexOf(roleId)
       if (index > -1) {
-        this.roleIds.splice(index, 1);
-        this.updateUserTimestamp();
+        this.roleIds.splice(index, 1)
+        this.updateUserTimestamp()
 
         // 添加角色移除事件
-        this.addDomainEvent(new UserRoleRemovedEvent(this, roleId));
+        this.addDomainEvent(new UserRoleRemovedEvent(this, roleId))
       }
     } else {
       // 移除所有角色
-      const removedRoles = [...this.roleIds];
-      this.roleIds = [];
-      this.updateUserTimestamp();
+      const removedRoles = [...this.roleIds]
+      this.roleIds = []
+      this.updateUserTimestamp()
 
       // 为每个移除的角色添加事件
-      removedRoles.forEach(roleId => {
-        this.addDomainEvent(new UserRoleRemovedEvent(this, roleId));
-      });
+      removedRoles.forEach((roleId) => {
+        this.addDomainEvent(new UserRoleRemovedEvent(this, roleId))
+      })
     }
   }
 
@@ -655,7 +677,7 @@ export class User extends BaseEntity {
    * @returns {boolean} 是否拥有该角色
    */
   hasRole(roleId: string): boolean {
-    return this.roleIds.includes(roleId);
+    return this.roleIds.includes(roleId)
   }
 
   /**
@@ -664,7 +686,7 @@ export class User extends BaseEntity {
    * @returns {string[]} 角色ID列表
    */
   getRoleIds(): string[] {
-    return [...this.roleIds];
+    return [...this.roleIds]
   }
 
   /**
@@ -674,9 +696,9 @@ export class User extends BaseEntity {
    */
   isLocked(): boolean {
     if (!this.lockedUntil) {
-      return false;
+      return false
     }
-    return new Date() < this.lockedUntil;
+    return new Date() < this.lockedUntil
   }
 
   /**
@@ -685,7 +707,7 @@ export class User extends BaseEntity {
    * @returns {boolean} 是否可以登录
    */
   canLogin(): boolean {
-    return this.status.canLogin() && !this.isLocked() && !this.isDeleted();
+    return this.status.canLogin() && !this.isLocked() && !this.isDeleted()
   }
 
   /**
@@ -694,7 +716,7 @@ export class User extends BaseEntity {
    * @returns {boolean} 如果用户激活返回true，否则返回false
    */
   isActive(): boolean {
-    return this.status.isActive() && !this.isDeleted();
+    return this.status.isActive() && !this.isDeleted()
   }
 
   /**
@@ -703,7 +725,7 @@ export class User extends BaseEntity {
    * @returns {boolean} 如果用户被禁用返回true，否则返回false
    */
   isSuspended(): boolean {
-    return this.status.isSuspended();
+    return this.status.isSuspended()
   }
 
   /**
@@ -712,7 +734,7 @@ export class User extends BaseEntity {
    * @returns {string} 用户名
    */
   getUsername(): string {
-    return this.username.getValue();
+    return this.username.getValue()
   }
 
   /**
@@ -721,7 +743,7 @@ export class User extends BaseEntity {
    * @returns {string} 邮箱地址
    */
   getEmail(): string {
-    return this.email.getValue();
+    return this.email.getValue()
   }
 
   /**
@@ -730,7 +752,7 @@ export class User extends BaseEntity {
    * @returns {string} 手机号，如果未设置返回空字符串
    */
   getPhone(): string {
-    return this.phone?.getValue() || '';
+    return this.phone?.getValue() || ''
   }
 
   /**
@@ -739,7 +761,7 @@ export class User extends BaseEntity {
    * @returns {string} 用户状态
    */
   getStatus(): string {
-    return this.status.getValue();
+    return this.status.getValue()
   }
 
   /**
@@ -748,7 +770,7 @@ export class User extends BaseEntity {
    * @returns {string} 状态显示名称
    */
   getStatusDisplayName(): string {
-    return this.status.getDisplayName();
+    return this.status.getDisplayName()
   }
 
   /**
@@ -757,7 +779,7 @@ export class User extends BaseEntity {
    * @returns {string} 状态描述
    */
   getStatusDescription(): string {
-    return this.status.getDescription();
+    return this.status.getDescription()
   }
 
   /**
@@ -766,7 +788,7 @@ export class User extends BaseEntity {
    * @returns {string} 全名
    */
   getFullName(): string {
-    return `${this.firstName} ${this.lastName}`;
+    return `${this.firstName} ${this.lastName}`
   }
 
   /**
@@ -775,7 +797,7 @@ export class User extends BaseEntity {
    * @param event 领域事件
    */
   addDomainEvent(event: any): void {
-    this._domainEvents.push(event);
+    this._domainEvents.push(event)
   }
 
   /**
@@ -783,7 +805,7 @@ export class User extends BaseEntity {
    * @description 清除领域事件
    */
   clearDomainEvents(): void {
-    this._domainEvents = [];
+    this._domainEvents = []
   }
 
   /**
@@ -792,7 +814,7 @@ export class User extends BaseEntity {
    * @returns {any[]} 领域事件列表
    */
   getDomainEvents(): any[] {
-    return [...this._domainEvents];
+    return [...this._domainEvents]
   }
 
   /**
@@ -801,7 +823,7 @@ export class User extends BaseEntity {
    * @returns {boolean} 是否有领域事件
    */
   hasDomainEvents(): boolean {
-    return this._domainEvents.length > 0;
+    return this._domainEvents.length > 0
   }
 
   /**
@@ -809,6 +831,6 @@ export class User extends BaseEntity {
    * @description 更新用户时间戳
    */
   private updateUserTimestamp(): void {
-    this.updatedAt = new Date();
+    this.updatedAt = new Date()
   }
-} 
+}

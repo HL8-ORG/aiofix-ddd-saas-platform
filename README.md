@@ -6,3 +6,7 @@
 [vibecode-playground](https://www.youtube.com/watch?v=Mfr8pi-jvu0)
 
 https://github.com/vuong-khai-ha/nextjs-modular-base/tree/main/src
+
+https://github.com/michaelshimeles/nextjs-starter-kit
+
+https://manfromexistence-ui.vercel.app/

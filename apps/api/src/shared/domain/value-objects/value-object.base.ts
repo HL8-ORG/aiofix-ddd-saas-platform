@@ -2,7 +2,7 @@
  * @abstract ValueObject
  * @description
  * 值对象基类，提供值对象的基础功能和抽象方法。
- * 
+ *
  * 主要原理与机制：
  * 1. 值对象是不可变的，创建后不可修改
  * 2. 值对象通过值相等性进行比较
@@ -11,7 +11,7 @@
  * 5. 遵循DDD值对象设计原则
  */
 export abstract class ValueObject<T> {
-  protected _value!: T;
+  protected _value!: T
 
   /**
    * @constructor
@@ -27,7 +27,7 @@ export abstract class ValueObject<T> {
    * @returns {T} 值对象的值
    */
   getValue(): T {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -38,9 +38,9 @@ export abstract class ValueObject<T> {
    */
   equals(other: ValueObject<T>): boolean {
     if (!other) {
-      return false;
+      return false
     }
-    return this._value === other._value;
+    return this._value === other._value
   }
 
   /**
@@ -49,7 +49,7 @@ export abstract class ValueObject<T> {
    * @returns {string} 字符串表示
    */
   toString(): string {
-    return String(this._value);
+    return String(this._value)
   }
 
   /**
@@ -58,7 +58,7 @@ export abstract class ValueObject<T> {
    * @returns {string} JSON字符串
    */
   toJSON(): string {
-    return JSON.stringify(this._value);
+    return JSON.stringify(this._value)
   }
 
   /**
@@ -67,6 +67,6 @@ export abstract class ValueObject<T> {
    * @returns {ValueObject<T>} 克隆的值对象
    */
   clone(): ValueObject<T> {
-    return this.constructor.prototype.constructor(this._value);
+    return this.constructor.prototype.constructor(this._value)
   }
-} 
+}

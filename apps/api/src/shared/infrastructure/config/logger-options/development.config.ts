@@ -1,13 +1,13 @@
-import { FastifyRequest } from 'fastify';
+import { FastifyRequest } from 'fastify'
 // import { User } from 'src/entities/user.entity';
-import pino from 'pino';
-import { REQUEST_ID_HEADER } from 'src/shared/domain/constants/app.constants';
+import pino from 'pino'
+import { REQUEST_ID_HEADER } from 'src/shared/domain/constants/app.constants'
 
 /**
  * @constant pinoDevConfig
  * @description
  * Pino 日志库在开发环境下的配置对象。该配置用于定制日志的输出格式、内容和行为，便于开发调试和问题追踪。
- * 
+ *
  * 主要原理与机制如下：
  * 1. level: 日志级别，优先读取环境变量LOG_LEVEL，默认为'debug'，便于开发时输出详细日志。
  * 2. transport: 配置pino-pretty插件，将日志美化为易读格式，并自定义时间格式（SYS:dd-mm-yyyy HH:MM:ss）。
@@ -17,7 +17,7 @@ import { REQUEST_ID_HEADER } from 'src/shared/domain/constants/app.constants';
  *    - res序列化器：仅输出响应状态码，简化日志内容。
  * 5. customProps: 自定义属性注入函数，将当前请求的用户信息（如id、用户名、邮箱、角色）添加到日志中，便于追踪用户操作。
  * 6. quietReqLogger: 设为true，关闭pino-http的默认请求日志，避免重复输出，由自定义日志逻辑接管。
- * 
+ *
  * 该配置通过pinoHttp插件集成到Fastify/NestJS应用中，实现结构化、可追溯的开发环境日志。
  */
 export const pinoDevConfig: { pinoHttp: any } = {
@@ -62,7 +62,7 @@ export const pinoDevConfig: { pinoHttp: any } = {
             statusCode: object.res?.statusCode,
             userAgent: object.req?.userAgent,
             ip: object.req?.ip,
-          };
+          }
         },
       },
     }),
@@ -74,14 +74,14 @@ export const pinoDevConfig: { pinoHttp: any } = {
        * 请求对象序列化器。提取并格式化请求的关键信息，便于日志追踪。
        */
       req: (req: {
-        id: any;
-        method: any;
-        url: any;
-        headers: { [x: string]: any };
-        ip: any;
-        body: any;
-        query: any;
-        params: any;
+        id: any
+        method: any
+        url: any
+        headers: { [x: string]: any }
+        ip: any
+        body: any
+        query: any
+        params: any
       }) => {
         return {
           [REQUEST_ID_HEADER]: req.id,
@@ -93,7 +93,7 @@ export const pinoDevConfig: { pinoHttp: any } = {
           body: req.body,
           query: req.query,
           params: req.params,
-        };
+        }
       },
       /**
        * @function res
@@ -103,14 +103,14 @@ export const pinoDevConfig: { pinoHttp: any } = {
       res: (res: { statusCode: any }) => {
         return {
           statusCode: res.statusCode,
-        };
+        }
       },
     },
     /**
      * @function customProps
      * @description
      * 自定义日志属性，将当前请求的用户信息注入到日志中，便于追踪用户操作。
-     * 
+     *
      * @param req FastifyRequest & { user?: User }
      * @returns 包含用户信息的对象
      */
@@ -130,4 +130,4 @@ export const pinoDevConfig: { pinoHttp: any } = {
     // 关闭默认请求日志，由自定义日志逻辑接管，避免重复输出
     quietReqLogger: true,
   },
-};
+}

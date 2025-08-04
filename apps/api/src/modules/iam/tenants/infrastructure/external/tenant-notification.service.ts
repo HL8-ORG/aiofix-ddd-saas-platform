@@ -1,6 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { Tenant } from '../../domain/entities/tenant.entity';
-import { TenantCreatedEvent, TenantActivatedEvent, TenantSuspendedEvent, TenantDeletedEvent } from '../../domain/events/tenant.events';
+import { Injectable } from '@nestjs/common'
+import type { Tenant } from '../../domain/entities/tenant.entity'
+import {
+  TenantActivatedEvent,
+  TenantCreatedEvent,
+  TenantDeletedEvent,
+  TenantSuspendedEvent,
+} from '../../domain/events/tenant.events'
 
 /**
  * @interface NotificationService
@@ -14,7 +19,7 @@ export interface NotificationService {
    * @param tenant 租户信息
    * @returns {Promise<void>}
    */
-  sendWelcomeEmail(tenant: Tenant): Promise<void>;
+  sendWelcomeEmail(tenant: Tenant): Promise<void>
 
   /**
    * @method sendActivationNotification
@@ -23,7 +28,10 @@ export interface NotificationService {
    * @param activatedBy 激活者ID
    * @returns {Promise<void>}
    */
-  sendActivationNotification(tenant: Tenant, activatedBy?: string): Promise<void>;
+  sendActivationNotification(
+    tenant: Tenant,
+    activatedBy?: string,
+  ): Promise<void>
 
   /**
    * @method sendSuspensionNotification
@@ -33,7 +41,11 @@ export interface NotificationService {
    * @param reason 暂停原因
    * @returns {Promise<void>}
    */
-  sendSuspensionNotification(tenant: Tenant, suspendedBy?: string, reason?: string): Promise<void>;
+  sendSuspensionNotification(
+    tenant: Tenant,
+    suspendedBy?: string,
+    reason?: string,
+  ): Promise<void>
 
   /**
    * @method sendDeletionNotification
@@ -43,14 +55,18 @@ export interface NotificationService {
    * @param reason 删除原因
    * @returns {Promise<void>}
    */
-  sendDeletionNotification(tenant: Tenant, deletedBy?: string, reason?: string): Promise<void>;
+  sendDeletionNotification(
+    tenant: Tenant,
+    deletedBy?: string,
+    reason?: string,
+  ): Promise<void>
 }
 
 /**
  * @class TenantNotificationService
  * @description
  * 租户通知服务实现，负责处理租户相关的通知发送。
- * 
+ *
  * 主要原理与机制：
  * 1. 实现NotificationService接口
  * 2. 处理各种租户事件的通知发送
@@ -66,7 +82,7 @@ export class TenantNotificationService implements NotificationService {
    */
   async sendWelcomeEmail(tenant: Tenant): Promise<void> {
     // TODO: 集成实际的邮件服务
-    console.log(`发送欢迎邮件给租户: ${tenant.getName()} (${tenant.getCode()})`);
+    console.log(`发送欢迎邮件给租户: ${tenant.getName()} (${tenant.getCode()})`)
 
     // 模拟邮件发送
     const emailContent = {
@@ -87,18 +103,21 @@ export class TenantNotificationService implements NotificationService {
         如有任何问题，请联系我们的客服团队。
         
         祝您使用愉快！
-      `
-    };
+      `,
+    }
 
-    console.log('邮件内容:', emailContent);
+    console.log('邮件内容:', emailContent)
   }
 
   /**
    * @method sendActivationNotification
    * @description 发送激活通知
    */
-  async sendActivationNotification(tenant: Tenant, activatedBy?: string): Promise<void> {
-    console.log(`发送激活通知给租户: ${tenant.getName()} (${tenant.getCode()})`);
+  async sendActivationNotification(
+    tenant: Tenant,
+    activatedBy?: string,
+  ): Promise<void> {
+    console.log(`发送激活通知给租户: ${tenant.getName()} (${tenant.getCode()})`)
 
     const notificationContent = {
       tenantId: tenant.id,
@@ -106,18 +125,22 @@ export class TenantNotificationService implements NotificationService {
       tenantCode: tenant.getCode(),
       activatedBy: activatedBy || 'system',
       activatedAt: new Date().toISOString(),
-      message: `租户 ${tenant.getName()} 已成功激活`
-    };
+      message: `租户 ${tenant.getName()} 已成功激活`,
+    }
 
-    console.log('激活通知内容:', notificationContent);
+    console.log('激活通知内容:', notificationContent)
   }
 
   /**
    * @method sendSuspensionNotification
    * @description 发送暂停通知
    */
-  async sendSuspensionNotification(tenant: Tenant, suspendedBy?: string, reason?: string): Promise<void> {
-    console.log(`发送暂停通知给租户: ${tenant.getName()} (${tenant.getCode()})`);
+  async sendSuspensionNotification(
+    tenant: Tenant,
+    suspendedBy?: string,
+    reason?: string,
+  ): Promise<void> {
+    console.log(`发送暂停通知给租户: ${tenant.getName()} (${tenant.getCode()})`)
 
     const notificationContent = {
       tenantId: tenant.id,
@@ -126,18 +149,22 @@ export class TenantNotificationService implements NotificationService {
       suspendedBy: suspendedBy || 'system',
       suspendedAt: new Date().toISOString(),
       reason: reason || '未提供原因',
-      message: `租户 ${tenant.getName()} 已被暂停`
-    };
+      message: `租户 ${tenant.getName()} 已被暂停`,
+    }
 
-    console.log('暂停通知内容:', notificationContent);
+    console.log('暂停通知内容:', notificationContent)
   }
 
   /**
    * @method sendDeletionNotification
    * @description 发送删除通知
    */
-  async sendDeletionNotification(tenant: Tenant, deletedBy?: string, reason?: string): Promise<void> {
-    console.log(`发送删除通知给租户: ${tenant.getName()} (${tenant.getCode()})`);
+  async sendDeletionNotification(
+    tenant: Tenant,
+    deletedBy?: string,
+    reason?: string,
+  ): Promise<void> {
+    console.log(`发送删除通知给租户: ${tenant.getName()} (${tenant.getCode()})`)
 
     const notificationContent = {
       tenantId: tenant.id,
@@ -146,9 +173,9 @@ export class TenantNotificationService implements NotificationService {
       deletedBy: deletedBy || 'system',
       deletedAt: new Date().toISOString(),
       reason: reason || '未提供原因',
-      message: `租户 ${tenant.getName()} 已被删除`
-    };
+      message: `租户 ${tenant.getName()} 已被删除`,
+    }
 
-    console.log('删除通知内容:', notificationContent);
+    console.log('删除通知内容:', notificationContent)
   }
-} 
+}

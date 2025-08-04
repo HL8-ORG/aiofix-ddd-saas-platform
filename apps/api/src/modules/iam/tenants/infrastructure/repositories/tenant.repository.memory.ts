@@ -1,15 +1,18 @@
-import { Injectable } from '@nestjs/common';
-import { Tenant } from '../../domain/entities/tenant.entity';
-import { TenantCode } from '../../domain/value-objects/tenant-code.value-object';
-import { TenantStatus, TenantStatusValue } from '../../domain/value-objects/tenant-status.value-object';
-import { TenantRepository } from '../../domain/repositories/tenant.repository';
+import { Injectable } from '@nestjs/common'
+import type { Tenant } from '../../domain/entities/tenant.entity'
+import { TenantRepository } from '../../domain/repositories/tenant.repository'
+import type { TenantCode } from '../../domain/value-objects/tenant-code.value-object'
+import {
+  TenantStatus,
+  TenantStatusValue,
+} from '../../domain/value-objects/tenant-status.value-object'
 
 /**
  * @class TenantRepositoryImpl
  * @description
  * 租户仓储抽象类的实现类，属于基础设施层。
  * 负责具体的数据库操作和外部服务集成。
- * 
+ *
  * 主要原理与机制：
  * 1. 继承TenantRepository抽象类，实现所有抽象方法
  * 2. 处理领域对象与数据库之间的转换
@@ -20,15 +23,15 @@ import { TenantRepository } from '../../domain/repositories/tenant.repository';
 @Injectable()
 export class TenantRepositoryMemory extends TenantRepository {
   // 临时使用内存存储，后续会替换为真实的数据库实现
-  private tenants: Map<string, Tenant> = new Map();
+  private tenants: Map<string, Tenant> = new Map()
 
   /**
    * @method save
    * @description 保存租户实体
    */
   async save(tenant: Tenant): Promise<Tenant> {
-    this.tenants.set(tenant.id, tenant);
-    return tenant;
+    this.tenants.set(tenant.id, tenant)
+    return tenant
   }
 
   /**
@@ -36,7 +39,7 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 根据ID查找租户
    */
   async findById(id: string): Promise<Tenant | null> {
-    return this.tenants.get(id) || null;
+    return this.tenants.get(id) || null
   }
 
   /**
@@ -46,10 +49,10 @@ export class TenantRepositoryMemory extends TenantRepository {
   async findByCode(code: TenantCode): Promise<Tenant | null> {
     for (const tenant of this.tenants.values()) {
       if (tenant.getCode() === code.value) {
-        return tenant;
+        return tenant
       }
     }
-    return null;
+    return null
   }
 
   /**
@@ -59,10 +62,10 @@ export class TenantRepositoryMemory extends TenantRepository {
   async findByCodeString(code: string): Promise<Tenant | null> {
     for (const tenant of this.tenants.values()) {
       if (tenant.getCode() === code) {
-        return tenant;
+        return tenant
       }
     }
-    return null;
+    return null
   }
 
   /**
@@ -70,9 +73,9 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 根据名称查找租户
    */
   async findByName(name: string): Promise<Tenant[]> {
-    return Array.from(this.tenants.values()).filter(
-      tenant => tenant.getName().toLowerCase().includes(name.toLowerCase())
-    );
+    return Array.from(this.tenants.values()).filter((tenant) =>
+      tenant.getName().toLowerCase().includes(name.toLowerCase()),
+    )
   }
 
   /**
@@ -81,8 +84,8 @@ export class TenantRepositoryMemory extends TenantRepository {
    */
   async findByStatus(status: TenantStatus): Promise<Tenant[]> {
     return Array.from(this.tenants.values()).filter(
-      tenant => tenant.getStatus() === status
-    );
+      (tenant) => tenant.getStatus() === status,
+    )
   }
 
   /**
@@ -91,8 +94,8 @@ export class TenantRepositoryMemory extends TenantRepository {
    */
   async findByAdminUserId(adminUserId: string): Promise<Tenant[]> {
     return Array.from(this.tenants.values()).filter(
-      tenant => tenant.adminUserId === adminUserId
-    );
+      (tenant) => tenant.adminUserId === adminUserId,
+    )
   }
 
   /**
@@ -101,8 +104,8 @@ export class TenantRepositoryMemory extends TenantRepository {
    */
   async findActive(): Promise<Tenant[]> {
     return Array.from(this.tenants.values()).filter(
-      tenant => tenant.getStatus() === TenantStatus.ACTIVE
-    );
+      (tenant) => tenant.getStatus() === TenantStatus.ACTIVE,
+    )
   }
 
   /**
@@ -111,8 +114,8 @@ export class TenantRepositoryMemory extends TenantRepository {
    */
   async findPending(): Promise<Tenant[]> {
     return Array.from(this.tenants.values()).filter(
-      tenant => tenant.getStatus() === TenantStatus.PENDING
-    );
+      (tenant) => tenant.getStatus() === TenantStatus.PENDING,
+    )
   }
 
   /**
@@ -121,8 +124,8 @@ export class TenantRepositoryMemory extends TenantRepository {
    */
   async findSuspended(): Promise<Tenant[]> {
     return Array.from(this.tenants.values()).filter(
-      tenant => tenant.getStatus() === TenantStatus.SUSPENDED
-    );
+      (tenant) => tenant.getStatus() === TenantStatus.SUSPENDED,
+    )
   }
 
   /**
@@ -130,9 +133,9 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 查找所有已删除的租户
    */
   async findDeleted(): Promise<Tenant[]> {
-    return Array.from(this.tenants.values()).filter(
-      tenant => tenant.isDeleted()
-    );
+    return Array.from(this.tenants.values()).filter((tenant) =>
+      tenant.isDeleted(),
+    )
   }
 
   /**
@@ -141,8 +144,8 @@ export class TenantRepositoryMemory extends TenantRepository {
    */
   async findAll(): Promise<Tenant[]> {
     return Array.from(this.tenants.values()).filter(
-      tenant => !tenant.isDeleted()
-    );
+      (tenant) => !tenant.isDeleted(),
+    )
   }
 
   /**
@@ -150,7 +153,7 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 查找所有租户（包括已删除的）
    */
   async findAllWithDeleted(): Promise<Tenant[]> {
-    return Array.from(this.tenants.values());
+    return Array.from(this.tenants.values())
   }
 
   /**
@@ -158,8 +161,8 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 检查租户是否存在
    */
   async exists(id: string): Promise<boolean> {
-    const tenant = this.tenants.get(id);
-    return tenant !== undefined && !tenant.isDeleted();
+    const tenant = this.tenants.get(id)
+    return tenant !== undefined && !tenant.isDeleted()
   }
 
   /**
@@ -169,10 +172,10 @@ export class TenantRepositoryMemory extends TenantRepository {
   async existsByCode(code: TenantCode): Promise<boolean> {
     for (const tenant of this.tenants.values()) {
       if (tenant.getCode() === code.value && !tenant.isDeleted()) {
-        return true;
+        return true
       }
     }
-    return false;
+    return false
   }
 
   /**
@@ -182,10 +185,10 @@ export class TenantRepositoryMemory extends TenantRepository {
   async existsByCodeString(code: string): Promise<boolean> {
     for (const tenant of this.tenants.values()) {
       if (tenant.getCode() === code && !tenant.isDeleted()) {
-        return true;
+        return true
       }
     }
-    return false;
+    return false
   }
 
   /**
@@ -194,8 +197,8 @@ export class TenantRepositoryMemory extends TenantRepository {
    */
   async count(): Promise<number> {
     return Array.from(this.tenants.values()).filter(
-      tenant => !tenant.isDeleted()
-    ).length;
+      (tenant) => !tenant.isDeleted(),
+    ).length
   }
 
   /**
@@ -204,8 +207,8 @@ export class TenantRepositoryMemory extends TenantRepository {
    */
   async countByStatus(status: TenantStatus): Promise<number> {
     return Array.from(this.tenants.values()).filter(
-      tenant => tenant.getStatus() === status && !tenant.isDeleted()
-    ).length;
+      (tenant) => tenant.getStatus() === status && !tenant.isDeleted(),
+    ).length
   }
 
   /**
@@ -213,12 +216,12 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 软删除租户
    */
   async delete(id: string): Promise<boolean> {
-    const tenant = this.tenants.get(id);
+    const tenant = this.tenants.get(id)
     if (tenant && !tenant.isDeleted()) {
-      tenant.softDelete();
-      return true;
+      tenant.softDelete()
+      return true
     }
-    return false;
+    return false
   }
 
   /**
@@ -226,7 +229,7 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 硬删除租户
    */
   async hardDelete(id: string): Promise<boolean> {
-    return this.tenants.delete(id);
+    return this.tenants.delete(id)
   }
 
   /**
@@ -234,12 +237,12 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 恢复已删除的租户
    */
   async restore(id: string): Promise<boolean> {
-    const tenant = this.tenants.get(id);
+    const tenant = this.tenants.get(id)
     if (tenant && tenant.isDeleted()) {
-      tenant.restore();
-      return true;
+      tenant.restore()
+      return true
     }
-    return false;
+    return false
   }
 
   /**
@@ -247,25 +250,28 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 更新租户状态
    */
   async updateStatus(id: string, status: TenantStatus): Promise<boolean> {
-    const tenant = this.tenants.get(id);
+    const tenant = this.tenants.get(id)
     if (tenant) {
-      tenant.status = new TenantStatusValue(status);
-      return true;
+      tenant.status = new TenantStatusValue(status)
+      return true
     }
-    return false;
+    return false
   }
 
   /**
    * @method updateSettings
    * @description 更新租户配置
    */
-  async updateSettings(id: string, settings: Record<string, any>): Promise<boolean> {
-    const tenant = this.tenants.get(id);
+  async updateSettings(
+    id: string,
+    settings: Record<string, any>,
+  ): Promise<boolean> {
+    const tenant = this.tenants.get(id)
     if (tenant) {
-      tenant.updateSettings(settings);
-      return true;
+      tenant.updateSettings(settings)
+      return true
     }
-    return false;
+    return false
   }
 
   /**
@@ -275,79 +281,95 @@ export class TenantRepositoryMemory extends TenantRepository {
   async findWithPagination(
     page: number,
     limit: number,
-    filters?: { status?: TenantStatus; adminUserId?: string; search?: string; },
-    sort?: { field: 'name' | 'code' | 'status' | 'createdAt' | 'updatedAt'; order: 'asc' | 'desc'; }
-  ): Promise<{ tenants: Tenant[]; total: number; page: number; limit: number; totalPages: number; }> {
-    let tenants = Array.from(this.tenants.values()).filter(tenant => !tenant.isDeleted());
+    filters?: { status?: TenantStatus; adminUserId?: string; search?: string },
+    sort?: {
+      field: 'name' | 'code' | 'status' | 'createdAt' | 'updatedAt'
+      order: 'asc' | 'desc'
+    },
+  ): Promise<{
+    tenants: Tenant[]
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }> {
+    let tenants = Array.from(this.tenants.values()).filter(
+      (tenant) => !tenant.isDeleted(),
+    )
 
     // 应用过滤器
     if (filters) {
       if (filters.status) {
-        tenants = tenants.filter(tenant => tenant.getStatus() === filters.status);
+        tenants = tenants.filter(
+          (tenant) => tenant.getStatus() === filters.status,
+        )
       }
       if (filters.adminUserId) {
-        tenants = tenants.filter(tenant => tenant.adminUserId === filters.adminUserId);
+        tenants = tenants.filter(
+          (tenant) => tenant.adminUserId === filters.adminUserId,
+        )
       }
       if (filters.search) {
-        const searchLower = filters.search.toLowerCase();
-        tenants = tenants.filter(tenant =>
-          tenant.getName().toLowerCase().includes(searchLower) ||
-          tenant.getCode().toLowerCase().includes(searchLower)
-        );
+        const searchLower = filters.search.toLowerCase()
+        tenants = tenants.filter(
+          (tenant) =>
+            tenant.getName().toLowerCase().includes(searchLower) ||
+            tenant.getCode().toLowerCase().includes(searchLower),
+        )
       }
     }
 
     // 应用排序
     if (sort) {
       tenants.sort((a, b) => {
-        let aValue: any, bValue: any;
+        let aValue: any, bValue: any
 
         switch (sort.field) {
           case 'name':
-            aValue = a.getName();
-            bValue = b.getName();
-            break;
+            aValue = a.getName()
+            bValue = b.getName()
+            break
           case 'code':
-            aValue = a.getCode();
-            bValue = b.getCode();
-            break;
+            aValue = a.getCode()
+            bValue = b.getCode()
+            break
           case 'status':
-            aValue = a.getStatus();
-            bValue = b.getStatus();
-            break;
+            aValue = a.getStatus()
+            bValue = b.getStatus()
+            break
           case 'createdAt':
-            aValue = a.createdAt;
-            bValue = b.createdAt;
-            break;
+            aValue = a.createdAt
+            bValue = b.createdAt
+            break
           case 'updatedAt':
-            aValue = a.updatedAt;
-            bValue = b.updatedAt;
-            break;
+            aValue = a.updatedAt
+            bValue = b.updatedAt
+            break
           default:
-            return 0;
+            return 0
         }
 
         if (sort.order === 'asc') {
-          return aValue > bValue ? 1 : -1;
+          return aValue > bValue ? 1 : -1
         } else {
-          return aValue < bValue ? 1 : -1;
+          return aValue < bValue ? 1 : -1
         }
-      });
+      })
     }
 
-    const total = tenants.length;
-    const totalPages = Math.ceil(total / limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedTenants = tenants.slice(startIndex, endIndex);
+    const total = tenants.length
+    const totalPages = Math.ceil(total / limit)
+    const startIndex = (page - 1) * limit
+    const endIndex = startIndex + limit
+    const paginatedTenants = tenants.slice(startIndex, endIndex)
 
     return {
       tenants: paginatedTenants,
       total,
       page,
       limit,
-      totalPages
-    };
+      totalPages,
+    }
   }
 
   /**
@@ -355,19 +377,19 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 根据搜索关键词查找租户
    */
   async findBySearch(search: string, limit?: number): Promise<Tenant[]> {
-    const searchLower = search.toLowerCase();
-    let tenants = Array.from(this.tenants.values()).filter(tenant =>
-      !tenant.isDeleted() && (
-        tenant.getName().toLowerCase().includes(searchLower) ||
-        tenant.getCode().toLowerCase().includes(searchLower)
-      )
-    );
+    const searchLower = search.toLowerCase()
+    let tenants = Array.from(this.tenants.values()).filter(
+      (tenant) =>
+        !tenant.isDeleted() &&
+        (tenant.getName().toLowerCase().includes(searchLower) ||
+          tenant.getCode().toLowerCase().includes(searchLower)),
+    )
 
     if (limit) {
-      tenants = tenants.slice(0, limit);
+      tenants = tenants.slice(0, limit)
     }
 
-    return tenants;
+    return tenants
   }
 
   /**
@@ -376,14 +398,14 @@ export class TenantRepositoryMemory extends TenantRepository {
    */
   async findRecent(limit?: number): Promise<Tenant[]> {
     let tenants = Array.from(this.tenants.values())
-      .filter(tenant => !tenant.isDeleted())
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .filter((tenant) => !tenant.isDeleted())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
 
     if (limit) {
-      tenants = tenants.slice(0, limit);
+      tenants = tenants.slice(0, limit)
     }
 
-    return tenants;
+    return tenants
   }
 
   /**
@@ -391,10 +413,11 @@ export class TenantRepositoryMemory extends TenantRepository {
    * @description 根据日期范围查找租户
    */
   async findByDateRange(startDate: Date, endDate: Date): Promise<Tenant[]> {
-    return Array.from(this.tenants.values()).filter(tenant =>
-      !tenant.isDeleted() &&
-      tenant.createdAt >= startDate &&
-      tenant.createdAt <= endDate
-    );
+    return Array.from(this.tenants.values()).filter(
+      (tenant) =>
+        !tenant.isDeleted() &&
+        tenant.createdAt >= startDate &&
+        tenant.createdAt <= endDate,
+    )
   }
-} 
+}

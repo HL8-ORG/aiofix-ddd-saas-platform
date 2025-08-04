@@ -1,22 +1,22 @@
-import { IsEnum } from 'class-validator';
-import { Expose } from 'class-transformer';
+import { Expose } from 'class-transformer'
+import { IsEnum } from 'class-validator'
 
 /**
  * @enum TenantStatus
  * @description 租户状态枚举
  */
 export enum TenantStatus {
-  PENDING = 'pending',    // 待激活
-  ACTIVE = 'active',      // 激活
+  PENDING = 'pending', // 待激活
+  ACTIVE = 'active', // 激活
   SUSPENDED = 'suspended', // 禁用
-  DELETED = 'deleted'     // 已删除
+  DELETED = 'deleted', // 已删除
 }
 
 /**
  * @class TenantStatusValue
  * @description
  * 租户状态值对象，封装租户状态的业务规则和状态转换逻辑。
- * 
+ *
  * 主要原理与机制：
  * 1. 值对象是不可变的，一旦创建就不能修改
  * 2. 通过状态机模式管理状态转换
@@ -31,7 +31,7 @@ export class TenantStatusValue {
    */
   @IsEnum(TenantStatus, { message: '无效的租户状态' })
   @Expose()
-  private readonly _value: TenantStatus;
+  private readonly _value: TenantStatus
 
   /**
    * @constructor
@@ -39,7 +39,7 @@ export class TenantStatusValue {
    * @param value 租户状态值
    */
   constructor(value: TenantStatus) {
-    this._value = value;
+    this._value = value
   }
 
   /**
@@ -48,7 +48,7 @@ export class TenantStatusValue {
    * @returns {TenantStatus} 租户状态
    */
   get value(): TenantStatus {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -57,7 +57,7 @@ export class TenantStatusValue {
    * @returns {boolean} 如果是待激活状态返回true，否则返回false
    */
   isPending(): boolean {
-    return this._value === TenantStatus.PENDING;
+    return this._value === TenantStatus.PENDING
   }
 
   /**
@@ -66,7 +66,7 @@ export class TenantStatusValue {
    * @returns {boolean} 如果是激活状态返回true，否则返回false
    */
   isActive(): boolean {
-    return this._value === TenantStatus.ACTIVE;
+    return this._value === TenantStatus.ACTIVE
   }
 
   /**
@@ -75,7 +75,7 @@ export class TenantStatusValue {
    * @returns {boolean} 如果是禁用状态返回true，否则返回false
    */
   isSuspended(): boolean {
-    return this._value === TenantStatus.SUSPENDED;
+    return this._value === TenantStatus.SUSPENDED
   }
 
   /**
@@ -84,7 +84,7 @@ export class TenantStatusValue {
    * @returns {boolean} 如果是已删除状态返回true，否则返回false
    */
   isDeleted(): boolean {
-    return this._value === TenantStatus.DELETED;
+    return this._value === TenantStatus.DELETED
   }
 
   /**
@@ -93,7 +93,10 @@ export class TenantStatusValue {
    * @returns {boolean} 如果可以激活返回true，否则返回false
    */
   canActivate(): boolean {
-    return this._value === TenantStatus.PENDING || this._value === TenantStatus.SUSPENDED;
+    return (
+      this._value === TenantStatus.PENDING ||
+      this._value === TenantStatus.SUSPENDED
+    )
   }
 
   /**
@@ -102,7 +105,10 @@ export class TenantStatusValue {
    * @returns {boolean} 如果可以禁用返回true，否则返回false
    */
   canSuspend(): boolean {
-    return this._value === TenantStatus.ACTIVE || this._value === TenantStatus.PENDING;
+    return (
+      this._value === TenantStatus.ACTIVE ||
+      this._value === TenantStatus.PENDING
+    )
   }
 
   /**
@@ -111,7 +117,7 @@ export class TenantStatusValue {
    * @returns {boolean} 如果可以删除返回true，否则返回false
    */
   canDelete(): boolean {
-    return this._value !== TenantStatus.DELETED;
+    return this._value !== TenantStatus.DELETED
   }
 
   /**
@@ -120,7 +126,7 @@ export class TenantStatusValue {
    * @returns {boolean} 如果可以恢复返回true，否则返回false
    */
   canRestore(): boolean {
-    return this._value === TenantStatus.DELETED;
+    return this._value === TenantStatus.DELETED
   }
 
   /**
@@ -131,15 +137,15 @@ export class TenantStatusValue {
   getDisplayName(): string {
     switch (this._value) {
       case TenantStatus.PENDING:
-        return '待激活';
+        return '待激活'
       case TenantStatus.ACTIVE:
-        return '激活';
+        return '激活'
       case TenantStatus.SUSPENDED:
-        return '禁用';
+        return '禁用'
       case TenantStatus.DELETED:
-        return '已删除';
+        return '已删除'
       default:
-        return '未知状态';
+        return '未知状态'
     }
   }
 
@@ -151,15 +157,15 @@ export class TenantStatusValue {
   getDescription(): string {
     switch (this._value) {
       case TenantStatus.PENDING:
-        return '租户已创建但尚未激活，需要管理员审核';
+        return '租户已创建但尚未激活，需要管理员审核'
       case TenantStatus.ACTIVE:
-        return '租户已激活，可以正常使用系统功能';
+        return '租户已激活，可以正常使用系统功能'
       case TenantStatus.SUSPENDED:
-        return '租户已被禁用，无法使用系统功能';
+        return '租户已被禁用，无法使用系统功能'
       case TenantStatus.DELETED:
-        return '租户已被删除，数据保留但无法访问';
+        return '租户已被删除，数据保留但无法访问'
       default:
-        return '未知状态';
+        return '未知状态'
     }
   }
 
@@ -169,7 +175,7 @@ export class TenantStatusValue {
    * @returns {string} 租户状态
    */
   toString(): string {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -179,8 +185,8 @@ export class TenantStatusValue {
    * @returns {boolean} 如果相等返回true，否则返回false
    */
   equals(other: TenantStatusValue): boolean {
-    if (!other) return false;
-    return this._value === other._value;
+    if (!other) return false
+    return this._value === other._value
   }
 
   /**
@@ -192,9 +198,9 @@ export class TenantStatusValue {
    */
   static fromString(value: string): TenantStatusValue {
     if (!Object.values(TenantStatus).includes(value as TenantStatus)) {
-      throw new Error(`无效的租户状态: ${value}`);
+      throw new Error(`无效的租户状态: ${value}`)
     }
-    return new TenantStatusValue(value as TenantStatus);
+    return new TenantStatusValue(value as TenantStatus)
   }
 
   /**
@@ -203,6 +209,6 @@ export class TenantStatusValue {
    * @returns {TenantStatus[]} 所有可用的状态
    */
   static getAvailableStatuses(): TenantStatus[] {
-    return Object.values(TenantStatus);
+    return Object.values(TenantStatus)
   }
-} 
+}

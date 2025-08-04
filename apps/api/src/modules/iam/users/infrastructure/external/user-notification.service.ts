@@ -1,12 +1,12 @@
-import { Injectable, Inject, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { UserInfrastructureConfig } from '../config/user-infrastructure.config';
+import { Inject, Injectable, Logger } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
+import type { UserInfrastructureConfig } from '../config/user-infrastructure.config'
 
 /**
  * @interface NotificationPayload
  * @description
  * 通知载荷接口，定义通知消息的结构。
- * 
+ *
  * 主要字段：
  * 1. type: 通知类型
  * 2. title: 通知标题
@@ -15,28 +15,28 @@ import { UserInfrastructureConfig } from '../config/user-infrastructure.config';
  * 5. recipients: 接收者列表
  */
 export interface NotificationPayload {
-  type: string;
-  title: string;
-  message: string;
-  data?: Record<string, any>;
-  recipients: string[];
-  tenantId: string;
+  type: string
+  title: string
+  message: string
+  data?: Record<string, any>
+  recipients: string[]
+  tenantId: string
 }
 
 /**
  * @interface NotificationResult
  * @description
  * 通知结果接口，定义通知发送的结果。
- * 
+ *
  * 主要字段：
  * 1. success: 是否成功
  * 2. messageId: 消息ID
  * 3. error?: 错误信息
  */
 export interface NotificationResult {
-  success: boolean;
-  messageId?: string;
-  error?: string;
+  success: boolean
+  messageId?: string
+  error?: string
 }
 
 /**
@@ -44,14 +44,14 @@ export interface NotificationResult {
  * @description
  * 用户通知服务，负责用户相关的通知发送。
  * 支持多种通知类型：用户创建、状态变更、密码重置等。
- * 
+ *
  * 主要功能：
  * 1. 用户创建通知：新用户注册成功通知
  * 2. 状态变更通知：用户激活、暂停、删除等状态变更通知
  * 3. 密码重置通知：密码重置链接发送
  * 4. 安全通知：登录异常、账户锁定等安全相关通知
  * 5. 批量通知：支持批量发送通知
- * 
+ *
  * 主要原理与机制：
  * 1. 通过HTTP客户端调用外部通知服务
  * 2. 支持异步通知发送，不阻塞主业务流程
@@ -60,14 +60,15 @@ export interface NotificationResult {
  */
 @Injectable()
 export class UserNotificationService {
-  private readonly logger = new Logger(UserNotificationService.name);
-  private readonly config: UserInfrastructureConfig;
+  private readonly logger = new Logger(UserNotificationService.name)
+  private readonly config: UserInfrastructureConfig
 
   constructor(
     @Inject(ConfigService)
     private readonly configService: ConfigService,
   ) {
-    this.config = this.configService.get<UserInfrastructureConfig>('userInfrastructure');
+    this.config =
+      this.configService.get<UserInfrastructureConfig>('userInfrastructure')
   }
 
   /**
@@ -76,27 +77,32 @@ export class UserNotificationService {
    * @param payload 通知载荷
    * @returns 通知发送结果
    */
-  async sendNotification(payload: NotificationPayload): Promise<NotificationResult> {
+  async sendNotification(
+    payload: NotificationPayload,
+  ): Promise<NotificationResult> {
     if (!this.config.external.notification.enabled) {
-      this.logger.debug('通知服务已禁用，跳过通知发送');
-      return { success: true, messageId: 'disabled' };
+      this.logger.debug('通知服务已禁用，跳过通知发送')
+      return { success: true, messageId: 'disabled' }
     }
 
     try {
       // 这里应该调用实际的通知服务
       // 目前使用模拟实现
-      const result = await this.callNotificationService(payload);
+      const result = await this.callNotificationService(payload)
 
-      this.logger.log(`通知发送成功: ${payload.type} -> ${payload.recipients.join(', ')}`);
-      return result;
+      this.logger.log(
+        `通知发送成功: ${payload.type} -> ${payload.recipients.join(', ')}`,
+      )
+      return result
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      const errorStack = error instanceof Error ? error.stack : undefined;
-      this.logger.error(`通知发送失败: ${errorMessage}`, errorStack);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error)
+      const errorStack = error instanceof Error ? error.stack : undefined
+      this.logger.error(`通知发送失败: ${errorMessage}`, errorStack)
       return {
         success: false,
         error: errorMessage,
-      };
+      }
     }
   }
 
@@ -115,7 +121,7 @@ export class UserNotificationService {
     username: string,
     email: string,
     tenantId: string,
-    adminUserId: string
+    adminUserId: string,
   ): Promise<NotificationResult> {
     const payload: NotificationPayload = {
       type: 'USER_CREATED',
@@ -130,9 +136,9 @@ export class UserNotificationService {
       },
       recipients: [adminUserId],
       tenantId,
-    };
+    }
 
-    return this.sendNotification(payload);
+    return this.sendNotification(payload)
   }
 
   /**
@@ -152,14 +158,14 @@ export class UserNotificationService {
     oldStatus: string,
     newStatus: string,
     tenantId: string,
-    adminUserId: string
+    adminUserId: string,
   ): Promise<NotificationResult> {
     const statusMessages = {
-      'ACTIVE': '用户已激活',
-      'SUSPENDED': '用户已暂停',
-      'DELETED': '用户已删除',
-      'RESTORED': '用户已恢复',
-    };
+      ACTIVE: '用户已激活',
+      SUSPENDED: '用户已暂停',
+      DELETED: '用户已删除',
+      RESTORED: '用户已恢复',
+    }
 
     const payload: NotificationPayload = {
       type: 'USER_STATUS_CHANGED',
@@ -175,9 +181,9 @@ export class UserNotificationService {
       },
       recipients: [adminUserId, userId],
       tenantId,
-    };
+    }
 
-    return this.sendNotification(payload);
+    return this.sendNotification(payload)
   }
 
   /**
@@ -195,7 +201,7 @@ export class UserNotificationService {
     username: string,
     email: string,
     resetToken: string,
-    tenantId: string
+    tenantId: string,
   ): Promise<NotificationResult> {
     const payload: NotificationPayload = {
       type: 'PASSWORD_RESET',
@@ -211,9 +217,9 @@ export class UserNotificationService {
       },
       recipients: [userId],
       tenantId,
-    };
+    }
 
-    return this.sendNotification(payload);
+    return this.sendNotification(payload)
   }
 
   /**
@@ -235,7 +241,7 @@ export class UserNotificationService {
     success: boolean,
     ipAddress: string,
     userAgent: string,
-    tenantId: string
+    tenantId: string,
   ): Promise<NotificationResult> {
     const payload: NotificationPayload = {
       type: success ? 'LOGIN_SUCCESS' : 'LOGIN_FAILED',
@@ -255,9 +261,9 @@ export class UserNotificationService {
       },
       recipients: success ? [userId] : [userId], // 失败时也通知用户
       tenantId,
-    };
+    }
 
-    return this.sendNotification(payload);
+    return this.sendNotification(payload)
   }
 
   /**
@@ -277,7 +283,7 @@ export class UserNotificationService {
     email: string,
     reason: string,
     lockoutDuration: number,
-    tenantId: string
+    tenantId: string,
   ): Promise<NotificationResult> {
     const payload: NotificationPayload = {
       type: 'ACCOUNT_LOCKED',
@@ -290,13 +296,15 @@ export class UserNotificationService {
         reason,
         lockoutDuration,
         tenantId,
-        unlockTime: new Date(Date.now() + lockoutDuration * 60 * 1000).toISOString(),
+        unlockTime: new Date(
+          Date.now() + lockoutDuration * 60 * 1000,
+        ).toISOString(),
       },
       recipients: [userId],
       tenantId,
-    };
+    }
 
-    return this.sendNotification(payload);
+    return this.sendNotification(payload)
   }
 
   /**
@@ -314,14 +322,14 @@ export class UserNotificationService {
     username: string,
     alertType: string,
     details: Record<string, any>,
-    tenantId: string
+    tenantId: string,
   ): Promise<NotificationResult> {
     const alertMessages = {
-      'SUSPICIOUS_ACTIVITY': '检测到可疑活动',
-      'MULTIPLE_FAILED_LOGINS': '多次登录失败',
-      'UNUSUAL_LOCATION': '异常登录位置',
-      'PASSWORD_EXPIRING': '密码即将过期',
-    };
+      SUSPICIOUS_ACTIVITY: '检测到可疑活动',
+      MULTIPLE_FAILED_LOGINS: '多次登录失败',
+      UNUSUAL_LOCATION: '异常登录位置',
+      PASSWORD_EXPIRING: '密码即将过期',
+    }
 
     const payload: NotificationPayload = {
       type: 'SECURITY_ALERT',
@@ -337,9 +345,9 @@ export class UserNotificationService {
       },
       recipients: [userId],
       tenantId,
-    };
+    }
 
-    return this.sendNotification(payload);
+    return this.sendNotification(payload)
   }
 
   /**
@@ -348,24 +356,27 @@ export class UserNotificationService {
    * @param payloads 通知载荷数组
    * @returns 批量通知结果
    */
-  async sendBulkNotification(payloads: NotificationPayload[]): Promise<NotificationResult[]> {
-    const results: NotificationResult[] = [];
+  async sendBulkNotification(
+    payloads: NotificationPayload[],
+  ): Promise<NotificationResult[]> {
+    const results: NotificationResult[] = []
 
     for (const payload of payloads) {
       try {
-        const result = await this.sendNotification(payload);
-        results.push(result);
+        const result = await this.sendNotification(payload)
+        results.push(result)
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        this.logger.error(`批量通知发送失败: ${errorMessage}`);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error)
+        this.logger.error(`批量通知发送失败: ${errorMessage}`)
         results.push({
           success: false,
           error: errorMessage,
-        });
+        })
       }
     }
 
-    return results;
+    return results
   }
 
   /**
@@ -375,7 +386,9 @@ export class UserNotificationService {
    * @param payload 通知载荷
    * @returns 通知结果
    */
-  private async callNotificationService(payload: NotificationPayload): Promise<NotificationResult> {
+  private async callNotificationService(
+    payload: NotificationPayload,
+  ): Promise<NotificationResult> {
     // 模拟外部服务调用
     // 在实际实现中，这里应该使用HTTP客户端调用真实的通知服务
     return new Promise((resolve) => {
@@ -383,8 +396,8 @@ export class UserNotificationService {
         resolve({
           success: true,
           messageId: `msg_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        });
-      }, 100); // 模拟网络延迟
-    });
+        })
+      }, 100) // 模拟网络延迟
+    })
   }
-} 
+}

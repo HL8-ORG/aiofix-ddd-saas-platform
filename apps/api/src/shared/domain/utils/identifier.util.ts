@@ -20,7 +20,7 @@
  * @returns 标准化后的编码
  */
 export function normalizeIdentifier(value: string): string {
-  return value.trim().replace(/_/g, '-').replace(/\s+/g, '-').toLowerCase();
+  return value.trim().replace(/_/g, '-').replace(/\s+/g, '-').toLowerCase()
 }
 
 /**
@@ -40,23 +40,29 @@ export function normalizeIdentifier(value: string): string {
 export function validateIdentifier(
   value: string,
   options: {
-    minLength?: number;
-    maxLength?: number;
-    allowConsecutiveHyphens?: boolean;
-    errorPrefix?: string;
-  } = {}
+    minLength?: number
+    maxLength?: number
+    allowConsecutiveHyphens?: boolean
+    errorPrefix?: string
+  } = {},
 ): void {
   const {
     minLength = 3,
     maxLength = 50,
     allowConsecutiveHyphens = true,
-    errorPrefix = '编码'
-  } = options;
+    errorPrefix = '编码',
+  } = options
 
-  if (!value || value.trim().length === 0) throw new Error(`${errorPrefix}不能为空`);
-  if (value.length < minLength) throw new Error(`${errorPrefix}至少需要${minLength}个字符`);
-  if (value.length > maxLength) throw new Error(`${errorPrefix}不能超过${maxLength}个字符`);
-  if (!/^[a-z0-9_-]+$/.test(value)) throw new Error(`${errorPrefix}只能包含小写字母、数字、下划线和连字符`);
-  if (!allowConsecutiveHyphens && value.includes('--')) throw new Error(`${errorPrefix}不能包含连续的连字符`);
-  if (value.startsWith('-') || value.endsWith('-')) throw new Error(`${errorPrefix}不能以连字符开头或结尾`);
+  if (!value || value.trim().length === 0)
+    throw new Error(`${errorPrefix}不能为空`)
+  if (value.length < minLength)
+    throw new Error(`${errorPrefix}至少需要${minLength}个字符`)
+  if (value.length > maxLength)
+    throw new Error(`${errorPrefix}不能超过${maxLength}个字符`)
+  if (!/^[a-z0-9_-]+$/.test(value))
+    throw new Error(`${errorPrefix}只能包含小写字母、数字、下划线和连字符`)
+  if (!allowConsecutiveHyphens && value.includes('--'))
+    throw new Error(`${errorPrefix}不能包含连续的连字符`)
+  if (value.startsWith('-') || value.endsWith('-'))
+    throw new Error(`${errorPrefix}不能以连字符开头或结尾`)
 }

@@ -1,32 +1,43 @@
-import { Expose, Transform } from 'class-transformer';
-import { IsUUID, IsOptional, IsString, MaxLength, IsBoolean, IsNumber, IsArray } from 'class-validator';
-import { BaseEntity } from '@/shared/domain/entities/base.entity';
-import { RoleName } from '../value-objects/role-name.value-object';
-import { RoleCode } from '../value-objects/role-code.value-object';
-import { RoleStatusValue, RoleStatus } from '../value-objects/role-status.value-object';
-import { RolePriority } from '../value-objects/role-priority.value-object';
-import { generateUuid } from '@/shared/domain/utils/uuid.util';
+import { BaseEntity } from '@/shared/domain/entities/base.entity'
+import { generateUuid } from '@/shared/domain/utils/uuid.util'
+import { Expose, Transform } from 'class-transformer'
 import {
-  RoleCreatedEvent,
+  IsArray,
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator'
+import {
   RoleActivatedEvent,
-  RoleSuspendedEvent,
+  RoleCreatedEvent,
   RoleDeletedEvent,
-  RoleRestoredEvent,
   RoleInfoUpdatedEvent,
+  RoleInheritanceRemovedEvent,
+  RoleInheritanceSetEvent,
   RolePermissionAssignedEvent,
   RolePermissionRemovedEvent,
+  RoleRestoredEvent,
+  RoleSuspendedEvent,
   RoleUserAssignedEvent,
   RoleUserRemovedEvent,
-  RoleInheritanceSetEvent,
-  RoleInheritanceRemovedEvent,
-} from '../events/role.events';
+} from '../events/role.events'
+import { RoleCode } from '../value-objects/role-code.value-object'
+import { RoleName } from '../value-objects/role-name.value-object'
+import { RolePriority } from '../value-objects/role-priority.value-object'
+import {
+  RoleStatus,
+  RoleStatusValue,
+} from '../value-objects/role-status.value-object'
 
 /**
  * @class Role
  * @description
  * 角色领域实体，作为角色聚合的根实体。
  * 封装角色的核心业务逻辑、状态管理和生命周期。
- * 
+ *
  * 主要原理与机制：
  * 1. 遵循DDD聚合根设计原则，管理角色相关的所有业务规则
  * 2. 通过值对象封装角色名称、代码、状态、优先级等属性
@@ -42,14 +53,14 @@ export class Role extends BaseEntity {
    * @description 角色名称，在租户内唯一
    */
   @Expose()
-  name: RoleName;
+  name: RoleName
 
   /**
    * @property code
    * @description 角色代码，在租户内唯一
    */
   @Expose()
-  code: RoleCode;
+  code: RoleCode
 
   /**
    * @property description
@@ -59,14 +70,14 @@ export class Role extends BaseEntity {
   @IsString({ message: '角色描述必须是字符串' })
   @MaxLength(500, { message: '角色描述不能超过500个字符' })
   @Expose()
-  description?: string;
+  description?: string
 
   /**
    * @property status
    * @description 角色状态
    */
   @Expose()
-  status: RoleStatusValue;
+  status: RoleStatusValue
 
   /**
    * @property tenantId
@@ -74,7 +85,7 @@ export class Role extends BaseEntity {
    */
   @IsUUID('4', { message: '租户ID必须是有效的UUID v4格式' })
   @Expose()
-  tenantId: string;
+  tenantId: string
 
   /**
    * @property organizationId
@@ -83,7 +94,7 @@ export class Role extends BaseEntity {
   @IsOptional()
   @IsUUID('4', { message: '组织ID必须是有效的UUID v4格式' })
   @Expose()
-  organizationId?: string;
+  organizationId?: string
 
   /**
    * @property adminUserId
@@ -91,7 +102,7 @@ export class Role extends BaseEntity {
    */
   @IsUUID('4', { message: '管理员用户ID必须是有效的UUID v4格式' })
   @Expose()
-  adminUserId: string;
+  adminUserId: string
 
   /**
    * @property permissionIds
@@ -100,7 +111,7 @@ export class Role extends BaseEntity {
   @IsOptional()
   @IsArray()
   @Expose()
-  permissionIds: string[] = [];
+  permissionIds: string[] = []
 
   /**
    * @property userIds
@@ -109,28 +120,28 @@ export class Role extends BaseEntity {
   @IsOptional()
   @IsArray()
   @Expose()
-  userIds: string[] = [];
+  userIds: string[] = []
 
   /**
    * @property isSystemRole
    * @description 是否为系统角色，系统角色不可删除
    */
   @IsBoolean({ message: '系统角色标识必须是布尔值' })
-  isSystemRole: boolean = false;
+  isSystemRole = false
 
   /**
    * @property isDefaultRole
    * @description 是否为默认角色，新用户自动分配
    */
   @IsBoolean({ message: '默认角色标识必须是布尔值' })
-  isDefaultRole: boolean = false;
+  isDefaultRole = false
 
   /**
    * @property priority
    * @description 角色优先级，用于权限冲突解决
    */
   @Expose()
-  priority: RolePriority;
+  priority: RolePriority
 
   /**
    * @property maxUsers
@@ -139,7 +150,7 @@ export class Role extends BaseEntity {
   @IsOptional()
   @IsNumber({}, { message: '最大用户数必须是数字' })
   @Expose()
-  maxUsers?: number;
+  maxUsers?: number
 
   /**
    * @property expiresAt
@@ -147,7 +158,7 @@ export class Role extends BaseEntity {
    */
   @IsOptional()
   @Expose()
-  expiresAt?: Date;
+  expiresAt?: Date
 
   /**
    * @property parentRoleId
@@ -156,7 +167,7 @@ export class Role extends BaseEntity {
   @IsOptional()
   @IsUUID('4', { message: '父角色ID必须是有效的UUID v4格式' })
   @Expose()
-  parentRoleId?: string;
+  parentRoleId?: string
 
   /**
    * @property childRoleIds
@@ -165,13 +176,13 @@ export class Role extends BaseEntity {
   @IsOptional()
   @IsArray()
   @Expose()
-  childRoleIds: string[] = [];
+  childRoleIds: string[] = []
 
   /**
    * @property _domainEvents
    * @description 领域事件列表
    */
-  private _domainEvents: any[] = [];
+  private _domainEvents: any[] = []
 
   /**
    * @constructor
@@ -203,47 +214,49 @@ export class Role extends BaseEntity {
     isDefaultRole?: boolean,
     maxUsers?: number,
     expiresAt?: Date,
-    parentRoleId?: string
+    parentRoleId?: string,
   ) {
-    super();
-    this.id = id;
-    this.name = new RoleName(name);
-    this.code = new RoleCode(code);
-    this.tenantId = tenantId;
-    this.adminUserId = adminUserId;
-    this.status = RoleStatusValue.active();
-    this.priority = priority ? new RolePriority(priority) : RolePriority.getDefault();
-    this.permissionIds = [];
-    this.userIds = [];
-    this.childRoleIds = [];
-    this.createdAt = new Date();
-    this.updatedAt = new Date();
+    super()
+    this.id = id
+    this.name = new RoleName(name)
+    this.code = new RoleCode(code)
+    this.tenantId = tenantId
+    this.adminUserId = adminUserId
+    this.status = RoleStatusValue.active()
+    this.priority = priority
+      ? new RolePriority(priority)
+      : RolePriority.getDefault()
+    this.permissionIds = []
+    this.userIds = []
+    this.childRoleIds = []
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
 
     // 设置可选字段
     if (description) {
-      this.description = description;
+      this.description = description
     }
     if (organizationId) {
-      this.organizationId = organizationId;
+      this.organizationId = organizationId
     }
     if (isSystemRole !== undefined) {
-      this.isSystemRole = isSystemRole;
+      this.isSystemRole = isSystemRole
     }
     if (isDefaultRole !== undefined) {
-      this.isDefaultRole = isDefaultRole;
+      this.isDefaultRole = isDefaultRole
     }
     if (maxUsers) {
-      this.maxUsers = maxUsers;
+      this.maxUsers = maxUsers
     }
     if (expiresAt) {
-      this.expiresAt = expiresAt;
+      this.expiresAt = expiresAt
     }
     if (parentRoleId) {
-      this.parentRoleId = parentRoleId;
+      this.parentRoleId = parentRoleId
     }
 
     // 添加角色创建事件
-    this.addDomainEvent(new RoleCreatedEvent(this));
+    this.addDomainEvent(new RoleCreatedEvent(this))
   }
 
   /**
@@ -253,13 +266,13 @@ export class Role extends BaseEntity {
    */
   activate(): void {
     if (!this.status.canActivate()) {
-      throw new Error(`角色当前状态为${this.status.getDisplayName()}，无法激活`);
+      throw new Error(`角色当前状态为${this.status.getDisplayName()}，无法激活`)
     }
-    this.status = RoleStatusValue.active();
-    this.updateRoleTimestamp();
+    this.status = RoleStatusValue.active()
+    this.updateRoleTimestamp()
 
     // 添加角色激活事件
-    this.addDomainEvent(new RoleActivatedEvent(this));
+    this.addDomainEvent(new RoleActivatedEvent(this))
   }
 
   /**
@@ -269,13 +282,13 @@ export class Role extends BaseEntity {
    */
   suspend(): void {
     if (!this.status.canSuspend()) {
-      throw new Error(`角色当前状态为${this.status.getDisplayName()}，无法禁用`);
+      throw new Error(`角色当前状态为${this.status.getDisplayName()}，无法禁用`)
     }
-    this.status = RoleStatusValue.suspended();
-    this.updateRoleTimestamp();
+    this.status = RoleStatusValue.suspended()
+    this.updateRoleTimestamp()
 
     // 添加角色禁用事件
-    this.addDomainEvent(new RoleSuspendedEvent(this));
+    this.addDomainEvent(new RoleSuspendedEvent(this))
   }
 
   /**
@@ -285,17 +298,17 @@ export class Role extends BaseEntity {
    */
   markAsDeleted(): void {
     if (this.isSystemRole) {
-      throw new Error('系统角色不可删除，只能禁用');
+      throw new Error('系统角色不可删除，只能禁用')
     }
     if (!this.status.canDelete()) {
-      throw new Error(`角色当前状态为${this.status.getDisplayName()}，无法删除`);
+      throw new Error(`角色当前状态为${this.status.getDisplayName()}，无法删除`)
     }
-    this.status = RoleStatusValue.deleted();
-    this.deletedAt = new Date();
-    this.updateRoleTimestamp();
+    this.status = RoleStatusValue.deleted()
+    this.deletedAt = new Date()
+    this.updateRoleTimestamp()
 
     // 添加角色删除事件
-    this.addDomainEvent(new RoleDeletedEvent(this));
+    this.addDomainEvent(new RoleDeletedEvent(this))
   }
 
   /**
@@ -305,14 +318,14 @@ export class Role extends BaseEntity {
    */
   restore(): void {
     if (!this.status.canRestore()) {
-      throw new Error(`角色当前状态为${this.status.getDisplayName()}，无法恢复`);
+      throw new Error(`角色当前状态为${this.status.getDisplayName()}，无法恢复`)
     }
-    this.status = RoleStatusValue.suspended();
-    this.deletedAt = undefined;
-    this.updateRoleTimestamp();
+    this.status = RoleStatusValue.suspended()
+    this.deletedAt = undefined
+    this.updateRoleTimestamp()
 
     // 添加角色恢复事件
-    this.addDomainEvent(new RoleRestoredEvent(this));
+    this.addDomainEvent(new RoleRestoredEvent(this))
   }
 
   /**
@@ -323,33 +336,38 @@ export class Role extends BaseEntity {
    * @param description 角色描述，可选
    * @param priority 角色优先级，可选
    */
-  updateInfo(name: string, code: string, description?: string, priority?: number): void {
+  updateInfo(
+    name: string,
+    code: string,
+    description?: string,
+    priority?: number,
+  ): void {
     const oldInfo = {
       name: this.getName(),
       code: this.getCode(),
       description: this.description,
       priority: this.priority.getValue(),
-    };
+    }
 
-    this.name = new RoleName(name);
-    this.code = new RoleCode(code);
+    this.name = new RoleName(name)
+    this.code = new RoleCode(code)
     if (description !== undefined) {
-      this.description = description;
+      this.description = description
     }
     if (priority !== undefined) {
-      this.priority = new RolePriority(priority);
+      this.priority = new RolePriority(priority)
     }
-    this.updateRoleTimestamp();
+    this.updateRoleTimestamp()
 
     const newInfo = {
       name: this.getName(),
       code: this.getCode(),
       description: this.description,
       priority: this.priority.getValue(),
-    };
+    }
 
     // 添加角色信息更新事件
-    this.addDomainEvent(new RoleInfoUpdatedEvent(this, oldInfo, newInfo));
+    this.addDomainEvent(new RoleInfoUpdatedEvent(this, oldInfo, newInfo))
   }
 
   /**
@@ -359,11 +377,11 @@ export class Role extends BaseEntity {
    */
   assignPermission(permissionId: string): void {
     if (!this.permissionIds.includes(permissionId)) {
-      this.permissionIds.push(permissionId);
-      this.updateRoleTimestamp();
+      this.permissionIds.push(permissionId)
+      this.updateRoleTimestamp()
 
       // 添加权限分配事件
-      this.addDomainEvent(new RolePermissionAssignedEvent(this, permissionId));
+      this.addDomainEvent(new RolePermissionAssignedEvent(this, permissionId))
     }
   }
 
@@ -375,24 +393,24 @@ export class Role extends BaseEntity {
   removePermission(permissionId?: string): void {
     if (permissionId) {
       // 移除指定权限
-      const index = this.permissionIds.indexOf(permissionId);
+      const index = this.permissionIds.indexOf(permissionId)
       if (index > -1) {
-        this.permissionIds.splice(index, 1);
-        this.updateRoleTimestamp();
+        this.permissionIds.splice(index, 1)
+        this.updateRoleTimestamp()
 
         // 添加权限移除事件
-        this.addDomainEvent(new RolePermissionRemovedEvent(this, permissionId));
+        this.addDomainEvent(new RolePermissionRemovedEvent(this, permissionId))
       }
     } else {
       // 移除所有权限
-      const removedPermissions = [...this.permissionIds];
-      this.permissionIds = [];
-      this.updateRoleTimestamp();
+      const removedPermissions = [...this.permissionIds]
+      this.permissionIds = []
+      this.updateRoleTimestamp()
 
       // 为每个移除的权限添加事件
-      removedPermissions.forEach(permId => {
-        this.addDomainEvent(new RolePermissionRemovedEvent(this, permId));
-      });
+      removedPermissions.forEach((permId) => {
+        this.addDomainEvent(new RolePermissionRemovedEvent(this, permId))
+      })
     }
   }
 
@@ -403,7 +421,7 @@ export class Role extends BaseEntity {
    * @returns {boolean} 是否拥有该权限
    */
   hasPermission(permissionId: string): boolean {
-    return this.permissionIds.includes(permissionId);
+    return this.permissionIds.includes(permissionId)
   }
 
   /**
@@ -412,7 +430,7 @@ export class Role extends BaseEntity {
    * @returns {string[]} 权限ID列表
    */
   getPermissionIds(): string[] {
-    return [...this.permissionIds];
+    return [...this.permissionIds]
   }
 
   /**
@@ -422,17 +440,19 @@ export class Role extends BaseEntity {
    */
   assignUser(userId: string): void {
     if (this.maxUsers && this.userIds.length >= this.maxUsers) {
-      throw new Error(`角色已达到最大用户数限制：${this.maxUsers}`);
+      throw new Error(`角色已达到最大用户数限制：${this.maxUsers}`)
     }
     if (!this.status.canAssignToUser()) {
-      throw new Error(`角色当前状态为${this.status.getDisplayName()}，无法分配给用户`);
+      throw new Error(
+        `角色当前状态为${this.status.getDisplayName()}，无法分配给用户`,
+      )
     }
     if (!this.userIds.includes(userId)) {
-      this.userIds.push(userId);
-      this.updateRoleTimestamp();
+      this.userIds.push(userId)
+      this.updateRoleTimestamp()
 
       // 添加用户分配事件
-      this.addDomainEvent(new RoleUserAssignedEvent(this, userId));
+      this.addDomainEvent(new RoleUserAssignedEvent(this, userId))
     }
   }
 
@@ -444,24 +464,24 @@ export class Role extends BaseEntity {
   removeUser(userId?: string): void {
     if (userId) {
       // 移除指定用户
-      const index = this.userIds.indexOf(userId);
+      const index = this.userIds.indexOf(userId)
       if (index > -1) {
-        this.userIds.splice(index, 1);
-        this.updateRoleTimestamp();
+        this.userIds.splice(index, 1)
+        this.updateRoleTimestamp()
 
         // 添加用户移除事件
-        this.addDomainEvent(new RoleUserRemovedEvent(this, userId));
+        this.addDomainEvent(new RoleUserRemovedEvent(this, userId))
       }
     } else {
       // 移除所有用户
-      const removedUsers = [...this.userIds];
-      this.userIds = [];
-      this.updateRoleTimestamp();
+      const removedUsers = [...this.userIds]
+      this.userIds = []
+      this.updateRoleTimestamp()
 
       // 为每个移除的用户添加事件
-      removedUsers.forEach(uid => {
-        this.addDomainEvent(new RoleUserRemovedEvent(this, uid));
-      });
+      removedUsers.forEach((uid) => {
+        this.addDomainEvent(new RoleUserRemovedEvent(this, uid))
+      })
     }
   }
 
@@ -472,7 +492,7 @@ export class Role extends BaseEntity {
    * @returns {boolean} 是否包含该用户
    */
   hasUser(userId: string): boolean {
-    return this.userIds.includes(userId);
+    return this.userIds.includes(userId)
   }
 
   /**
@@ -481,7 +501,7 @@ export class Role extends BaseEntity {
    * @returns {string[]} 用户ID列表
    */
   getUserIds(): string[] {
-    return [...this.userIds];
+    return [...this.userIds]
   }
 
   /**
@@ -491,14 +511,16 @@ export class Role extends BaseEntity {
    */
   setInheritance(parentRoleId: string): void {
     if (this.parentRoleId === parentRoleId) {
-      return; // 已经是相同的父角色
+      return // 已经是相同的父角色
     }
-    const oldParentRoleId = this.parentRoleId;
-    this.parentRoleId = parentRoleId;
-    this.updateRoleTimestamp();
+    const oldParentRoleId = this.parentRoleId
+    this.parentRoleId = parentRoleId
+    this.updateRoleTimestamp()
 
     // 添加继承关系设置事件
-    this.addDomainEvent(new RoleInheritanceSetEvent(this, oldParentRoleId, parentRoleId));
+    this.addDomainEvent(
+      new RoleInheritanceSetEvent(this, oldParentRoleId, parentRoleId),
+    )
   }
 
   /**
@@ -507,14 +529,14 @@ export class Role extends BaseEntity {
    */
   removeInheritance(): void {
     if (!this.parentRoleId) {
-      return; // 没有继承关系
+      return // 没有继承关系
     }
-    const oldParentRoleId = this.parentRoleId;
-    this.parentRoleId = undefined;
-    this.updateRoleTimestamp();
+    const oldParentRoleId = this.parentRoleId
+    this.parentRoleId = undefined
+    this.updateRoleTimestamp()
 
     // 添加继承关系移除事件
-    this.addDomainEvent(new RoleInheritanceRemovedEvent(this, oldParentRoleId));
+    this.addDomainEvent(new RoleInheritanceRemovedEvent(this, oldParentRoleId))
   }
 
   /**
@@ -524,8 +546,8 @@ export class Role extends BaseEntity {
    */
   addChildRole(childRoleId: string): void {
     if (!this.childRoleIds.includes(childRoleId)) {
-      this.childRoleIds.push(childRoleId);
-      this.updateRoleTimestamp();
+      this.childRoleIds.push(childRoleId)
+      this.updateRoleTimestamp()
     }
   }
 
@@ -535,10 +557,10 @@ export class Role extends BaseEntity {
    * @param childRoleId 子角色ID
    */
   removeChildRole(childRoleId: string): void {
-    const index = this.childRoleIds.indexOf(childRoleId);
+    const index = this.childRoleIds.indexOf(childRoleId)
     if (index > -1) {
-      this.childRoleIds.splice(index, 1);
-      this.updateRoleTimestamp();
+      this.childRoleIds.splice(index, 1)
+      this.updateRoleTimestamp()
     }
   }
 
@@ -549,9 +571,9 @@ export class Role extends BaseEntity {
    */
   isExpired(): boolean {
     if (!this.expiresAt) {
-      return false;
+      return false
     }
-    return new Date() > this.expiresAt;
+    return new Date() > this.expiresAt
   }
 
   /**
@@ -560,7 +582,9 @@ export class Role extends BaseEntity {
    * @returns {boolean} 是否可以分配给用户
    */
   canAssignToUser(): boolean {
-    return this.status.canAssignToUser() && !this.isExpired() && !this.isDeleted();
+    return (
+      this.status.canAssignToUser() && !this.isExpired() && !this.isDeleted()
+    )
   }
 
   /**
@@ -569,7 +593,7 @@ export class Role extends BaseEntity {
    * @returns {boolean} 如果角色激活返回true，否则返回false
    */
   isActive(): boolean {
-    return this.status.isActive() && !this.isDeleted();
+    return this.status.isActive() && !this.isDeleted()
   }
 
   /**
@@ -578,7 +602,7 @@ export class Role extends BaseEntity {
    * @returns {boolean} 如果角色被禁用返回true，否则返回false
    */
   isSuspended(): boolean {
-    return this.status.isSuspended();
+    return this.status.isSuspended()
   }
 
   /**
@@ -587,7 +611,7 @@ export class Role extends BaseEntity {
    * @returns {string} 角色名称
    */
   getName(): string {
-    return this.name.getValue();
+    return this.name.getValue()
   }
 
   /**
@@ -596,7 +620,7 @@ export class Role extends BaseEntity {
    * @returns {string} 角色代码
    */
   getCode(): string {
-    return this.code.getValue();
+    return this.code.getValue()
   }
 
   /**
@@ -605,7 +629,7 @@ export class Role extends BaseEntity {
    * @returns {string} 角色状态
    */
   getStatus(): string {
-    return this.status.getValue();
+    return this.status.getValue()
   }
 
   /**
@@ -614,7 +638,7 @@ export class Role extends BaseEntity {
    * @returns {string} 状态显示名称
    */
   getStatusDisplayName(): string {
-    return this.status.getDisplayName();
+    return this.status.getDisplayName()
   }
 
   /**
@@ -623,7 +647,7 @@ export class Role extends BaseEntity {
    * @returns {string} 状态描述
    */
   getStatusDescription(): string {
-    return this.status.getDescription();
+    return this.status.getDescription()
   }
 
   /**
@@ -632,7 +656,7 @@ export class Role extends BaseEntity {
    * @returns {number} 角色优先级
    */
   getPriority(): number {
-    return this.priority.getValue();
+    return this.priority.getValue()
   }
 
   /**
@@ -641,7 +665,7 @@ export class Role extends BaseEntity {
    * @returns {string} 优先级显示名称
    */
   getPriorityDisplayName(): string {
-    return this.priority.getDisplayPriority();
+    return this.priority.getDisplayPriority()
   }
 
   /**
@@ -650,7 +674,7 @@ export class Role extends BaseEntity {
    * @returns {string} 优先级描述
    */
   getPriorityDescription(): string {
-    return this.priority.getDescription();
+    return this.priority.getDescription()
   }
 
   /**
@@ -659,7 +683,7 @@ export class Role extends BaseEntity {
    * @returns {boolean} 是否为系统角色
    */
   getIsSystemRole(): boolean {
-    return this.isSystemRole;
+    return this.isSystemRole
   }
 
   /**
@@ -668,7 +692,7 @@ export class Role extends BaseEntity {
    * @returns {boolean} 是否为默认角色
    */
   getIsDefaultRole(): boolean {
-    return this.isDefaultRole;
+    return this.isDefaultRole
   }
 
   /**
@@ -677,7 +701,7 @@ export class Role extends BaseEntity {
    * @param event 领域事件
    */
   addDomainEvent(event: any): void {
-    this._domainEvents.push(event);
+    this._domainEvents.push(event)
   }
 
   /**
@@ -685,7 +709,7 @@ export class Role extends BaseEntity {
    * @description 清除领域事件
    */
   clearDomainEvents(): void {
-    this._domainEvents = [];
+    this._domainEvents = []
   }
 
   /**
@@ -694,7 +718,7 @@ export class Role extends BaseEntity {
    * @returns {any[]} 领域事件列表
    */
   getDomainEvents(): any[] {
-    return [...this._domainEvents];
+    return [...this._domainEvents]
   }
 
   /**
@@ -703,7 +727,7 @@ export class Role extends BaseEntity {
    * @returns {boolean} 是否有领域事件
    */
   hasDomainEvents(): boolean {
-    return this._domainEvents.length > 0;
+    return this._domainEvents.length > 0
   }
 
   /**
@@ -711,6 +735,6 @@ export class Role extends BaseEntity {
    * @description 更新角色时间戳
    */
   private updateRoleTimestamp(): void {
-    this.updatedAt = new Date();
+    this.updatedAt = new Date()
   }
-} 
+}

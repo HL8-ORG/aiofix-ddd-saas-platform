@@ -1,16 +1,16 @@
-import { Permission } from '../entities/permission.entity';
+import type { Permission } from '../entities/permission.entity'
 
 /**
  * @abstract PermissionDomainEvent
  * @description 权限领域事件抽象基类
  */
 export abstract class PermissionDomainEvent {
-  public readonly occurredOn: Date;
-  public readonly permission: Permission;
+  public readonly occurredOn: Date
+  public readonly permission: Permission
 
   constructor(permission: Permission) {
-    this.occurredOn = new Date();
-    this.permission = permission;
+    this.occurredOn = new Date()
+    this.permission = permission
   }
 }
 
@@ -20,7 +20,7 @@ export abstract class PermissionDomainEvent {
  */
 export class PermissionCreatedEvent extends PermissionDomainEvent {
   constructor(permission: Permission) {
-    super(permission);
+    super(permission)
   }
 }
 
@@ -30,7 +30,7 @@ export class PermissionCreatedEvent extends PermissionDomainEvent {
  */
 export class PermissionActivatedEvent extends PermissionDomainEvent {
   constructor(permission: Permission) {
-    super(permission);
+    super(permission)
   }
 }
 
@@ -40,7 +40,7 @@ export class PermissionActivatedEvent extends PermissionDomainEvent {
  */
 export class PermissionSuspendedEvent extends PermissionDomainEvent {
   constructor(permission: Permission) {
-    super(permission);
+    super(permission)
   }
 }
 
@@ -50,7 +50,7 @@ export class PermissionSuspendedEvent extends PermissionDomainEvent {
  */
 export class PermissionDeletedEvent extends PermissionDomainEvent {
   constructor(permission: Permission) {
-    super(permission);
+    super(permission)
   }
 }
 
@@ -60,7 +60,7 @@ export class PermissionDeletedEvent extends PermissionDomainEvent {
  */
 export class PermissionRestoredEvent extends PermissionDomainEvent {
   constructor(permission: Permission) {
-    super(permission);
+    super(permission)
   }
 }
 
@@ -70,7 +70,7 @@ export class PermissionRestoredEvent extends PermissionDomainEvent {
  */
 export class PermissionInfoUpdatedEvent extends PermissionDomainEvent {
   constructor(permission: Permission) {
-    super(permission);
+    super(permission)
   }
 }
 
@@ -80,7 +80,7 @@ export class PermissionInfoUpdatedEvent extends PermissionDomainEvent {
  */
 export class PermissionActionUpdatedEvent extends PermissionDomainEvent {
   constructor(permission: Permission) {
-    super(permission);
+    super(permission)
   }
 }
 
@@ -90,7 +90,7 @@ export class PermissionActionUpdatedEvent extends PermissionDomainEvent {
  */
 export class PermissionConditionUpdatedEvent extends PermissionDomainEvent {
   constructor(permission: Permission) {
-    super(permission);
+    super(permission)
   }
 }
 
@@ -100,6 +100,6 @@ export class PermissionConditionUpdatedEvent extends PermissionDomainEvent {
  */
 export class PermissionFieldsUpdatedEvent extends PermissionDomainEvent {
   constructor(permission: Permission) {
-    super(permission);
+    super(permission)
   }
-} 
+}

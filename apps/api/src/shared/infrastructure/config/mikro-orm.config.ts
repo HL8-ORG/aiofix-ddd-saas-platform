@@ -1,8 +1,8 @@
-import { PostgreSqlDriver } from '@mikro-orm/postgresql';
-import { Migrator } from '@mikro-orm/migrations';
-import { Options } from '@mikro-orm/core';
-import dotenv from 'dotenv';
-import { SeedManager } from '@mikro-orm/seeder';
+import type { Options } from '@mikro-orm/core'
+import { Migrator } from '@mikro-orm/migrations'
+import { PostgreSqlDriver } from '@mikro-orm/postgresql'
+import { SeedManager } from '@mikro-orm/seeder'
+import dotenv from 'dotenv'
 
 /**
  * @file mikro-orm.config.ts
@@ -21,8 +21,8 @@ import { SeedManager } from '@mikro-orm/seeder';
  * 8. debug 根据 NODE_ENV 环境变量自动切换，非生产环境下开启调试模式，便于开发排查问题。
  */
 
-const envFiles = ['.env.development.local', '.env'];
-dotenv.config({ path: envFiles });
+const envFiles = ['.env.development.local', '.env']
+dotenv.config({ path: envFiles })
 
 /**
  * @constant config
@@ -39,21 +39,31 @@ const config: Options = {
   entities: ['./dist/**/*.orm.entity.js'],
   entitiesTs: ['./src/**/*.orm.entity.ts'],
   seeder: {
-    path: process.env.MIKRO_ORM_SEEDER_PATH || './dist/shared/infrastructure/database/seeders',
-    pathTs: process.env.MIKRO_ORM_SEEDER_PATH_TS || './src/shared/infrastructure/database/seeders',
-    defaultSeeder: process.env.MIKRO_ORM_SEEDER_DEFAULT_SEEDER || 'DatabaseSeeder',
+    path:
+      process.env.MIKRO_ORM_SEEDER_PATH ||
+      './dist/shared/infrastructure/database/seeders',
+    pathTs:
+      process.env.MIKRO_ORM_SEEDER_PATH_TS ||
+      './src/shared/infrastructure/database/seeders',
+    defaultSeeder:
+      process.env.MIKRO_ORM_SEEDER_DEFAULT_SEEDER || 'DatabaseSeeder',
     glob: process.env.MIKRO_ORM_SEEDER_GLOB || '!(*.d).{js,ts}',
-    emit: (process.env.MIKRO_ORM_SEEDER_EMIT as 'ts' | 'js' | undefined) || 'ts',
+    emit:
+      (process.env.MIKRO_ORM_SEEDER_EMIT as 'ts' | 'js' | undefined) || 'ts',
     fileName: (className: string) => className.toLowerCase() + '.seeder',
   },
   migrations: {
-    path: process.env.MIKRO_ORM_MIGRATION_PATH || './dist/shared/infrastructure/database/migrations',
-    pathTs: process.env.MIKRO_ORM_MIGRATION_PATH_TS || './src/shared/infrastructure/database/migrations',
+    path:
+      process.env.MIKRO_ORM_MIGRATION_PATH ||
+      './dist/shared/infrastructure/database/migrations',
+    pathTs:
+      process.env.MIKRO_ORM_MIGRATION_PATH_TS ||
+      './src/shared/infrastructure/database/migrations',
     glob: process.env.MIKRO_ORM_MIGRATION_GLOB || '!(*.d).{js,ts}',
   },
   driver: PostgreSqlDriver,
   extensions: [Migrator, SeedManager],
   debug: process.env.NODE_ENV !== 'production',
-};
+}
 
-export default config; 
+export default config

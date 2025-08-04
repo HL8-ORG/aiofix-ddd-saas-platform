@@ -1,4 +1,4 @@
-import { ValueObject } from '@/shared/domain/value-objects/value-object.base';
+import { ValueObject } from '@/shared/domain/value-objects/value-object.base'
 
 /**
  * @enum PermissionAction
@@ -24,7 +24,7 @@ export enum PermissionAction {
   LIST = 'list',
   SEARCH = 'search',
   FILTER = 'filter',
-  SORT = 'sort'
+  SORT = 'sort',
 }
 
 /**
@@ -32,7 +32,7 @@ export enum PermissionAction {
  * @description
  * 权限操作值对象，封装权限操作的验证规则和业务逻辑。
  * 基于CASL的Action概念，支持细粒度的权限控制。
- * 
+ *
  * 主要原理与机制：
  * 1. 继承ValueObject基类，确保值对象的不可变性
  * 2. 实现权限操作的验证规则和业务逻辑
@@ -47,9 +47,9 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @throws {Error} 当权限操作无效时抛出异常
    */
   constructor(action: PermissionAction) {
-    super();
-    this.validateAction(action);
-    this._value = action;
+    super()
+    this.validateAction(action)
+    this._value = action
   }
 
   /**
@@ -58,7 +58,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {PermissionAction} 权限操作
    */
   getValue(): PermissionAction {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -69,47 +69,47 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
   getDisplayName(): string {
     switch (this._value) {
       case PermissionAction.CREATE:
-        return '创建';
+        return '创建'
       case PermissionAction.READ:
-        return '读取';
+        return '读取'
       case PermissionAction.UPDATE:
-        return '更新';
+        return '更新'
       case PermissionAction.DELETE:
-        return '删除';
+        return '删除'
       case PermissionAction.MANAGE:
-        return '管理';
+        return '管理'
       case PermissionAction.PUBLISH:
-        return '发布';
+        return '发布'
       case PermissionAction.UNPUBLISH:
-        return '取消发布';
+        return '取消发布'
       case PermissionAction.APPROVE:
-        return '审批';
+        return '审批'
       case PermissionAction.REJECT:
-        return '拒绝';
+        return '拒绝'
       case PermissionAction.EXPORT:
-        return '导出';
+        return '导出'
       case PermissionAction.IMPORT:
-        return '导入';
+        return '导入'
       case PermissionAction.DOWNLOAD:
-        return '下载';
+        return '下载'
       case PermissionAction.UPLOAD:
-        return '上传';
+        return '上传'
       case PermissionAction.EXECUTE:
-        return '执行';
+        return '执行'
       case PermissionAction.VIEW:
-        return '查看';
+        return '查看'
       case PermissionAction.EDIT:
-        return '编辑';
+        return '编辑'
       case PermissionAction.LIST:
-        return '列表';
+        return '列表'
       case PermissionAction.SEARCH:
-        return '搜索';
+        return '搜索'
       case PermissionAction.FILTER:
-        return '筛选';
+        return '筛选'
       case PermissionAction.SORT:
-        return '排序';
+        return '排序'
       default:
-        return '未知操作';
+        return '未知操作'
     }
   }
 
@@ -121,47 +121,47 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
   getDescription(): string {
     switch (this._value) {
       case PermissionAction.CREATE:
-        return '允许创建新的资源';
+        return '允许创建新的资源'
       case PermissionAction.READ:
-        return '允许读取资源信息';
+        return '允许读取资源信息'
       case PermissionAction.UPDATE:
-        return '允许更新现有资源';
+        return '允许更新现有资源'
       case PermissionAction.DELETE:
-        return '允许删除资源';
+        return '允许删除资源'
       case PermissionAction.MANAGE:
-        return '允许完全管理资源（包含所有操作）';
+        return '允许完全管理资源（包含所有操作）'
       case PermissionAction.PUBLISH:
-        return '允许发布内容';
+        return '允许发布内容'
       case PermissionAction.UNPUBLISH:
-        return '允许取消发布内容';
+        return '允许取消发布内容'
       case PermissionAction.APPROVE:
-        return '允许审批流程';
+        return '允许审批流程'
       case PermissionAction.REJECT:
-        return '允许拒绝流程';
+        return '允许拒绝流程'
       case PermissionAction.EXPORT:
-        return '允许导出数据';
+        return '允许导出数据'
       case PermissionAction.IMPORT:
-        return '允许导入数据';
+        return '允许导入数据'
       case PermissionAction.DOWNLOAD:
-        return '允许下载文件';
+        return '允许下载文件'
       case PermissionAction.UPLOAD:
-        return '允许上传文件';
+        return '允许上传文件'
       case PermissionAction.EXECUTE:
-        return '允许执行操作';
+        return '允许执行操作'
       case PermissionAction.VIEW:
-        return '允许查看内容';
+        return '允许查看内容'
       case PermissionAction.EDIT:
-        return '允许编辑内容';
+        return '允许编辑内容'
       case PermissionAction.LIST:
-        return '允许查看列表';
+        return '允许查看列表'
       case PermissionAction.SEARCH:
-        return '允许搜索功能';
+        return '允许搜索功能'
       case PermissionAction.FILTER:
-        return '允许筛选功能';
+        return '允许筛选功能'
       case PermissionAction.SORT:
-        return '允许排序功能';
+        return '允许排序功能'
       default:
-        return '未知操作描述';
+        return '未知操作描述'
     }
   }
 
@@ -171,7 +171,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {boolean} 是否为管理操作
    */
   isManage(): boolean {
-    return this._value === PermissionAction.MANAGE;
+    return this._value === PermissionAction.MANAGE
   }
 
   /**
@@ -180,7 +180,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {boolean} 是否为创建操作
    */
   isCreate(): boolean {
-    return this._value === PermissionAction.CREATE;
+    return this._value === PermissionAction.CREATE
   }
 
   /**
@@ -189,7 +189,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {boolean} 是否为读取操作
    */
   isRead(): boolean {
-    return this._value === PermissionAction.READ;
+    return this._value === PermissionAction.READ
   }
 
   /**
@@ -198,7 +198,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {boolean} 是否为更新操作
    */
   isUpdate(): boolean {
-    return this._value === PermissionAction.UPDATE;
+    return this._value === PermissionAction.UPDATE
   }
 
   /**
@@ -207,7 +207,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {boolean} 是否为删除操作
    */
   isDelete(): boolean {
-    return this._value === PermissionAction.DELETE;
+    return this._value === PermissionAction.DELETE
   }
 
   /**
@@ -219,8 +219,8 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
     return [
       PermissionAction.DELETE,
       PermissionAction.MANAGE,
-      PermissionAction.REJECT
-    ].includes(this._value);
+      PermissionAction.REJECT,
+    ].includes(this._value)
   }
 
   /**
@@ -229,7 +229,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {boolean} 是否需要确认
    */
   requiresConfirmation(): boolean {
-    return this.isDangerous();
+    return this.isDangerous()
   }
 
   /**
@@ -240,7 +240,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    */
   private validateAction(action: PermissionAction): void {
     if (!Object.values(PermissionAction).includes(action)) {
-      throw new Error(`无效的权限操作: ${action}`);
+      throw new Error(`无效的权限操作: ${action}`)
     }
   }
 
@@ -252,9 +252,9 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    */
   equals(other: PermissionActionValue): boolean {
     if (!other) {
-      return false;
+      return false
     }
-    return this._value === other._value;
+    return this._value === other._value
   }
 
   /**
@@ -263,7 +263,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {string} 权限操作字符串
    */
   toString(): string {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -272,7 +272,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {PermissionActionValue} 管理操作值对象
    */
   static getManage(): PermissionActionValue {
-    return new PermissionActionValue(PermissionAction.MANAGE);
+    return new PermissionActionValue(PermissionAction.MANAGE)
   }
 
   /**
@@ -281,7 +281,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {PermissionActionValue} 创建操作值对象
    */
   static getCreate(): PermissionActionValue {
-    return new PermissionActionValue(PermissionAction.CREATE);
+    return new PermissionActionValue(PermissionAction.CREATE)
   }
 
   /**
@@ -290,7 +290,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {PermissionActionValue} 读取操作值对象
    */
   static getRead(): PermissionActionValue {
-    return new PermissionActionValue(PermissionAction.READ);
+    return new PermissionActionValue(PermissionAction.READ)
   }
 
   /**
@@ -299,7 +299,7 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {PermissionActionValue} 更新操作值对象
    */
   static getUpdate(): PermissionActionValue {
-    return new PermissionActionValue(PermissionAction.UPDATE);
+    return new PermissionActionValue(PermissionAction.UPDATE)
   }
 
   /**
@@ -308,6 +308,6 @@ export class PermissionActionValue extends ValueObject<PermissionAction> {
    * @returns {PermissionActionValue} 删除操作值对象
    */
   static getDelete(): PermissionActionValue {
-    return new PermissionActionValue(PermissionAction.DELETE);
+    return new PermissionActionValue(PermissionAction.DELETE)
   }
-} 
+}

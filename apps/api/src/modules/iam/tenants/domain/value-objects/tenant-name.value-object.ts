@@ -1,11 +1,17 @@
-import { IsNotEmpty, IsString, MaxLength, MinLength, Matches } from 'class-validator';
-import { Expose } from 'class-transformer';
+import { Expose } from 'class-transformer'
+import {
+  IsNotEmpty,
+  IsString,
+  Matches,
+  MaxLength,
+  MinLength,
+} from 'class-validator'
 
 /**
  * @class TenantName
  * @description
  * 租户名称值对象，封装租户名称的业务规则和约束。
- * 
+ *
  * 主要原理与机制：
  * 1. 值对象是不可变的，一旦创建就不能修改
  * 2. 通过构造函数确保数据的有效性
@@ -23,10 +29,10 @@ export class TenantName {
   @MinLength(2, { message: '租户名称至少2个字符' })
   @MaxLength(100, { message: '租户名称不能超过100个字符' })
   @Matches(/^[\u4e00-\u9fa5a-zA-Z0-9\s\-_()（）]+$/, {
-    message: '租户名称只能包含中文、英文、数字、空格、连字符、下划线和括号'
+    message: '租户名称只能包含中文、英文、数字、空格、连字符、下划线和括号',
   })
   @Expose()
-  private readonly _value: string;
+  private readonly _value: string
 
   /**
    * @constructor
@@ -36,8 +42,8 @@ export class TenantName {
    */
   constructor(value: string) {
     // 标准化处理：去除首尾空格，规范化空格
-    this._value = this.normalizeName(value);
-    this.validateName(this._value);
+    this._value = this.normalizeName(value)
+    this.validateName(this._value)
   }
 
   /**
@@ -46,7 +52,7 @@ export class TenantName {
    * @returns {string} 租户名称
    */
   get value(): string {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -55,7 +61,7 @@ export class TenantName {
    * @returns {string} 租户名称
    */
   toString(): string {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -65,8 +71,8 @@ export class TenantName {
    * @returns {boolean} 如果相等返回true，否则返回false
    */
   equals(other: TenantName): boolean {
-    if (!other) return false;
-    return this._value === other._value;
+    if (!other) return false
+    return this._value === other._value
   }
 
   /**
@@ -75,7 +81,7 @@ export class TenantName {
    * @returns {string} 大写的租户名称
    */
   toUpperCase(): string {
-    return this._value.toUpperCase();
+    return this._value.toUpperCase()
   }
 
   /**
@@ -84,7 +90,7 @@ export class TenantName {
    * @returns {string} 小写的租户名称
    */
   toLowerCase(): string {
-    return this._value.toLowerCase();
+    return this._value.toLowerCase()
   }
 
   /**
@@ -95,8 +101,8 @@ export class TenantName {
   getDisplayName(): string {
     return this._value
       .split(' ')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-      .join(' ');
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
   }
 
   /**
@@ -105,7 +111,9 @@ export class TenantName {
    * @returns {string} 短名称
    */
   getShortName(): string {
-    return this._value.length > 20 ? this._value.substring(0, 20) + '...' : this._value;
+    return this._value.length > 20
+      ? this._value.substring(0, 20) + '...'
+      : this._value
   }
 
   /**
@@ -119,7 +127,7 @@ export class TenantName {
       .trim()
       .replace(/\s+/g, ' ') // 将多个空格替换为单个空格
       .replace(/（/g, '(') // 将中文左括号替换为英文左括号
-      .replace(/）/g, ')'); // 将中文右括号替换为英文右括号
+      .replace(/）/g, ')') // 将中文右括号替换为英文右括号
   }
 
   /**
@@ -130,30 +138,32 @@ export class TenantName {
    */
   private validateName(name: string): void {
     if (!name || name.trim().length === 0) {
-      throw new Error('租户名称不能为空');
+      throw new Error('租户名称不能为空')
     }
 
     if (name.length < 2) {
-      throw new Error('租户名称至少需要2个字符');
+      throw new Error('租户名称至少需要2个字符')
     }
 
     if (name.length > 100) {
-      throw new Error('租户名称不能超过100个字符');
+      throw new Error('租户名称不能超过100个字符')
     }
 
     // 校验字符集：中文、英文、数字、空格、连字符、下划线、括号
     if (!/^[\u4e00-\u9fa5a-zA-Z0-9\s\-_()（）]+$/.test(name)) {
-      throw new Error('租户名称只能包含中文、英文、数字、空格、连字符、下划线和括号');
+      throw new Error(
+        '租户名称只能包含中文、英文、数字、空格、连字符、下划线和括号',
+      )
     }
 
     // 校验不能只包含空格
     if (/^\s+$/.test(name)) {
-      throw new Error('租户名称不能只包含空格');
+      throw new Error('租户名称不能只包含空格')
     }
 
     // 校验不能以空格开头或结尾
     if (name.startsWith(' ') || name.endsWith(' ')) {
-      throw new Error('租户名称不能以空格开头或结尾');
+      throw new Error('租户名称不能以空格开头或结尾')
     }
   }
-} 
+}

@@ -1,10 +1,10 @@
-import { ValueObject } from '@/shared/domain/value-objects/value-object.base';
+import { ValueObject } from '@/shared/domain/value-objects/value-object.base'
 
 /**
  * @class PermissionName
  * @description
  * 权限名称值对象，封装权限名称的验证规则和业务逻辑。
- * 
+ *
  * 主要原理与机制：
  * 1. 继承ValueObject基类，确保值对象的不可变性
  * 2. 实现权限名称的验证规则（长度、字符限制、格式等）
@@ -19,9 +19,9 @@ export class PermissionName extends ValueObject<string> {
    * @throws {Error} 当权限名称不符合验证规则时抛出异常
    */
   constructor(value: string) {
-    super();
-    this._value = this.normalizeName(value);
-    this.validateName(this._value);
+    super()
+    this._value = this.normalizeName(value)
+    this.validateName(this._value)
   }
 
   /**
@@ -30,7 +30,7 @@ export class PermissionName extends ValueObject<string> {
    * @returns {string} 权限名称
    */
   getValue(): string {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -39,7 +39,7 @@ export class PermissionName extends ValueObject<string> {
    * @returns {string} 权限名称显示值
    */
   getDisplayName(): string {
-    return this._value.trim();
+    return this._value.trim()
   }
 
   /**
@@ -48,7 +48,9 @@ export class PermissionName extends ValueObject<string> {
    * @returns {string} 权限名称简短版本
    */
   getShortName(): string {
-    return this._value.length > 20 ? this._value.substring(0, 20) + '...' : this._value;
+    return this._value.length > 20
+      ? this._value.substring(0, 20) + '...'
+      : this._value
   }
 
   /**
@@ -59,16 +61,16 @@ export class PermissionName extends ValueObject<string> {
    */
   private normalizeName(name: string): string {
     if (!name) {
-      throw new Error('权限名称不能为空');
+      throw new Error('权限名称不能为空')
     }
 
     // 去除前后空格
-    let normalized = name.trim();
+    let normalized = name.trim()
 
     // 将多个连续空格替换为单个空格
-    normalized = normalized.replace(/\s+/g, ' ');
+    normalized = normalized.replace(/\s+/g, ' ')
 
-    return normalized;
+    return normalized
   }
 
   /**
@@ -79,30 +81,30 @@ export class PermissionName extends ValueObject<string> {
    */
   private validateName(name: string): void {
     if (!name || name.length === 0) {
-      throw new Error('权限名称不能为空');
+      throw new Error('权限名称不能为空')
     }
 
     if (name.length < 2) {
-      throw new Error('权限名称长度不能少于2个字符');
+      throw new Error('权限名称长度不能少于2个字符')
     }
 
     if (name.length > 50) {
-      throw new Error('权限名称长度不能超过50个字符');
+      throw new Error('权限名称长度不能超过50个字符')
     }
 
     // 检查是否以数字开头
     if (/^\d/.test(name)) {
-      throw new Error('权限名称不能以数字开头');
+      throw new Error('权限名称不能以数字开头')
     }
 
     // 检查是否包含连续的特殊字符（除了空格）
     if (/[^\w\u4e00-\u9fa5\-\s]{2,}/.test(name)) {
-      throw new Error('权限名称不能包含连续的特殊字符');
+      throw new Error('权限名称不能包含连续的特殊字符')
     }
 
     // 检查是否包含不允许的字符（只允许字母、数字、下划线、连字符、中文、空格）
     if (!/^[\w\u4e00-\u9fa5\-\s]+$/.test(name)) {
-      throw new Error('权限名称只能包含字母、数字、下划线、连字符、中文和空格');
+      throw new Error('权限名称只能包含字母、数字、下划线、连字符、中文和空格')
     }
   }
 
@@ -114,9 +116,9 @@ export class PermissionName extends ValueObject<string> {
    */
   equals(other: PermissionName): boolean {
     if (!other) {
-      return false;
+      return false
     }
-    return this._value.toLowerCase() === other._value.toLowerCase();
+    return this._value.toLowerCase() === other._value.toLowerCase()
   }
 
   /**
@@ -125,6 +127,6 @@ export class PermissionName extends ValueObject<string> {
    * @returns {string} 权限名称字符串
    */
   toString(): string {
-    return this._value;
+    return this._value
   }
-} 
+}

@@ -1,15 +1,15 @@
-import { User } from '../entities/user.entity';
-import { Username } from '../value-objects/username.value-object';
-import { Email } from '../value-objects/email.value-object';
-import { Phone } from '../value-objects/phone.value-object';
-import { UserStatusValue } from '../value-objects/user-status.value-object';
+import type { User } from '../entities/user.entity'
+import type { Email } from '../value-objects/email.value-object'
+import type { Phone } from '../value-objects/phone.value-object'
+import type { UserStatusValue } from '../value-objects/user-status.value-object'
+import type { Username } from '../value-objects/username.value-object'
 
 /**
  * @abstract class UserRepository
  * @description
  * 用户仓储抽象类，定义用户数据访问的抽象契约和通用实现。
  * 这是领域层的一部分，不依赖具体的数据访问技术。
- * 
+ *
  * 主要原理与机制：
  * 1. 定义在领域层，遵循依赖倒置原则
  * 2. 使用领域对象作为参数和返回值
@@ -26,7 +26,7 @@ export abstract class UserRepository {
    * @param user 用户实体
    * @returns {Promise<User>} 保存后的用户实体
    */
-  abstract save(user: User): Promise<User>;
+  abstract save(user: User): Promise<User>
 
   /**
    * @method findById
@@ -35,7 +35,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User | null>} 用户实体或null
    */
-  abstract findById(id: string, tenantId: string): Promise<User | null>;
+  abstract findById(id: string, tenantId: string): Promise<User | null>
 
   /**
    * @method findByUsername
@@ -44,7 +44,10 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User | null>} 用户实体或null
    */
-  abstract findByUsername(username: Username, tenantId: string): Promise<User | null>;
+  abstract findByUsername(
+    username: Username,
+    tenantId: string,
+  ): Promise<User | null>
 
   /**
    * @method findByUsernameString
@@ -53,7 +56,10 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User | null>} 用户实体或null
    */
-  abstract findByUsernameString(username: string, tenantId: string): Promise<User | null>;
+  abstract findByUsernameString(
+    username: string,
+    tenantId: string,
+  ): Promise<User | null>
 
   /**
    * @method findByEmail
@@ -62,7 +68,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User | null>} 用户实体或null
    */
-  abstract findByEmail(email: Email, tenantId: string): Promise<User | null>;
+  abstract findByEmail(email: Email, tenantId: string): Promise<User | null>
 
   /**
    * @method findByEmailString
@@ -71,7 +77,10 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User | null>} 用户实体或null
    */
-  abstract findByEmailString(email: string, tenantId: string): Promise<User | null>;
+  abstract findByEmailString(
+    email: string,
+    tenantId: string,
+  ): Promise<User | null>
 
   /**
    * @method findByPhone
@@ -80,7 +89,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User | null>} 用户实体或null
    */
-  abstract findByPhone(phone: Phone, tenantId: string): Promise<User | null>;
+  abstract findByPhone(phone: Phone, tenantId: string): Promise<User | null>
 
   /**
    * @method findByPhoneString
@@ -89,7 +98,10 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User | null>} 用户实体或null
    */
-  abstract findByPhoneString(phone: string, tenantId: string): Promise<User | null>;
+  abstract findByPhoneString(
+    phone: string,
+    tenantId: string,
+  ): Promise<User | null>
 
   /**
    * @method findByIds
@@ -98,7 +110,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 用户实体列表
    */
-  abstract findByIds(ids: string[], tenantId: string): Promise<User[]>;
+  abstract findByIds(ids: string[], tenantId: string): Promise<User[]>
 
   /**
    * @method findByOrganizationId
@@ -107,7 +119,10 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 匹配的用户列表
    */
-  abstract findByOrganizationId(organizationId: string, tenantId: string): Promise<User[]>;
+  abstract findByOrganizationId(
+    organizationId: string,
+    tenantId: string,
+  ): Promise<User[]>
 
   /**
    * @method findByRoleId
@@ -116,7 +131,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 匹配的用户列表
    */
-  abstract findByRoleId(roleId: string, tenantId: string): Promise<User[]>;
+  abstract findByRoleId(roleId: string, tenantId: string): Promise<User[]>
 
   /**
    * @method findByStatus
@@ -125,7 +140,10 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 匹配的用户列表
    */
-  abstract findByStatus(status: UserStatusValue, tenantId: string): Promise<User[]>;
+  abstract findByStatus(
+    status: UserStatusValue,
+    tenantId: string,
+  ): Promise<User[]>
 
   /**
    * @method findByAdminUserId
@@ -134,7 +152,10 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 匹配的用户列表
    */
-  abstract findByAdminUserId(adminUserId: string, tenantId: string): Promise<User[]>;
+  abstract findByAdminUserId(
+    adminUserId: string,
+    tenantId: string,
+  ): Promise<User[]>
 
   /**
    * @method findActive
@@ -142,7 +163,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 激活状态的用户列表
    */
-  abstract findActive(tenantId: string): Promise<User[]>;
+  abstract findActive(tenantId: string): Promise<User[]>
 
   /**
    * @method findPending
@@ -150,7 +171,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 待激活状态的用户列表
    */
-  abstract findPending(tenantId: string): Promise<User[]>;
+  abstract findPending(tenantId: string): Promise<User[]>
 
   /**
    * @method findSuspended
@@ -158,7 +179,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 禁用状态的用户列表
    */
-  abstract findSuspended(tenantId: string): Promise<User[]>;
+  abstract findSuspended(tenantId: string): Promise<User[]>
 
   /**
    * @method findDeleted
@@ -166,7 +187,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 已删除的用户列表
    */
-  abstract findDeleted(tenantId: string): Promise<User[]>;
+  abstract findDeleted(tenantId: string): Promise<User[]>
 
   /**
    * @method findAll
@@ -174,7 +195,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 所有用户列表
    */
-  abstract findAll(tenantId: string): Promise<User[]>;
+  abstract findAll(tenantId: string): Promise<User[]>
 
   /**
    * @method findAllWithDeleted
@@ -182,7 +203,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 所有用户列表
    */
-  abstract findAllWithDeleted(tenantId: string): Promise<User[]>;
+  abstract findAllWithDeleted(tenantId: string): Promise<User[]>
 
   /**
    * @method exists
@@ -191,7 +212,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<boolean>} 如果存在返回true，否则返回false
    */
-  abstract exists(id: string, tenantId: string): Promise<boolean>;
+  abstract exists(id: string, tenantId: string): Promise<boolean>
 
   /**
    * @method existsByUsername
@@ -201,7 +222,11 @@ export abstract class UserRepository {
    * @param excludeId 排除的用户ID（用于更新时检查）
    * @returns {Promise<boolean>} 如果存在返回true，否则返回false
    */
-  abstract existsByUsername(username: Username, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByUsername(
+    username: Username,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method existsByUsernameString
@@ -211,7 +236,11 @@ export abstract class UserRepository {
    * @param excludeId 排除的用户ID（用于更新时检查）
    * @returns {Promise<boolean>} 如果存在返回true，否则返回false
    */
-  abstract existsByUsernameString(username: string, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByUsernameString(
+    username: string,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method existsByEmail
@@ -221,7 +250,11 @@ export abstract class UserRepository {
    * @param excludeId 排除的用户ID（用于更新时检查）
    * @returns {Promise<boolean>} 如果存在返回true，否则返回false
    */
-  abstract existsByEmail(email: Email, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByEmail(
+    email: Email,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method existsByEmailString
@@ -231,7 +264,11 @@ export abstract class UserRepository {
    * @param excludeId 排除的用户ID（用于更新时检查）
    * @returns {Promise<boolean>} 如果存在返回true，否则返回false
    */
-  abstract existsByEmailString(email: string, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByEmailString(
+    email: string,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method existsByPhone
@@ -241,7 +278,11 @@ export abstract class UserRepository {
    * @param excludeId 排除的用户ID（用于更新时检查）
    * @returns {Promise<boolean>} 如果存在返回true，否则返回false
    */
-  abstract existsByPhone(phone: Phone, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByPhone(
+    phone: Phone,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method existsByPhoneString
@@ -251,7 +292,11 @@ export abstract class UserRepository {
    * @param excludeId 排除的用户ID（用于更新时检查）
    * @returns {Promise<boolean>} 如果存在返回true，否则返回false
    */
-  abstract existsByPhoneString(phone: string, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByPhoneString(
+    phone: string,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method count
@@ -259,7 +304,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<number>} 用户数量
    */
-  abstract count(tenantId: string): Promise<number>;
+  abstract count(tenantId: string): Promise<number>
 
   /**
    * @method countByStatus
@@ -268,7 +313,10 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<number>} 指定状态的用户数量
    */
-  abstract countByStatus(status: UserStatusValue, tenantId: string): Promise<number>;
+  abstract countByStatus(
+    status: UserStatusValue,
+    tenantId: string,
+  ): Promise<number>
 
   /**
    * @method delete
@@ -277,7 +325,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<boolean>} 如果删除成功返回true，否则返回false
    */
-  abstract delete(id: string, tenantId: string): Promise<boolean>;
+  abstract delete(id: string, tenantId: string): Promise<boolean>
 
   /**
    * @method hardDelete
@@ -286,7 +334,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<boolean>} 如果删除成功返回true，否则返回false
    */
-  abstract hardDelete(id: string, tenantId: string): Promise<boolean>;
+  abstract hardDelete(id: string, tenantId: string): Promise<boolean>
 
   /**
    * @method restore
@@ -295,7 +343,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<boolean>} 如果恢复成功返回true，否则返回false
    */
-  abstract restore(id: string, tenantId: string): Promise<boolean>;
+  abstract restore(id: string, tenantId: string): Promise<boolean>
 
   /**
    * @method updateStatus
@@ -305,7 +353,11 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<boolean>} 如果更新成功返回true，否则返回false
    */
-  abstract updateStatus(id: string, status: UserStatusValue, tenantId: string): Promise<boolean>;
+  abstract updateStatus(
+    id: string,
+    status: UserStatusValue,
+    tenantId: string,
+  ): Promise<boolean>
 
   /**
    * @method findWithPagination
@@ -322,23 +374,30 @@ export abstract class UserRepository {
     limit: number,
     tenantId: string,
     filters?: {
-      status?: UserStatusValue;
-      organizationId?: string;
-      roleId?: string;
-      adminUserId?: string;
-      search?: string;
+      status?: UserStatusValue
+      organizationId?: string
+      roleId?: string
+      adminUserId?: string
+      search?: string
     },
     sort?: {
-      field: 'username' | 'email' | 'firstName' | 'lastName' | 'status' | 'createdAt' | 'updatedAt';
-      order: 'asc' | 'desc';
-    }
+      field:
+        | 'username'
+        | 'email'
+        | 'firstName'
+        | 'lastName'
+        | 'status'
+        | 'createdAt'
+        | 'updatedAt'
+      order: 'asc' | 'desc'
+    },
   ): Promise<{
-    users: User[];
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  }>;
+    users: User[]
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }>
 
   /**
    * @method findBySearch
@@ -348,7 +407,11 @@ export abstract class UserRepository {
    * @param limit 限制返回数量
    * @returns {Promise<User[]>} 匹配的用户列表
    */
-  abstract findBySearch(search: string, tenantId: string, limit?: number): Promise<User[]>;
+  abstract findBySearch(
+    search: string,
+    tenantId: string,
+    limit?: number,
+  ): Promise<User[]>
 
   /**
    * @method findRecent
@@ -357,7 +420,7 @@ export abstract class UserRepository {
    * @param limit 限制返回数量
    * @returns {Promise<User[]>} 最近创建的用户列表
    */
-  abstract findRecent(tenantId: string, limit?: number): Promise<User[]>;
+  abstract findRecent(tenantId: string, limit?: number): Promise<User[]>
 
   /**
    * @method findByDateRange
@@ -367,7 +430,11 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 匹配的用户列表
    */
-  abstract findByDateRange(startDate: Date, endDate: Date, tenantId: string): Promise<User[]>;
+  abstract findByDateRange(
+    startDate: Date,
+    endDate: Date,
+    tenantId: string,
+  ): Promise<User[]>
 
   /**
    * @method findLocked
@@ -375,7 +442,7 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 被锁定的用户列表
    */
-  abstract findLocked(tenantId: string): Promise<User[]>;
+  abstract findLocked(tenantId: string): Promise<User[]>
 
   /**
    * @method findWithFailedLoginAttempts
@@ -384,5 +451,83 @@ export abstract class UserRepository {
    * @param tenantId 租户ID（用于数据隔离）
    * @returns {Promise<User[]>} 符合条件的用户列表
    */
-  abstract findWithFailedLoginAttempts(threshold: number, tenantId: string): Promise<User[]>;
-} 
+  abstract findWithFailedLoginAttempts(
+    threshold: number,
+    tenantId: string,
+  ): Promise<User[]>
+
+  // ==================== 统计相关方法 ====================
+
+  /**
+   * @method getActiveUserCount
+   * @description 获取活跃用户数量
+   * @param tenantId 租户ID（用于数据隔离）
+   * @returns {Promise<number>} 活跃用户数量
+   */
+  abstract getActiveUserCount(tenantId: string): Promise<number>
+
+  /**
+   * @method getNewUserCount
+   * @description 获取指定天数内的新用户数量
+   * @param tenantId 租户ID（用于数据隔离）
+   * @param days 天数
+   * @returns {Promise<number>} 新用户数量
+   */
+  abstract getNewUserCount(tenantId: string, days: number): Promise<number>
+
+  /**
+   * @method getDeletedUserCount
+   * @description 获取指定天数内的删除用户数量
+   * @param tenantId 租户ID（用于数据隔离）
+   * @param days 天数
+   * @returns {Promise<number>} 删除用户数量
+   */
+  abstract getDeletedUserCount(tenantId: string, days: number): Promise<number>
+
+  /**
+   * @method countByOrganization
+   * @description 按组织统计用户数量
+   * @param tenantId 租户ID（用于数据隔离）
+   * @returns {Promise<Record<string, number>>} 组织用户数量映射
+   */
+  abstract countByOrganization(
+    tenantId: string,
+  ): Promise<Record<string, number>>
+
+  /**
+   * @method countByRole
+   * @description 按角色统计用户数量
+   * @param tenantId 租户ID（用于数据隔离）
+   * @returns {Promise<Record<string, number>>} 角色用户数量映射
+   */
+  abstract countByRole(tenantId: string): Promise<Record<string, number>>
+
+  /**
+   * @method countByDateRange
+   * @description 按日期范围统计用户数量
+   * @param tenantId 租户ID（用于数据隔离）
+   * @param startDate 开始日期
+   * @param endDate 结束日期
+   * @returns {Promise<Record<string, number>>} 日期用户数量映射
+   */
+  abstract countByDateRange(
+    tenantId: string,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<Record<string, number>>
+
+  /**
+   * @method countByTenant
+   * @description 按租户统计用户数量
+   * @param tenantIds 租户ID列表
+   * @returns {Promise<Record<string, { totalUsers: number; activeUsers: number; newUsers: number }>>} 租户用户统计映射
+   */
+  abstract countByTenant(
+    tenantIds: string[],
+  ): Promise<
+    Record<
+      string,
+      { totalUsers: number; activeUsers: number; newUsers: number }
+    >
+  >
+}

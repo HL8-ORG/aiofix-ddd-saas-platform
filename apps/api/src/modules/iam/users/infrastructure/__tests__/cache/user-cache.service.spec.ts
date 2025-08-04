@@ -1,12 +1,12 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { UserCacheService } from '../../cache/user-cache.service';
-import { User } from '../../../domain/entities/user.entity';
-import { UserStatusValue } from '../../../domain/value-objects/user-status.value-object';
+import { ConfigService } from '@nestjs/config'
+import { Test, type TestingModule } from '@nestjs/testing'
+import { User } from '../../../domain/entities/user.entity'
+import { UserStatusValue } from '../../../domain/value-objects/user-status.value-object'
+import { UserCacheService } from '../../cache/user-cache.service'
 
 describe('UserCacheService', () => {
-  let service: UserCacheService;
-  let configService: ConfigService;
+  let service: UserCacheService
+  let configService: ConfigService
 
   const mockUser = {
     id: '550e8400-e29b-41d4-a716-446655440000',
@@ -34,7 +34,7 @@ describe('UserCacheService', () => {
     getEmail: () => 'john.doe@example.com',
     getPhone: () => '+86-138-0013-8000',
     getStatus: () => 'ACTIVE',
-  } as any;
+  } as any
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -78,149 +78,149 @@ describe('UserCacheService', () => {
           },
         },
       ],
-    }).compile();
+    }).compile()
 
-    service = module.get<UserCacheService>(UserCacheService);
-    configService = module.get<ConfigService>(ConfigService);
-  });
+    service = module.get<UserCacheService>(UserCacheService)
+    configService = module.get<ConfigService>(ConfigService)
+  })
 
   it('应该被定义', () => {
-    expect(service).toBeDefined();
-  });
+    expect(service).toBeDefined()
+  })
 
   describe('基本缓存操作', () => {
     it('应该能够设置和获取缓存', () => {
-      const key = 'test-key';
-      const data = { test: 'data' };
+      const key = 'test-key'
+      const data = { test: 'data' }
 
-      service.set(key, data);
-      const result = service.get(key);
+      service.set(key, data)
+      const result = service.get(key)
 
-      expect(result).toEqual(data);
-    });
+      expect(result).toEqual(data)
+    })
 
     it('应该能够删除缓存', () => {
-      const key = 'test-key';
-      const data = { test: 'data' };
+      const key = 'test-key'
+      const data = { test: 'data' }
 
-      service.set(key, data);
-      service.delete(key);
-      const result = service.get(key);
+      service.set(key, data)
+      service.delete(key)
+      const result = service.get(key)
 
-      expect(result).toBeNull();
-    });
+      expect(result).toBeNull()
+    })
 
     it('应该能够清空所有缓存', () => {
-      service.set('key1', 'data1');
-      service.set('key2', 'data2');
+      service.set('key1', 'data1')
+      service.set('key2', 'data2')
 
-      service.clear();
+      service.clear()
 
-      expect(service.get('key1')).toBeNull();
-      expect(service.get('key2')).toBeNull();
-    });
-  });
+      expect(service.get('key1')).toBeNull()
+      expect(service.get('key2')).toBeNull()
+    })
+  })
 
   describe('用户缓存操作', () => {
     it('应该能够缓存用户数据', () => {
-      service.setUser(mockUser);
+      service.setUser(mockUser)
 
-      const cachedUser = service.getUser(mockUser.id, mockUser.tenantId);
+      const cachedUser = service.getUser(mockUser.id, mockUser.tenantId)
 
-      expect(cachedUser).toBeDefined();
-      expect(cachedUser?.id).toBe(mockUser.id);
-      expect(cachedUser?.username).toBe(mockUser.username);
-    });
+      expect(cachedUser).toBeDefined()
+      expect(cachedUser?.id).toBe(mockUser.id)
+      expect(cachedUser?.username).toBe(mockUser.username)
+    })
 
     it('应该能够删除用户缓存', () => {
-      service.setUser(mockUser);
-      service.deleteUser(mockUser.id, mockUser.tenantId);
+      service.setUser(mockUser)
+      service.deleteUser(mockUser.id, mockUser.tenantId)
 
-      const cachedUser = service.getUser(mockUser.id, mockUser.tenantId);
+      const cachedUser = service.getUser(mockUser.id, mockUser.tenantId)
 
-      expect(cachedUser).toBeNull();
-    });
-  });
+      expect(cachedUser).toBeNull()
+    })
+  })
 
   describe('用户列表缓存操作', () => {
     it('应该能够缓存用户列表数据', () => {
-      const tenantId = 'tenant-1';
-      const page = 1;
-      const limit = 10;
-      const filters = { status: 'ACTIVE' };
+      const tenantId = 'tenant-1'
+      const page = 1
+      const limit = 10
+      const filters = { status: 'ACTIVE' }
       const data = {
         users: [mockUser],
         total: 1,
-      };
+      }
 
-      service.setUserList(tenantId, page, limit, filters, data);
+      service.setUserList(tenantId, page, limit, filters, data)
 
-      const cachedData = service.getUserList(tenantId, page, limit, filters);
+      const cachedData = service.getUserList(tenantId, page, limit, filters)
 
-      expect(cachedData).toEqual(data);
-    });
+      expect(cachedData).toEqual(data)
+    })
 
     it('应该能够使租户下的所有用户列表缓存失效', () => {
-      const tenantId = 'tenant-1';
-      const data = { users: [mockUser], total: 1 };
+      const tenantId = 'tenant-1'
+      const data = { users: [mockUser], total: 1 }
 
       // 设置多个用户列表缓存
-      service.setUserList(tenantId, 1, 10, undefined, data);
-      service.setUserList(tenantId, 2, 10, undefined, data);
+      service.setUserList(tenantId, 1, 10, undefined, data)
+      service.setUserList(tenantId, 2, 10, undefined, data)
 
       // 验证缓存已设置
-      expect(service.getUserList(tenantId, 1, 10, undefined)).toEqual(data);
-      expect(service.getUserList(tenantId, 2, 10, undefined)).toEqual(data);
+      expect(service.getUserList(tenantId, 1, 10, undefined)).toEqual(data)
+      expect(service.getUserList(tenantId, 2, 10, undefined)).toEqual(data)
 
-      service.invalidateUserList(tenantId);
+      service.invalidateUserList(tenantId)
 
       // 验证缓存已被清除
-      expect(service.getUserList(tenantId, 1, 10, undefined)).toBeNull();
-      expect(service.getUserList(tenantId, 2, 10, undefined)).toBeNull();
-    });
-  });
+      expect(service.getUserList(tenantId, 1, 10, undefined)).toBeNull()
+      expect(service.getUserList(tenantId, 2, 10, undefined)).toBeNull()
+    })
+  })
 
   describe('缓存统计', () => {
     it('应该能够获取缓存统计信息', () => {
-      service.set('key1', 'data1');
-      service.set('key2', 'data2');
+      service.set('key1', 'data1')
+      service.set('key2', 'data2')
 
-      const stats = service.getStats();
+      const stats = service.getStats()
 
-      expect(stats.size).toBe(2);
-      expect(stats.enabled).toBe(true);
-      expect(stats.ttl).toBe(3600);
-      expect(stats.maxSize).toBe(1000);
-    });
-  });
+      expect(stats.size).toBe(2)
+      expect(stats.enabled).toBe(true)
+      expect(stats.ttl).toBe(3600)
+      expect(stats.maxSize).toBe(1000)
+    })
+  })
 
   describe('缓存过期', () => {
     it('应该能够处理缓存过期', () => {
-      const key = 'test-key';
-      const data = { test: 'data' };
+      const key = 'test-key'
+      const data = { test: 'data' }
 
       // 设置一个很短的TTL
-      service.set(key, data, 1);
+      service.set(key, data, 1)
 
       // 等待过期
       setTimeout(() => {
-        const result = service.get(key);
-        expect(result).toBeNull();
-      }, 1100);
-    });
-  });
+        const result = service.get(key)
+        expect(result).toBeNull()
+      }, 1100)
+    })
+  })
 
   describe('缓存大小限制', () => {
     it('应该能够处理缓存大小限制', () => {
       // 模拟达到最大缓存大小
       for (let i = 0; i < 1001; i++) {
-        service.set(`key-${i}`, `data-${i}`);
+        service.set(`key-${i}`, `data-${i}`)
       }
 
-      const stats = service.getStats();
-      expect(stats.size).toBeLessThanOrEqual(1000);
-    });
-  });
+      const stats = service.getStats()
+      expect(stats.size).toBeLessThanOrEqual(1000)
+    })
+  })
 
   describe('缓存禁用', () => {
     it('当缓存被禁用时应该返回null', () => {
@@ -231,14 +231,14 @@ describe('UserCacheService', () => {
           ttl: 3600,
           maxSize: 1000,
         },
-      } as any);
+      } as any)
 
-      const disabledService = new UserCacheService(configService);
+      const disabledService = new UserCacheService(configService)
 
-      disabledService.set('key', 'data');
-      const result = disabledService.get('key');
+      disabledService.set('key', 'data')
+      const result = disabledService.get('key')
 
-      expect(result).toBeNull();
-    });
-  });
-}); 
+      expect(result).toBeNull()
+    })
+  })
+})

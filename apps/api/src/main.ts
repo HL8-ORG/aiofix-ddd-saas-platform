@@ -1,16 +1,16 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe, VersioningType } from '@nestjs/common';
-import { useContainer } from 'class-validator';
-import { Logger } from '@libs/pino-nestjs';
+import { writeFileSync } from 'fs'
+import { Logger } from '@libs/pino-nestjs'
+import { ValidationPipe, VersioningType } from '@nestjs/common'
+import { NestFactory } from '@nestjs/core'
 import {
   FastifyAdapter,
-  NestFastifyApplication,
-} from '@nestjs/platform-fastify';
-import { v4 as uuidv4 } from 'uuid';
-import { REQUEST_ID_HEADER } from 'src/shared/domain/constants/app.constants';
-import { DocumentBuilder, SwaggerModule } from "@nestjs/swagger";
-import { writeFileSync } from "fs";
+  type NestFastifyApplication,
+} from '@nestjs/platform-fastify'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { useContainer } from 'class-validator'
+import { REQUEST_ID_HEADER } from 'src/shared/domain/constants/app.constants'
+import { v4 as uuidv4 } from 'uuid'
+import { AppModule } from './app.module'
 /**
  * @function bootstrap
  * @description
@@ -43,13 +43,13 @@ async function bootstrap() {
     // 重写fastify的genReqId方法，自定义请求 ID 生成逻辑，而不是使用fastify默认的递增整型ID
     genReqId: (req: { headers: { [x: string]: any } }) => {
       // 优先使用客户端传递的请求 ID，否则自动生成, 需要与前端约定好请求头字段名 REQUEST_ID_HEADER
-      const userRequestId = req.headers[REQUEST_ID_HEADER];
+      const userRequestId = req.headers[REQUEST_ID_HEADER]
       if (userRequestId) {
-        return userRequestId;
+        return userRequestId
       }
-      return uuidv4();
+      return uuidv4()
     },
-  });
+  })
 
   // 可选：自动在响应头中设置 X-Request-Id，便于前后端链路追踪
   // fastifyAdapter.getInstance().addHook('onSend', (request, reply, done) => {
@@ -64,28 +64,28 @@ async function bootstrap() {
     AppModule,
     fastifyAdapter,
     { bufferLogs: true },
-  );
+  )
 
   // 启用基于 URI 的 API 版本控制，默认版本为 1
   app.enableVersioning({
     type: VersioningType.URI,
     defaultVersion: '1',
-  });
+  })
 
   // 注册全局校验管道，自动转换和校验请求数据
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
     }),
-  );
+  )
 
   // 设置全局日志系统为 pino-nestjs 的 Logger
-  app.useLogger(app.get(Logger));
+  app.useLogger(app.get(Logger))
   // 添加测试日志
-  const logger = app.get(Logger);
-  logger.log('应用启动成功，开始监听端口');
-  logger.error('测试错误日志');
-  logger.debug('测试调试日志');
+  const logger = app.get(Logger)
+  logger.log('应用启动成功，开始监听端口')
+  logger.error('测试错误日志')
+  logger.debug('测试调试日志')
 
   // 启用CORS，允许前端跨域访问
   app.enableCors({
@@ -93,33 +93,30 @@ async function bootstrap() {
     credentials: true, // 允许携带凭证
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // 允许的HTTP方法
     allowedHeaders: ['Content-Type', 'Authorization', 'x-request-id'], // 允许的请求头
-  });
+  })
 
   // 配置 class-validator 使用 Nest 的依赖注入容器，支持自定义校验器注入
-  useContainer(app.select(AppModule), { fallbackOnErrors: true });
+  useContainer(app.select(AppModule), { fallbackOnErrors: true })
   // Swagger configuration
   const swaggerConfig = new DocumentBuilder()
-    .setTitle("API Documentation")
-    .setDescription("API description")
-    .setVersion("1.0")
+    .setTitle('API Documentation')
+    .setDescription('API description')
+    .setVersion('1.0')
     .addBearerAuth()
-    .build();
+    .build()
 
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  SwaggerModule.setup("docs", app, document);
-  writeFileSync("swagger.json", JSON.stringify(document, null, 2));
-
-
-
+  const document = SwaggerModule.createDocument(app, swaggerConfig)
+  SwaggerModule.setup('docs', app, document)
+  writeFileSync('swagger.json', JSON.stringify(document, null, 2))
 
   // 启动 HTTP 服务，监听指定端口（默认 3000），支持容器化部署
-  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0')
   console.log(
-    `Swagger documentation available at http://localhost:${process.env.PORT}/docs`
-  );
+    `Swagger documentation available at http://localhost:${process.env.PORT}/docs`,
+  )
 }
 
 /**
  * 应用启动入口
  */
-bootstrap();
+bootstrap()

@@ -1,14 +1,14 @@
-import { Permission } from '../entities/permission.entity';
-import { PermissionType } from '../value-objects/permission-type.value-object';
-import { PermissionStatus } from '../value-objects/permission-status.value-object';
-import { PermissionAction } from '../value-objects/permission-action.value-object';
+import type { Permission } from '../entities/permission.entity'
+import type { PermissionAction } from '../value-objects/permission-action.value-object'
+import type { PermissionStatus } from '../value-objects/permission-status.value-object'
+import type { PermissionType } from '../value-objects/permission-type.value-object'
 
 /**
  * @abstract PermissionRepository
  * @description
  * 权限仓储抽象类，定义权限数据访问的契约。
  * 支持多租户、条件查询、批量操作等高级功能。
- * 
+ *
  * 主要原理与机制：
  * 1. 定义权限数据访问的标准接口
  * 2. 支持多租户数据隔离
@@ -22,7 +22,7 @@ export abstract class PermissionRepository {
    * @param permission 权限实体
    * @returns {Promise<Permission>} 保存后的权限
    */
-  abstract save(permission: Permission): Promise<Permission>;
+  abstract save(permission: Permission): Promise<Permission>
 
   /**
    * @method findById
@@ -31,7 +31,7 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Permission | null>} 权限实体或null
    */
-  abstract findById(id: string, tenantId: string): Promise<Permission | null>;
+  abstract findById(id: string, tenantId: string): Promise<Permission | null>
 
   /**
    * @method findByCode
@@ -40,7 +40,10 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Permission | null>} 权限实体或null
    */
-  abstract findByCode(code: string, tenantId: string): Promise<Permission | null>;
+  abstract findByCode(
+    code: string,
+    tenantId: string,
+  ): Promise<Permission | null>
 
   /**
    * @method findByName
@@ -49,7 +52,10 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Permission | null>} 权限实体或null
    */
-  abstract findByName(name: string, tenantId: string): Promise<Permission | null>;
+  abstract findByName(
+    name: string,
+    tenantId: string,
+  ): Promise<Permission | null>
 
   /**
    * @method findByType
@@ -59,7 +65,11 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findByType(type: PermissionType, tenantId: string, organizationId?: string): Promise<Permission[]>;
+  abstract findByType(
+    type: PermissionType,
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<Permission[]>
 
   /**
    * @method findByStatus
@@ -69,7 +79,11 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findByStatus(status: PermissionStatus, tenantId: string, organizationId?: string): Promise<Permission[]>;
+  abstract findByStatus(
+    status: PermissionStatus,
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<Permission[]>
 
   /**
    * @method findByAction
@@ -79,7 +93,11 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findByAction(action: PermissionAction, tenantId: string, organizationId?: string): Promise<Permission[]>;
+  abstract findByAction(
+    action: PermissionAction,
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<Permission[]>
 
   /**
    * @method findByResource
@@ -89,7 +107,11 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findByResource(resource: string, tenantId: string, organizationId?: string): Promise<Permission[]>;
+  abstract findByResource(
+    resource: string,
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<Permission[]>
 
   /**
    * @method findByModule
@@ -99,7 +121,11 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findByModule(module: string, tenantId: string, organizationId?: string): Promise<Permission[]>;
+  abstract findByModule(
+    module: string,
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<Permission[]>
 
   /**
    * @method findByRoleId
@@ -108,7 +134,7 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findByRoleId(roleId: string, tenantId: string): Promise<Permission[]>;
+  abstract findByRoleId(roleId: string, tenantId: string): Promise<Permission[]>
 
   /**
    * @method findByParentPermissionId
@@ -117,7 +143,10 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findByParentPermissionId(parentPermissionId: string, tenantId: string): Promise<Permission[]>;
+  abstract findByParentPermissionId(
+    parentPermissionId: string,
+    tenantId: string,
+  ): Promise<Permission[]>
 
   /**
    * @method findSystemPermissions
@@ -125,7 +154,7 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Permission[]>} 系统权限列表
    */
-  abstract findSystemPermissions(tenantId: string): Promise<Permission[]>;
+  abstract findSystemPermissions(tenantId: string): Promise<Permission[]>
 
   /**
    * @method findDefaultPermissions
@@ -133,7 +162,7 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Permission[]>} 默认权限列表
    */
-  abstract findDefaultPermissions(tenantId: string): Promise<Permission[]>;
+  abstract findDefaultPermissions(tenantId: string): Promise<Permission[]>
 
   /**
    * @method findExpiredPermissions
@@ -141,7 +170,7 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Permission[]>} 过期权限列表
    */
-  abstract findExpiredPermissions(tenantId: string): Promise<Permission[]>;
+  abstract findExpiredPermissions(tenantId: string): Promise<Permission[]>
 
   /**
    * @method findActivePermissions
@@ -150,7 +179,10 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<Permission[]>} 激活权限列表
    */
-  abstract findActivePermissions(tenantId: string, organizationId?: string): Promise<Permission[]>;
+  abstract findActivePermissions(
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<Permission[]>
 
   /**
    * @method findAll
@@ -161,7 +193,12 @@ export abstract class PermissionRepository {
    * @param limit 每页数量
    * @returns {Promise<{ permissions: Permission[]; total: number }>} 权限列表和总数
    */
-  abstract findAll(tenantId: string, organizationId?: string, page?: number, limit?: number): Promise<{ permissions: Permission[]; total: number }>;
+  abstract findAll(
+    tenantId: string,
+    organizationId?: string,
+    page?: number,
+    limit?: number,
+  ): Promise<{ permissions: Permission[]; total: number }>
 
   /**
    * @method search
@@ -173,7 +210,13 @@ export abstract class PermissionRepository {
    * @param limit 每页数量
    * @returns {Promise<{ permissions: Permission[]; total: number }>} 权限列表和总数
    */
-  abstract search(query: string, tenantId: string, organizationId?: string, page?: number, limit?: number): Promise<{ permissions: Permission[]; total: number }>;
+  abstract search(
+    query: string,
+    tenantId: string,
+    organizationId?: string,
+    page?: number,
+    limit?: number,
+  ): Promise<{ permissions: Permission[]; total: number }>
 
   /**
    * @method countByTenant
@@ -182,7 +225,10 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<number>} 权限数量
    */
-  abstract countByTenant(tenantId: string, organizationId?: string): Promise<number>;
+  abstract countByTenant(
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<number>
 
   /**
    * @method countByType
@@ -192,7 +238,11 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<number>} 权限数量
    */
-  abstract countByType(type: PermissionType, tenantId: string, organizationId?: string): Promise<number>;
+  abstract countByType(
+    type: PermissionType,
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<number>
 
   /**
    * @method countByStatus
@@ -202,7 +252,11 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<number>} 权限数量
    */
-  abstract countByStatus(status: PermissionStatus, tenantId: string, organizationId?: string): Promise<number>;
+  abstract countByStatus(
+    status: PermissionStatus,
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<number>
 
   /**
    * @method exists
@@ -211,7 +265,7 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<boolean>} 是否存在
    */
-  abstract exists(id: string, tenantId: string): Promise<boolean>;
+  abstract exists(id: string, tenantId: string): Promise<boolean>
 
   /**
    * @method existsByCode
@@ -221,7 +275,11 @@ export abstract class PermissionRepository {
    * @param excludeId 排除的权限ID
    * @returns {Promise<boolean>} 是否存在
    */
-  abstract existsByCode(code: string, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByCode(
+    code: string,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method existsByName
@@ -231,7 +289,11 @@ export abstract class PermissionRepository {
    * @param excludeId 排除的权限ID
    * @returns {Promise<boolean>} 是否存在
    */
-  abstract existsByName(name: string, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByName(
+    name: string,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method delete
@@ -240,7 +302,7 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<boolean>} 是否删除成功
    */
-  abstract delete(id: string, tenantId: string): Promise<boolean>;
+  abstract delete(id: string, tenantId: string): Promise<boolean>
 
   /**
    * @method deleteByTenant
@@ -248,7 +310,7 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 删除的权限数量
    */
-  abstract deleteByTenant(tenantId: string): Promise<number>;
+  abstract deleteByTenant(tenantId: string): Promise<number>
 
   /**
    * @method deleteByOrganization
@@ -257,7 +319,10 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 删除的权限数量
    */
-  abstract deleteByOrganization(organizationId: string, tenantId: string): Promise<number>;
+  abstract deleteByOrganization(
+    organizationId: string,
+    tenantId: string,
+  ): Promise<number>
 
   /**
    * @method bulkSave
@@ -265,7 +330,7 @@ export abstract class PermissionRepository {
    * @param permissions 权限列表
    * @returns {Promise<Permission[]>} 保存后的权限列表
    */
-  abstract bulkSave(permissions: Permission[]): Promise<Permission[]>;
+  abstract bulkSave(permissions: Permission[]): Promise<Permission[]>
 
   /**
    * @method bulkDelete
@@ -274,7 +339,7 @@ export abstract class PermissionRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 删除的权限数量
    */
-  abstract bulkDelete(ids: string[], tenantId: string): Promise<number>;
+  abstract bulkDelete(ids: string[], tenantId: string): Promise<number>
 
   /**
    * @method findWithConditions
@@ -283,7 +348,10 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findWithConditions(tenantId: string, organizationId?: string): Promise<Permission[]>;
+  abstract findWithConditions(
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<Permission[]>
 
   /**
    * @method findWithFields
@@ -292,7 +360,10 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findWithFields(tenantId: string, organizationId?: string): Promise<Permission[]>;
+  abstract findWithFields(
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<Permission[]>
 
   /**
    * @method findByTags
@@ -302,5 +373,9 @@ export abstract class PermissionRepository {
    * @param organizationId 组织ID（可选）
    * @returns {Promise<Permission[]>} 权限列表
    */
-  abstract findByTags(tags: string[], tenantId: string, organizationId?: string): Promise<Permission[]>;
-} 
+  abstract findByTags(
+    tags: string[],
+    tenantId: string,
+    organizationId?: string,
+  ): Promise<Permission[]>
+}

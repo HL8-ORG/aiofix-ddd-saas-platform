@@ -1,10 +1,10 @@
-import { Role } from '../entities/role.entity';
+import type { Role } from '../entities/role.entity'
 
 /**
  * @abstract RoleRepository
  * @description
  * 角色仓储抽象类，定义角色数据访问的接口。
- * 
+ *
  * 主要原理与机制：
  * 1. 遵循DDD仓储模式，提供角色实体的持久化抽象
  * 2. 支持多租户隔离，所有查询都基于租户ID过滤
@@ -20,7 +20,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role | null>} 角色实体或null
    */
-  abstract findById(id: string, tenantId: string): Promise<Role | null>;
+  abstract findById(id: string, tenantId: string): Promise<Role | null>
 
   /**
    * @method findByCode
@@ -29,7 +29,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role | null>} 角色实体或null
    */
-  abstract findByCode(code: string, tenantId: string): Promise<Role | null>;
+  abstract findByCode(code: string, tenantId: string): Promise<Role | null>
 
   /**
    * @method findByName
@@ -38,7 +38,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role | null>} 角色实体或null
    */
-  abstract findByName(name: string, tenantId: string): Promise<Role | null>;
+  abstract findByName(name: string, tenantId: string): Promise<Role | null>
 
   /**
    * @method findByTenant
@@ -46,7 +46,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 角色列表
    */
-  abstract findByTenant(tenantId: string): Promise<Role[]>;
+  abstract findByTenant(tenantId: string): Promise<Role[]>
 
   /**
    * @method findByOrganization
@@ -55,7 +55,10 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 角色列表
    */
-  abstract findByOrganization(organizationId: string, tenantId: string): Promise<Role[]>;
+  abstract findByOrganization(
+    organizationId: string,
+    tenantId: string,
+  ): Promise<Role[]>
 
   /**
    * @method findByUser
@@ -64,7 +67,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 角色列表
    */
-  abstract findByUser(userId: string, tenantId: string): Promise<Role[]>;
+  abstract findByUser(userId: string, tenantId: string): Promise<Role[]>
 
   /**
    * @method findByPermission
@@ -73,7 +76,10 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 角色列表
    */
-  abstract findByPermission(permissionId: string, tenantId: string): Promise<Role[]>;
+  abstract findByPermission(
+    permissionId: string,
+    tenantId: string,
+  ): Promise<Role[]>
 
   /**
    * @method findSystemRoles
@@ -81,7 +87,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 系统角色列表
    */
-  abstract findSystemRoles(tenantId: string): Promise<Role[]>;
+  abstract findSystemRoles(tenantId: string): Promise<Role[]>
 
   /**
    * @method findDefaultRoles
@@ -89,7 +95,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 默认角色列表
    */
-  abstract findDefaultRoles(tenantId: string): Promise<Role[]>;
+  abstract findDefaultRoles(tenantId: string): Promise<Role[]>
 
   /**
    * @method findActiveRoles
@@ -97,7 +103,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 激活角色列表
    */
-  abstract findActiveRoles(tenantId: string): Promise<Role[]>;
+  abstract findActiveRoles(tenantId: string): Promise<Role[]>
 
   /**
    * @method findSuspendedRoles
@@ -105,7 +111,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 禁用角色列表
    */
-  abstract findSuspendedRoles(tenantId: string): Promise<Role[]>;
+  abstract findSuspendedRoles(tenantId: string): Promise<Role[]>
 
   /**
    * @method findDeletedRoles
@@ -113,7 +119,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 已删除角色列表
    */
-  abstract findDeletedRoles(tenantId: string): Promise<Role[]>;
+  abstract findDeletedRoles(tenantId: string): Promise<Role[]>
 
   /**
    * @method findExpiredRoles
@@ -121,7 +127,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 已过期角色列表
    */
-  abstract findExpiredRoles(tenantId: string): Promise<Role[]>;
+  abstract findExpiredRoles(tenantId: string): Promise<Role[]>
 
   /**
    * @method findParentRoles
@@ -130,7 +136,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 父角色列表
    */
-  abstract findParentRoles(roleId: string, tenantId: string): Promise<Role[]>;
+  abstract findParentRoles(roleId: string, tenantId: string): Promise<Role[]>
 
   /**
    * @method findChildRoles
@@ -139,7 +145,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 子角色列表
    */
-  abstract findChildRoles(roleId: string, tenantId: string): Promise<Role[]>;
+  abstract findChildRoles(roleId: string, tenantId: string): Promise<Role[]>
 
   /**
    * @method findRolesByPriority
@@ -149,7 +155,11 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Role[]>} 角色列表
    */
-  abstract findRolesByPriority(minPriority: number, maxPriority: number, tenantId: string): Promise<Role[]>;
+  abstract findRolesByPriority(
+    minPriority: number,
+    maxPriority: number,
+    tenantId: string,
+  ): Promise<Role[]>
 
   /**
    * @method findRolesWithUserCount
@@ -157,7 +167,9 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Array<{ role: Role; userCount: number }>>} 角色和用户数量列表
    */
-  abstract findRolesWithUserCount(tenantId: string): Promise<Array<{ role: Role; userCount: number }>>;
+  abstract findRolesWithUserCount(
+    tenantId: string,
+  ): Promise<Array<{ role: Role; userCount: number }>>
 
   /**
    * @method findRolesWithPermissionCount
@@ -165,7 +177,9 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<Array<{ role: Role; permissionCount: number }>>} 角色和权限数量列表
    */
-  abstract findRolesWithPermissionCount(tenantId: string): Promise<Array<{ role: Role; permissionCount: number }>>;
+  abstract findRolesWithPermissionCount(
+    tenantId: string,
+  ): Promise<Array<{ role: Role; permissionCount: number }>>
 
   /**
    * @method save
@@ -173,7 +187,7 @@ export abstract class RoleRepository {
    * @param role 角色实体
    * @returns {Promise<void>}
    */
-  abstract save(role: Role): Promise<void>;
+  abstract save(role: Role): Promise<void>
 
   /**
    * @method saveMany
@@ -181,7 +195,7 @@ export abstract class RoleRepository {
    * @param roles 角色实体列表
    * @returns {Promise<void>}
    */
-  abstract saveMany(roles: Role[]): Promise<void>;
+  abstract saveMany(roles: Role[]): Promise<void>
 
   /**
    * @method delete
@@ -190,7 +204,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<void>}
    */
-  abstract delete(id: string, tenantId: string): Promise<void>;
+  abstract delete(id: string, tenantId: string): Promise<void>
 
   /**
    * @method deleteMany
@@ -199,7 +213,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<void>}
    */
-  abstract deleteMany(ids: string[], tenantId: string): Promise<void>;
+  abstract deleteMany(ids: string[], tenantId: string): Promise<void>
 
   /**
    * @method exists
@@ -208,7 +222,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<boolean>} 是否存在
    */
-  abstract exists(id: string, tenantId: string): Promise<boolean>;
+  abstract exists(id: string, tenantId: string): Promise<boolean>
 
   /**
    * @method existsByCode
@@ -218,7 +232,11 @@ export abstract class RoleRepository {
    * @param excludeId 排除的角色ID，可选
    * @returns {Promise<boolean>} 是否存在
    */
-  abstract existsByCode(code: string, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByCode(
+    code: string,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method existsByName
@@ -228,7 +246,11 @@ export abstract class RoleRepository {
    * @param excludeId 排除的角色ID，可选
    * @returns {Promise<boolean>} 是否存在
    */
-  abstract existsByName(name: string, tenantId: string, excludeId?: string): Promise<boolean>;
+  abstract existsByName(
+    name: string,
+    tenantId: string,
+    excludeId?: string,
+  ): Promise<boolean>
 
   /**
    * @method countByTenant
@@ -236,7 +258,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 角色数量
    */
-  abstract countByTenant(tenantId: string): Promise<number>;
+  abstract countByTenant(tenantId: string): Promise<number>
 
   /**
    * @method countByOrganization
@@ -245,7 +267,10 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 角色数量
    */
-  abstract countByOrganization(organizationId: string, tenantId: string): Promise<number>;
+  abstract countByOrganization(
+    organizationId: string,
+    tenantId: string,
+  ): Promise<number>
 
   /**
    * @method countByUser
@@ -254,7 +279,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 角色数量
    */
-  abstract countByUser(userId: string, tenantId: string): Promise<number>;
+  abstract countByUser(userId: string, tenantId: string): Promise<number>
 
   /**
    * @method countByPermission
@@ -263,7 +288,10 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 角色数量
    */
-  abstract countByPermission(permissionId: string, tenantId: string): Promise<number>;
+  abstract countByPermission(
+    permissionId: string,
+    tenantId: string,
+  ): Promise<number>
 
   /**
    * @method countSystemRoles
@@ -271,7 +299,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 系统角色数量
    */
-  abstract countSystemRoles(tenantId: string): Promise<number>;
+  abstract countSystemRoles(tenantId: string): Promise<number>
 
   /**
    * @method countDefaultRoles
@@ -279,7 +307,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 默认角色数量
    */
-  abstract countDefaultRoles(tenantId: string): Promise<number>;
+  abstract countDefaultRoles(tenantId: string): Promise<number>
 
   /**
    * @method countActiveRoles
@@ -287,7 +315,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 激活角色数量
    */
-  abstract countActiveRoles(tenantId: string): Promise<number>;
+  abstract countActiveRoles(tenantId: string): Promise<number>
 
   /**
    * @method countSuspendedRoles
@@ -295,7 +323,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 禁用角色数量
    */
-  abstract countSuspendedRoles(tenantId: string): Promise<number>;
+  abstract countSuspendedRoles(tenantId: string): Promise<number>
 
   /**
    * @method countDeletedRoles
@@ -303,7 +331,7 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 已删除角色数量
    */
-  abstract countDeletedRoles(tenantId: string): Promise<number>;
+  abstract countDeletedRoles(tenantId: string): Promise<number>
 
   /**
    * @method countExpiredRoles
@@ -311,5 +339,5 @@ export abstract class RoleRepository {
    * @param tenantId 租户ID
    * @returns {Promise<number>} 已过期角色数量
    */
-  abstract countExpiredRoles(tenantId: string): Promise<number>;
-} 
+  abstract countExpiredRoles(tenantId: string): Promise<number>
+}

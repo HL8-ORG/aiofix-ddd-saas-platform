@@ -1,24 +1,39 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException, Inject } from '@nestjs/common';
-import { User } from '../domain/entities/user.entity';
-import { UserStatusValue } from '../domain/value-objects/user-status.value-object';
-import { Username } from '../domain/value-objects/username.value-object';
-import { Email } from '../domain/value-objects/email.value-object';
-import { Phone } from '../domain/value-objects/phone.value-object';
-import { generateUuid } from '../../../../shared/domain/utils/uuid.util';
-import { UserRepository } from '../domain/repositories/user.repository';
+import { Inject, Injectable } from '@nestjs/common'
+import type { User } from '../domain/entities/user.entity'
+import type { UserRepository } from '../domain/repositories/user.repository'
+import type { AssignRoleToUserUseCase } from './use-cases/assign-role-to-user.use-case'
+import type { AssignUserToOrganizationUseCase } from './use-cases/assign-user-to-organization.use-case'
+import type { CreateUserUseCase } from './use-cases/create-user.use-case'
+import type { DeleteUserUseCase } from './use-cases/delete-user.use-case'
+import type { GetUserStatisticsUseCase } from './use-cases/get-user-statistics.use-case'
+import type { GetUserUseCase } from './use-cases/get-user.use-case'
+import type { GetUsersUseCase } from './use-cases/get-users.use-case'
+import type { SearchUsersUseCase } from './use-cases/search-users.use-case'
+import type { UpdateUserStatusUseCase } from './use-cases/update-user-status.use-case'
+import type { UpdateUserUseCase } from './use-cases/update-user.use-case'
 
 /**
  * @class UsersService
  * @description
- * 用户应用服务，负责协调领域对象完成业务用例。
- * 这是应用层的核心服务，连接表现层和领域层。
+ * 用户应用服务，负责协调各个use cases完成业务用例。
+ * 这是应用层的核心服务，连接表现层和use cases层。
  */
 @Injectable()
 export class UsersService {
   constructor(
     @Inject('UserRepository')
-    private readonly userRepository: UserRepository
-  ) { }
+    private readonly userRepository: UserRepository,
+    private readonly createUserUseCase: CreateUserUseCase,
+    private readonly getUserUseCase: GetUserUseCase,
+    private readonly getUsersUseCase: GetUsersUseCase,
+    private readonly updateUserUseCase: UpdateUserUseCase,
+    private readonly updateUserStatusUseCase: UpdateUserStatusUseCase,
+    private readonly deleteUserUseCase: DeleteUserUseCase,
+    private readonly assignUserToOrganizationUseCase: AssignUserToOrganizationUseCase,
+    private readonly assignRoleToUserUseCase: AssignRoleToUserUseCase,
+    private readonly searchUsersUseCase: SearchUsersUseCase,
+    private readonly getUserStatisticsUseCase: GetUserStatisticsUseCase,
+  ) {}
 
   /**
    * @method createUser
@@ -37,50 +52,25 @@ export class UsersService {
     avatar?: string,
     organizationIds?: string[],
     roleIds?: string[],
-    preferences?: Record<string, any>
+    preferences?: Record<string, unknown>,
   ): Promise<User> {
-    try {
-      // 验证用户名是否已存在
-      if (await this.userRepository.existsByUsernameString(username, tenantId)) {
-        throw new ConflictException('用户名已存在');
-      }
-
-      // 验证邮箱是否已存在
-      if (await this.userRepository.existsByEmailString(email, tenantId)) {
-        throw new ConflictException('邮箱已存在');
-      }
-
-      // 验证手机号是否已存在（如果提供）
-      if (phone && await this.userRepository.existsByPhoneString(phone, tenantId)) {
-        throw new ConflictException('手机号已存在');
-      }
-
-      // 创建用户实体
-      const user = new User(
-        generateUuid(),
+    return await this.createUserUseCase.execute(
+      {
         username,
         email,
         firstName,
         lastName,
-        tenantId,
-        adminUserId,
         passwordHash,
         phone,
         displayName,
         avatar,
         organizationIds,
         roleIds,
-        preferences
-      );
-
-      // 保存到仓储
-      return await this.userRepository.save(user);
-    } catch (error) {
-      if (error instanceof ConflictException || error instanceof BadRequestException) {
-        throw error;
-      }
-      throw new BadRequestException('创建用户失败: ' + (error as Error).message);
-    }
+        preferences,
+      },
+      tenantId,
+      adminUserId,
+    )
   }
 
   /**
@@ -88,11 +78,7 @@ export class UsersService {
    * @description 根据ID获取用户
    */
   async getUserById(id: string, tenantId: string): Promise<User> {
-    const user = await this.userRepository.findById(id, tenantId);
-    if (!user) {
-      throw new NotFoundException('用户不存在');
-    }
-    return user;
+    return await this.getUserUseCase.execute(id, tenantId)
   }
 
   /**
@@ -100,11 +86,7 @@ export class UsersService {
    * @description 根据用户名获取用户
    */
   async getUserByUsername(username: string, tenantId: string): Promise<User> {
-    const user = await this.userRepository.findByUsernameString(username, tenantId);
-    if (!user) {
-      throw new NotFoundException('用户不存在');
-    }
-    return user;
+    return await this.getUserUseCase.executeByUsername(username, tenantId)
   }
 
   /**
@@ -112,11 +94,7 @@ export class UsersService {
    * @description 根据邮箱获取用户
    */
   async getUserByEmail(email: string, tenantId: string): Promise<User> {
-    const user = await this.userRepository.findByEmailString(email, tenantId);
-    if (!user) {
-      throw new NotFoundException('用户不存在');
-    }
-    return user;
+    return await this.getUserUseCase.executeByEmail(email, tenantId)
   }
 
   /**
@@ -124,7 +102,7 @@ export class UsersService {
    * @description 获取所有用户
    */
   async getAllUsers(tenantId: string): Promise<User[]> {
-    return await this.userRepository.findAll(tenantId);
+    return await this.getUsersUseCase.executeAllUsers(tenantId)
   }
 
   /**
@@ -132,32 +110,64 @@ export class UsersService {
    * @description 获取所有激活状态的用户
    */
   async getActiveUsers(tenantId: string): Promise<User[]> {
-    return await this.userRepository.findActive(tenantId);
+    return await this.getUsersUseCase.executeActiveUsers(tenantId)
+  }
+
+  /**
+   * @method getUsersWithPagination
+   * @description 分页获取用户列表
+   */
+  async getUsersWithPagination(
+    tenantId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{
+    users: User[]
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }> {
+    return await this.getUsersUseCase.execute(tenantId, page, limit)
   }
 
   /**
    * @method activateUser
    * @description 激活用户
    */
-  async activateUser(id: string, tenantId: string): Promise<User> {
-    const user = await this.getUserById(id, tenantId);
-    user.activate();
-    return await this.userRepository.save(user);
+  async activateUser(
+    id: string,
+    tenantId: string,
+    adminUserId: string,
+  ): Promise<User> {
+    return await this.updateUserStatusUseCase.executeActivate(
+      id,
+      tenantId,
+      adminUserId,
+    )
   }
 
   /**
    * @method suspendUser
    * @description 禁用用户
    */
-  async suspendUser(id: string, tenantId: string): Promise<User> {
-    const user = await this.getUserById(id, tenantId);
-    user.suspend();
-    return await this.userRepository.save(user);
+  async suspendUser(
+    id: string,
+    tenantId: string,
+    adminUserId: string,
+    reason: string,
+  ): Promise<User> {
+    return await this.updateUserStatusUseCase.executeSuspend(
+      id,
+      tenantId,
+      adminUserId,
+      reason,
+    )
   }
 
   /**
    * @method updateUserInfo
-   * @description 更新用户信息
+   * @description 更新用户基本信息
    */
   async updateUserInfo(
     id: string,
@@ -165,11 +175,18 @@ export class UsersService {
     firstName: string,
     lastName: string,
     displayName?: string,
-    avatar?: string
+    avatar?: string,
   ): Promise<User> {
-    const user = await this.getUserById(id, tenantId);
-    user.updateInfo(firstName, lastName, displayName, avatar);
-    return await this.userRepository.save(user);
+    return await this.updateUserUseCase.execute(
+      id,
+      {
+        firstName,
+        lastName,
+        displayName,
+        avatar,
+      },
+      tenantId,
+    )
   }
 
   /**
@@ -180,118 +197,113 @@ export class UsersService {
     id: string,
     tenantId: string,
     email: string,
-    phone?: string
+    phone?: string,
   ): Promise<User> {
-    const user = await this.getUserById(id, tenantId);
-
-    // 验证邮箱唯一性（排除当前用户）
-    if (await this.userRepository.existsByEmailString(email, tenantId, id)) {
-      throw new ConflictException('邮箱已存在');
+    const updateData: { email: string; phone?: string } = { email }
+    if (phone) {
+      updateData.phone = phone
     }
-
-    // 验证手机号唯一性（如果提供且排除当前用户）
-    if (phone && await this.userRepository.existsByPhoneString(phone, tenantId, id)) {
-      throw new ConflictException('手机号已存在');
-    }
-
-    user.updateContactInfo(email, phone);
-    return await this.userRepository.save(user);
-  }
-
-  /**
-   * @method updateUserPassword
-   * @description 更新用户密码
-   */
-  async updateUserPassword(id: string, tenantId: string, passwordHash: string): Promise<User> {
-    const user = await this.getUserById(id, tenantId);
-    user.updatePassword(passwordHash);
-    return await this.userRepository.save(user);
+    return await this.updateUserUseCase.execute(id, updateData, tenantId)
   }
 
   /**
    * @method deleteUser
    * @description 删除用户（软删除）
    */
-  async deleteUser(id: string, tenantId: string): Promise<boolean> {
-    const user = await this.getUserById(id, tenantId);
-    user.markAsDeleted();
-    await this.userRepository.save(user);
-    return true;
+  async deleteUser(
+    id: string,
+    tenantId: string,
+    adminUserId: string,
+  ): Promise<boolean> {
+    return await this.deleteUserUseCase.execute(id, tenantId, adminUserId)
   }
 
   /**
    * @method restoreUser
    * @description 恢复已删除的用户
    */
-  async restoreUser(id: string, tenantId: string): Promise<User> {
-    const user = await this.userRepository.findById(id, tenantId);
-    if (!user) {
-      throw new NotFoundException('用户不存在');
-    }
-    user.restore();
-    return await this.userRepository.save(user);
+  async restoreUser(
+    id: string,
+    tenantId: string,
+    adminUserId: string,
+  ): Promise<boolean> {
+    return await this.deleteUserUseCase.executeRestore(
+      id,
+      tenantId,
+      adminUserId,
+    )
   }
 
   /**
    * @method assignUserToOrganization
    * @description 将用户分配到组织
    */
-  async assignUserToOrganization(id: string, tenantId: string, organizationId: string): Promise<User> {
-    const user = await this.getUserById(id, tenantId);
-    user.assignToOrganization(organizationId);
-    return await this.userRepository.save(user);
+  async assignUserToOrganization(
+    id: string,
+    tenantId: string,
+    organizationId: string,
+    adminUserId: string,
+  ): Promise<User> {
+    return await this.assignUserToOrganizationUseCase.execute(
+      id,
+      organizationId,
+      tenantId,
+      adminUserId,
+    )
   }
 
   /**
    * @method removeUserFromOrganization
    * @description 从组织移除用户
    */
-  async removeUserFromOrganization(id: string, tenantId: string, organizationId?: string): Promise<User> {
-    const user = await this.getUserById(id, tenantId);
-    user.removeFromOrganization(organizationId);
-    return await this.userRepository.save(user);
+  async removeUserFromOrganization(
+    id: string,
+    tenantId: string,
+    organizationId: string,
+    adminUserId: string,
+  ): Promise<User> {
+    return await this.assignUserToOrganizationUseCase.executeRemoveFromOrganization(
+      id,
+      organizationId,
+      tenantId,
+      adminUserId,
+    )
   }
 
   /**
    * @method assignRoleToUser
    * @description 为用户分配角色
    */
-  async assignRoleToUser(id: string, tenantId: string, roleId: string): Promise<User> {
-    const user = await this.getUserById(id, tenantId);
-    user.assignRole(roleId);
-    return await this.userRepository.save(user);
+  async assignRoleToUser(
+    id: string,
+    tenantId: string,
+    roleId: string,
+    adminUserId: string,
+  ): Promise<User> {
+    return await this.assignRoleToUserUseCase.execute(
+      id,
+      roleId,
+      tenantId,
+      adminUserId,
+    )
   }
 
   /**
    * @method removeRoleFromUser
    * @description 移除用户角色
    */
-  async removeRoleFromUser(id: string, tenantId: string, roleId?: string): Promise<User> {
-    const user = await this.getUserById(id, tenantId);
-    user.removeRole(roleId);
-    return await this.userRepository.save(user);
-  }
-
-  /**
-   * @method getUserStats
-   * @description 获取用户统计信息
-   */
-  async getUserStats(tenantId: string) {
-    const [totalCount, activeCount, pendingCount, suspendedCount, deletedCount] = await Promise.all([
-      this.userRepository.count(tenantId),
-      this.userRepository.countByStatus(UserStatusValue.active(), tenantId),
-      this.userRepository.countByStatus(UserStatusValue.pending(), tenantId),
-      this.userRepository.countByStatus(UserStatusValue.suspended(), tenantId),
-      this.userRepository.countByStatus(UserStatusValue.deleted(), tenantId),
-    ]);
-
-    return {
-      total: totalCount,
-      active: activeCount,
-      pending: pendingCount,
-      suspended: suspendedCount,
-      deleted: deletedCount
-    };
+  async removeRoleFromUser(
+    id: string,
+    tenantId: string,
+    roleId: string,
+    adminUserId: string,
+  ): Promise<User> {
+    return await this.assignRoleToUserUseCase.executeRemoveRole(
+      id,
+      roleId,
+      tenantId,
+      adminUserId,
+    )
   }
 
   /**
@@ -301,42 +313,155 @@ export class UsersService {
   async searchUsers(
     searchTerm: string,
     tenantId: string,
-    page: number = 1,
-    limit: number = 10
-  ): Promise<{ users: User[]; total: number; page: number; limit: number; totalPages: number }> {
-    return await this.userRepository.findWithPagination(
+    page = 1,
+    limit = 10,
+  ): Promise<{
+    users: User[]
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }> {
+    return await this.searchUsersUseCase.execute(
+      searchTerm,
+      tenantId,
       page,
       limit,
-      tenantId,
-      { search: searchTerm }
-    );
+    )
   }
 
   /**
-   * @method getUsersWithPagination
-   * @description 分页获取用户列表
+   * @method searchUsersAdvanced
+   * @description 高级搜索用户
    */
-  async getUsersWithPagination(
-    tenantId: string,
-    page: number = 1,
-    limit: number = 10,
-    filters?: {
-      status?: UserStatusValue;
-      organizationId?: string;
-      roleId?: string;
-      search?: string;
+  async searchUsersAdvanced(
+    searchCriteria: {
+      keyword?: string
+      status?: string
+      organizationId?: string
+      roleId?: string
+      dateRange?: {
+        startDate: Date
+        endDate: Date
+      }
+      sortBy?: string
+      sortOrder?: 'asc' | 'desc'
     },
-    sort?: {
-      field: 'username' | 'email' | 'firstName' | 'lastName' | 'status' | 'createdAt' | 'updatedAt';
-      order: 'asc' | 'desc';
-    }
-  ): Promise<{ users: User[]; total: number; page: number; limit: number; totalPages: number }> {
-    return await this.userRepository.findWithPagination(
+    tenantId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{
+    users: User[]
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }> {
+    return await this.searchUsersUseCase.executeAdvancedSearch(
+      searchCriteria,
+      tenantId,
       page,
       limit,
-      tenantId,
-      filters,
-      sort
-    );
+    )
   }
-} 
+
+  /**
+   * @method getUserSuggestions
+   * @description 获取用户建议（用于自动完成）
+   */
+  async getUserSuggestions(
+    query: string,
+    tenantId: string,
+    limit = 5,
+  ): Promise<
+    Array<{ id: string; username: string; displayName: string; email: string }>
+  > {
+    return await this.searchUsersUseCase.executeGetUserSuggestions(
+      query,
+      tenantId,
+      limit,
+    )
+  }
+
+  /**
+   * @method getUsersByOrganization
+   * @description 获取组织下的所有用户
+   */
+  async getUsersByOrganization(
+    organizationId: string,
+    tenantId: string,
+  ): Promise<User[]> {
+    return await this.assignUserToOrganizationUseCase.executeGetUsersByOrganization(
+      organizationId,
+      tenantId,
+    )
+  }
+
+  /**
+   * @method getUsersByRole
+   * @description 获取拥有指定角色的所有用户
+   */
+  async getUsersByRole(roleId: string, tenantId: string): Promise<User[]> {
+    return await this.assignRoleToUserUseCase.executeGetUsersByRole(
+      roleId,
+      tenantId,
+    )
+  }
+
+  /**
+   * @method getUserOrganizations
+   * @description 获取用户所属的所有组织
+   */
+  async getUserOrganizations(
+    userId: string,
+    tenantId: string,
+  ): Promise<string[]> {
+    return await this.assignUserToOrganizationUseCase.executeGetUserOrganizations(
+      userId,
+      tenantId,
+    )
+  }
+
+  /**
+   * @method getUserRoles
+   * @description 获取用户的所有角色
+   */
+  async getUserRoles(userId: string, tenantId: string): Promise<string[]> {
+    return await this.assignRoleToUserUseCase.executeGetUserRoles(
+      userId,
+      tenantId,
+    )
+  }
+
+  /**
+   * @method getUserStatistics
+   * @description 获取用户统计信息
+   */
+  async getUserStatistics(tenantId: string) {
+    return await this.getUserStatisticsUseCase.execute(tenantId)
+  }
+
+  /**
+   * @method getUserStatisticsByStatus
+   * @description 获取按状态分组的用户统计
+   */
+  async getUserStatisticsByStatus(tenantId: string) {
+    return await this.getUserStatisticsUseCase.executeByStatus(tenantId)
+  }
+
+  /**
+   * @method getUserStatisticsByOrganization
+   * @description 获取按组织分组的用户统计
+   */
+  async getUserStatisticsByOrganization(tenantId: string) {
+    return await this.getUserStatisticsUseCase.executeByOrganization(tenantId)
+  }
+
+  /**
+   * @method getUserStatisticsByRole
+   * @description 获取按角色分组的用户统计
+   */
+  async getUserStatisticsByRole(tenantId: string) {
+    return await this.getUserStatisticsUseCase.executeByRole(tenantId)
+  }
+}

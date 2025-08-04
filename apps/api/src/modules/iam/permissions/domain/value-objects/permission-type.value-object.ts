@@ -1,4 +1,4 @@
-import { ValueObject } from '@/shared/domain/value-objects/value-object.base';
+import { ValueObject } from '@/shared/domain/value-objects/value-object.base'
 
 /**
  * @enum PermissionType
@@ -8,14 +8,14 @@ export enum PermissionType {
   MENU = 'menu',
   BUTTON = 'button',
   API = 'api',
-  DATA = 'data'
+  DATA = 'data',
 }
 
 /**
  * @class PermissionTypeValue
  * @description
  * 权限类型值对象，封装权限类型的验证规则和业务逻辑。
- * 
+ *
  * 主要原理与机制：
  * 1. 继承ValueObject基类，确保值对象的不可变性
  * 2. 实现权限类型的验证规则和业务逻辑
@@ -30,9 +30,9 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @throws {Error} 当权限类型无效时抛出异常
    */
   constructor(type: PermissionType) {
-    super();
-    this.validateType(type);
-    this._value = type;
+    super()
+    this.validateType(type)
+    this._value = type
   }
 
   /**
@@ -41,7 +41,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {PermissionType} 权限类型
    */
   getValue(): PermissionType {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -52,15 +52,15 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
   getDisplayName(): string {
     switch (this._value) {
       case PermissionType.MENU:
-        return '菜单权限';
+        return '菜单权限'
       case PermissionType.BUTTON:
-        return '按钮权限';
+        return '按钮权限'
       case PermissionType.API:
-        return '接口权限';
+        return '接口权限'
       case PermissionType.DATA:
-        return '数据权限';
+        return '数据权限'
       default:
-        return '未知类型';
+        return '未知类型'
     }
   }
 
@@ -72,15 +72,15 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
   getDescription(): string {
     switch (this._value) {
       case PermissionType.MENU:
-        return '控制用户对系统菜单的访问权限';
+        return '控制用户对系统菜单的访问权限'
       case PermissionType.BUTTON:
-        return '控制用户对页面按钮的操作权限';
+        return '控制用户对页面按钮的操作权限'
       case PermissionType.API:
-        return '控制用户对后端接口的调用权限';
+        return '控制用户对后端接口的调用权限'
       case PermissionType.DATA:
-        return '控制用户对数据的访问和操作权限';
+        return '控制用户对数据的访问和操作权限'
       default:
-        return '未知类型描述';
+        return '未知类型描述'
     }
   }
 
@@ -90,7 +90,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {boolean} 是否为菜单权限
    */
   isMenu(): boolean {
-    return this._value === PermissionType.MENU;
+    return this._value === PermissionType.MENU
   }
 
   /**
@@ -99,7 +99,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {boolean} 是否为按钮权限
    */
   isButton(): boolean {
-    return this._value === PermissionType.BUTTON;
+    return this._value === PermissionType.BUTTON
   }
 
   /**
@@ -108,7 +108,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {boolean} 是否为接口权限
    */
   isApi(): boolean {
-    return this._value === PermissionType.API;
+    return this._value === PermissionType.API
   }
 
   /**
@@ -117,7 +117,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {boolean} 是否为数据权限
    */
   isData(): boolean {
-    return this._value === PermissionType.DATA;
+    return this._value === PermissionType.DATA
   }
 
   /**
@@ -126,7 +126,9 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {boolean} 是否可以设置条件
    */
   canHaveConditions(): boolean {
-    return this._value === PermissionType.DATA || this._value === PermissionType.API;
+    return (
+      this._value === PermissionType.DATA || this._value === PermissionType.API
+    )
   }
 
   /**
@@ -135,7 +137,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {boolean} 是否可以设置字段权限
    */
   canHaveFields(): boolean {
-    return this._value === PermissionType.DATA;
+    return this._value === PermissionType.DATA
   }
 
   /**
@@ -146,7 +148,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    */
   private validateType(type: PermissionType): void {
     if (!Object.values(PermissionType).includes(type)) {
-      throw new Error(`无效的权限类型: ${type}`);
+      throw new Error(`无效的权限类型: ${type}`)
     }
   }
 
@@ -158,9 +160,9 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    */
   equals(other: PermissionTypeValue): boolean {
     if (!other) {
-      return false;
+      return false
     }
-    return this._value === other._value;
+    return this._value === other._value
   }
 
   /**
@@ -169,7 +171,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {string} 权限类型字符串
    */
   toString(): string {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -178,7 +180,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {PermissionTypeValue} 菜单权限类型值对象
    */
   static getMenu(): PermissionTypeValue {
-    return new PermissionTypeValue(PermissionType.MENU);
+    return new PermissionTypeValue(PermissionType.MENU)
   }
 
   /**
@@ -187,7 +189,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {PermissionTypeValue} 按钮权限类型值对象
    */
   static getButton(): PermissionTypeValue {
-    return new PermissionTypeValue(PermissionType.BUTTON);
+    return new PermissionTypeValue(PermissionType.BUTTON)
   }
 
   /**
@@ -196,7 +198,7 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {PermissionTypeValue} 接口权限类型值对象
    */
   static getApi(): PermissionTypeValue {
-    return new PermissionTypeValue(PermissionType.API);
+    return new PermissionTypeValue(PermissionType.API)
   }
 
   /**
@@ -205,6 +207,6 @@ export class PermissionTypeValue extends ValueObject<PermissionType> {
    * @returns {PermissionTypeValue} 数据权限类型值对象
    */
   static getData(): PermissionTypeValue {
-    return new PermissionTypeValue(PermissionType.DATA);
+    return new PermissionTypeValue(PermissionType.DATA)
   }
-} 
+}

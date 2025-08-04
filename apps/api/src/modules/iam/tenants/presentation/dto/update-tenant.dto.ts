@@ -1,11 +1,17 @@
-import { IsString, IsOptional, IsUUID, MaxLength, IsObject } from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiPropertyOptional } from '@nestjs/swagger'
+import {
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator'
 
 /**
  * @class UpdateTenantDto
  * @description
  * 更新租户的数据传输对象，定义更新租户API接口的请求数据结构。
- * 
+ *
  * 主要原理与机制：
  * 1. 使用class-validator进行参数验证
  * 2. 使用class-transformer进行数据转换
@@ -27,7 +33,7 @@ export class UpdateTenantDto {
   @IsOptional()
   @IsString({ message: '租户名称必须是字符串' })
   @MaxLength(100, { message: '租户名称不能超过100个字符' })
-  name?: string;
+  name?: string
 
   /**
    * @property code
@@ -43,7 +49,7 @@ export class UpdateTenantDto {
   @IsOptional()
   @IsString({ message: '租户编码必须是字符串' })
   @MaxLength(50, { message: '租户编码不能超过50个字符' })
-  code?: string;
+  code?: string
 
   /**
    * @property adminUserId
@@ -56,7 +62,7 @@ export class UpdateTenantDto {
   })
   @IsOptional()
   @IsUUID('4', { message: '管理员用户ID必须是有效的UUID v4格式' })
-  adminUserId?: string;
+  adminUserId?: string
 
   /**
    * @property description
@@ -71,7 +77,7 @@ export class UpdateTenantDto {
   @IsOptional()
   @IsString({ message: '租户描述必须是字符串' })
   @MaxLength(500, { message: '租户描述不能超过500个字符' })
-  description?: string;
+  description?: string
 
   /**
    * @property settings
@@ -85,7 +91,7 @@ export class UpdateTenantDto {
   })
   @IsOptional()
   @IsObject({ message: '租户配置必须是对象' })
-  settings?: Record<string, any>;
+  settings?: Record<string, any>
 }
 
 /**
@@ -106,7 +112,7 @@ export class UpdateTenantSettingsDto {
   })
   @IsOptional()
   @IsObject({ message: '租户配置必须是对象' })
-  settings?: Record<string, any>;
+  settings?: Record<string, any>
 }
 
 /**
@@ -128,7 +134,7 @@ export class ActivateTenantDto {
   @IsOptional()
   @IsString({ message: '激活原因必须是字符串' })
   @MaxLength(200, { message: '激活原因不能超过200个字符' })
-  reason?: string;
+  reason?: string
 }
 
 /**
@@ -150,5 +156,5 @@ export class SuspendTenantDto {
   @IsOptional()
   @IsString({ message: '禁用原因必须是字符串' })
   @MaxLength(200, { message: '禁用原因不能超过200个字符' })
-  reason?: string;
-} 
+  reason?: string
+}

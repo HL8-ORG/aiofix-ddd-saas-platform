@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { EntityManager } from '@mikro-orm/core';
-import { Tenant } from '../../domain/entities/tenant.entity';
-import { TenantCode } from '../../domain/value-objects/tenant-code.value-object';
-import { TenantStatus } from '../../domain/value-objects/tenant-status.value-object';
-import { TenantRepository } from '../../domain/repositories/tenant.repository';
-import { TenantOrmEntity } from '../entities/tenant.orm.entity';
-import { TenantMapper } from '../mappers/tenant.mapper';
+import { EntityManager } from '@mikro-orm/core'
+import { Injectable } from '@nestjs/common'
+import type { Tenant } from '../../domain/entities/tenant.entity'
+import { TenantRepository } from '../../domain/repositories/tenant.repository'
+import type { TenantCode } from '../../domain/value-objects/tenant-code.value-object'
+import { TenantStatus } from '../../domain/value-objects/tenant-status.value-object'
+import { TenantOrmEntity } from '../entities/tenant.orm.entity'
+import { TenantMapper } from '../mappers/tenant.mapper'
 
 /**
  * @class TenantRepositoryMikroOrm
@@ -16,7 +16,7 @@ import { TenantMapper } from '../mappers/tenant.mapper';
 @Injectable()
 export class TenantRepositoryMikroOrm extends TenantRepository {
   constructor(private readonly em: EntityManager) {
-    super();
+    super()
   }
 
   /**
@@ -24,9 +24,9 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 保存租户实体
    */
   async save(tenant: Tenant): Promise<Tenant> {
-    const ormEntity = TenantMapper.toOrm(tenant);
-    await this.em.persistAndFlush(ormEntity);
-    return TenantMapper.toDomain(ormEntity);
+    const ormEntity = TenantMapper.toOrm(tenant)
+    await this.em.persistAndFlush(ormEntity)
+    return TenantMapper.toDomain(ormEntity)
   }
 
   /**
@@ -34,67 +34,77 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 根据ID查找租户
    */
   async findById(id: string): Promise<Tenant | null> {
-    const ormEntity = await this.em.findOne(TenantOrmEntity, { id });
-    return ormEntity ? TenantMapper.toDomain(ormEntity) : null;
+    const ormEntity = await this.em.findOne(TenantOrmEntity, { id })
+    return ormEntity ? TenantMapper.toDomain(ormEntity) : null
   }
 
   async findByCode(code: TenantCode): Promise<Tenant | null> {
-    const ormEntity = await this.em.findOne(TenantOrmEntity, { code: code.value });
-    return ormEntity ? TenantMapper.toDomain(ormEntity) : null;
+    const ormEntity = await this.em.findOne(TenantOrmEntity, {
+      code: code.value,
+    })
+    return ormEntity ? TenantMapper.toDomain(ormEntity) : null
   }
 
   async findByCodeString(code: string): Promise<Tenant | null> {
-    const ormEntity = await this.em.findOne(TenantOrmEntity, { code });
-    return ormEntity ? TenantMapper.toDomain(ormEntity) : null;
+    const ormEntity = await this.em.findOne(TenantOrmEntity, { code })
+    return ormEntity ? TenantMapper.toDomain(ormEntity) : null
   }
 
   async findByName(name: string): Promise<Tenant[]> {
     const ormEntities = await this.em.find(TenantOrmEntity, {
-      name: { $ilike: `%${name}%` }
-    });
-    return TenantMapper.toDomainList(ormEntities);
+      name: { $ilike: `%${name}%` },
+    })
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   async findByStatus(status: TenantStatus): Promise<Tenant[]> {
-    const ormEntities = await this.em.find(TenantOrmEntity, { status });
-    return TenantMapper.toDomainList(ormEntities);
+    const ormEntities = await this.em.find(TenantOrmEntity, { status })
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   async findByAdminUserId(adminUserId: string): Promise<Tenant[]> {
-    const ormEntities = await this.em.find(TenantOrmEntity, { adminUserId });
-    return TenantMapper.toDomainList(ormEntities);
+    const ormEntities = await this.em.find(TenantOrmEntity, { adminUserId })
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   async findActive(): Promise<Tenant[]> {
-    const ormEntities = await this.em.find(TenantOrmEntity, { status: TenantStatus.ACTIVE });
-    return TenantMapper.toDomainList(ormEntities);
+    const ormEntities = await this.em.find(TenantOrmEntity, {
+      status: TenantStatus.ACTIVE,
+    })
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   async findPending(): Promise<Tenant[]> {
-    const ormEntities = await this.em.find(TenantOrmEntity, { status: TenantStatus.PENDING });
-    return TenantMapper.toDomainList(ormEntities);
+    const ormEntities = await this.em.find(TenantOrmEntity, {
+      status: TenantStatus.PENDING,
+    })
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   async findSuspended(): Promise<Tenant[]> {
-    const ormEntities = await this.em.find(TenantOrmEntity, { status: TenantStatus.SUSPENDED });
-    return TenantMapper.toDomainList(ormEntities);
+    const ormEntities = await this.em.find(TenantOrmEntity, {
+      status: TenantStatus.SUSPENDED,
+    })
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   async findDeleted(): Promise<Tenant[]> {
-    const ormEntities = await this.em.find(TenantOrmEntity, { status: TenantStatus.DELETED });
-    return TenantMapper.toDomainList(ormEntities);
+    const ormEntities = await this.em.find(TenantOrmEntity, {
+      status: TenantStatus.DELETED,
+    })
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   async findAll(): Promise<Tenant[]> {
     const ormEntities = await this.em.find(TenantOrmEntity, {
-      status: { $ne: TenantStatus.DELETED }
-    });
-    return TenantMapper.toDomainList(ormEntities);
+      status: { $ne: TenantStatus.DELETED },
+    })
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   async findAllWithDeleted(): Promise<Tenant[]> {
-    const ormEntities = await this.em.find(TenantOrmEntity, {});
-    return TenantMapper.toDomainList(ormEntities);
+    const ormEntities = await this.em.find(TenantOrmEntity, {})
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   /**
@@ -102,8 +112,8 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 检查租户是否存在
    */
   async exists(id: string): Promise<boolean> {
-    const count = await this.em.count(TenantOrmEntity, { id });
-    return count > 0;
+    const count = await this.em.count(TenantOrmEntity, { id })
+    return count > 0
   }
 
   /**
@@ -111,8 +121,8 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 检查租户编码是否存在
    */
   async existsByCode(code: TenantCode): Promise<boolean> {
-    const count = await this.em.count(TenantOrmEntity, { code: code.value });
-    return count > 0;
+    const count = await this.em.count(TenantOrmEntity, { code: code.value })
+    return count > 0
   }
 
   /**
@@ -120,8 +130,8 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 检查租户编码字符串是否存在
    */
   async existsByCodeString(code: string): Promise<boolean> {
-    const count = await this.em.count(TenantOrmEntity, { code });
-    return count > 0;
+    const count = await this.em.count(TenantOrmEntity, { code })
+    return count > 0
   }
 
   /**
@@ -130,8 +140,8 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    */
   async count(): Promise<number> {
     return await this.em.count(TenantOrmEntity, {
-      status: { $ne: TenantStatus.DELETED }
-    });
+      status: { $ne: TenantStatus.DELETED },
+    })
   }
 
   /**
@@ -139,7 +149,7 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 根据状态统计租户数量
    */
   async countByStatus(status: TenantStatus): Promise<number> {
-    return await this.em.count(TenantOrmEntity, { status });
+    return await this.em.count(TenantOrmEntity, { status })
   }
 
   /**
@@ -147,17 +157,17 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 软删除租户
    */
   async delete(id: string): Promise<boolean> {
-    const ormEntity = await this.em.findOne(TenantOrmEntity, { id });
+    const ormEntity = await this.em.findOne(TenantOrmEntity, { id })
     if (!ormEntity) {
-      return false;
+      return false
     }
 
-    ormEntity.status = TenantStatus.DELETED;
-    ormEntity.deletedAt = new Date();
-    ormEntity.updatedAt = new Date();
+    ormEntity.status = TenantStatus.DELETED
+    ormEntity.deletedAt = new Date()
+    ormEntity.updatedAt = new Date()
 
-    await this.em.flush();
-    return true;
+    await this.em.flush()
+    return true
   }
 
   /**
@@ -165,13 +175,13 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 硬删除租户
    */
   async hardDelete(id: string): Promise<boolean> {
-    const ormEntity = await this.em.findOne(TenantOrmEntity, { id });
+    const ormEntity = await this.em.findOne(TenantOrmEntity, { id })
     if (!ormEntity) {
-      return false;
+      return false
     }
 
-    await this.em.removeAndFlush(ormEntity);
-    return true;
+    await this.em.removeAndFlush(ormEntity)
+    return true
   }
 
   /**
@@ -179,17 +189,17 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 恢复已删除的租户
    */
   async restore(id: string): Promise<boolean> {
-    const ormEntity = await this.em.findOne(TenantOrmEntity, { id });
+    const ormEntity = await this.em.findOne(TenantOrmEntity, { id })
     if (!ormEntity || ormEntity.status !== TenantStatus.DELETED) {
-      return false;
+      return false
     }
 
-    ormEntity.status = TenantStatus.PENDING;
-    ormEntity.deletedAt = undefined;
-    ormEntity.updatedAt = new Date();
+    ormEntity.status = TenantStatus.PENDING
+    ormEntity.deletedAt = undefined
+    ormEntity.updatedAt = new Date()
 
-    await this.em.flush();
-    return true;
+    await this.em.flush()
+    return true
   }
 
   /**
@@ -197,33 +207,36 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 更新租户状态
    */
   async updateStatus(id: string, status: TenantStatus): Promise<boolean> {
-    const ormEntity = await this.em.findOne(TenantOrmEntity, { id });
+    const ormEntity = await this.em.findOne(TenantOrmEntity, { id })
     if (!ormEntity) {
-      return false;
+      return false
     }
 
-    ormEntity.status = status;
-    ormEntity.updatedAt = new Date();
+    ormEntity.status = status
+    ormEntity.updatedAt = new Date()
 
-    await this.em.flush();
-    return true;
+    await this.em.flush()
+    return true
   }
 
   /**
    * @method updateSettings
    * @description 更新租户配置
    */
-  async updateSettings(id: string, settings: Record<string, any>): Promise<boolean> {
-    const ormEntity = await this.em.findOne(TenantOrmEntity, { id });
+  async updateSettings(
+    id: string,
+    settings: Record<string, any>,
+  ): Promise<boolean> {
+    const ormEntity = await this.em.findOne(TenantOrmEntity, { id })
     if (!ormEntity) {
-      return false;
+      return false
     }
 
-    ormEntity.settings = { ...ormEntity.settings, ...settings };
-    ormEntity.updatedAt = new Date();
+    ormEntity.settings = { ...ormEntity.settings, ...settings }
+    ormEntity.updatedAt = new Date()
 
-    await this.em.flush();
-    return true;
+    await this.em.flush()
+    return true
   }
 
   /**
@@ -233,53 +246,62 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
   async findWithPagination(
     page: number,
     limit: number,
-    filters?: { status?: TenantStatus; adminUserId?: string; search?: string; },
-    sort?: { field: 'name' | 'code' | 'status' | 'createdAt' | 'updatedAt'; order: 'asc' | 'desc'; }
-  ): Promise<{ tenants: Tenant[]; total: number; page: number; limit: number; totalPages: number; }> {
-    const offset = (page - 1) * limit;
+    filters?: { status?: TenantStatus; adminUserId?: string; search?: string },
+    sort?: {
+      field: 'name' | 'code' | 'status' | 'createdAt' | 'updatedAt'
+      order: 'asc' | 'desc'
+    },
+  ): Promise<{
+    tenants: Tenant[]
+    total: number
+    page: number
+    limit: number
+    totalPages: number
+  }> {
+    const offset = (page - 1) * limit
 
     // 构建查询条件
-    const where: any = {};
+    const where: any = {}
     if (filters?.status) {
-      where.status = filters.status;
+      where.status = filters.status
     }
     if (filters?.adminUserId) {
-      where.adminUserId = filters.adminUserId;
+      where.adminUserId = filters.adminUserId
     }
     if (filters?.search) {
       where.$or = [
         { name: { $ilike: `%${filters.search}%` } },
         { code: { $ilike: `%${filters.search}%` } },
-        { description: { $ilike: `%${filters.search}%` } }
-      ];
+        { description: { $ilike: `%${filters.search}%` } },
+      ]
     }
 
     // 构建排序条件
-    const orderBy: any = {};
+    const orderBy: any = {}
     if (sort) {
-      orderBy[sort.field] = sort.order;
+      orderBy[sort.field] = sort.order
     } else {
-      orderBy.createdAt = 'desc';
+      orderBy.createdAt = 'desc'
     }
 
     // 执行查询
     const ormEntities = await this.em.find(TenantOrmEntity, where, {
       offset,
       limit,
-      orderBy
-    });
-    const total = await this.em.count(TenantOrmEntity, where);
+      orderBy,
+    })
+    const total = await this.em.count(TenantOrmEntity, where)
 
-    const tenants = TenantMapper.toDomainList(ormEntities);
-    const totalPages = Math.ceil(total / limit);
+    const tenants = TenantMapper.toDomainList(ormEntities)
+    const totalPages = Math.ceil(total / limit)
 
     return {
       tenants,
       total,
       page,
       limit,
-      totalPages
-    };
+      totalPages,
+    }
   }
 
   /**
@@ -291,16 +313,16 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
       $or: [
         { name: { $ilike: `%${search}%` } },
         { code: { $ilike: `%${search}%` } },
-        { description: { $ilike: `%${search}%` } }
-      ]
-    };
+        { description: { $ilike: `%${search}%` } },
+      ],
+    }
 
     const ormEntities = await this.em.find(TenantOrmEntity, where, {
       limit,
-      orderBy: { createdAt: 'desc' }
-    });
+      orderBy: { createdAt: 'desc' },
+    })
 
-    return TenantMapper.toDomainList(ormEntities);
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   /**
@@ -308,12 +330,16 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
    * @description 查找最近创建的租户
    */
   async findRecent(limit?: number): Promise<Tenant[]> {
-    const ormEntities = await this.em.find(TenantOrmEntity, {}, {
-      limit,
-      orderBy: { createdAt: 'desc' }
-    });
+    const ormEntities = await this.em.find(
+      TenantOrmEntity,
+      {},
+      {
+        limit,
+        orderBy: { createdAt: 'desc' },
+      },
+    )
 
-    return TenantMapper.toDomainList(ormEntities);
+    return TenantMapper.toDomainList(ormEntities)
   }
 
   /**
@@ -324,10 +350,10 @@ export class TenantRepositoryMikroOrm extends TenantRepository {
     const ormEntities = await this.em.find(TenantOrmEntity, {
       createdAt: {
         $gte: startDate,
-        $lte: endDate
-      }
-    });
+        $lte: endDate,
+      },
+    })
 
-    return TenantMapper.toDomainList(ormEntities);
+    return TenantMapper.toDomainList(ormEntities)
   }
-} 
+}

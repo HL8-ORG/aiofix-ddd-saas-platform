@@ -1,8 +1,8 @@
-import { EntityManager, IsolationLevel } from '@mikro-orm/core';
+import type { EntityManager, IsolationLevel } from '@mikro-orm/core'
 
 /**
  * @description 数据库工具类
- * 
+ *
  * 提供常用的数据库操作工具函数，包括：
  * 1. 事务管理
  * 2. 批量操作
@@ -21,19 +21,19 @@ export class DatabaseUtils {
     em: EntityManager,
     operation: () => Promise<T>,
     options?: {
-      isolationLevel?: IsolationLevel;
-    }
+      isolationLevel?: IsolationLevel
+    },
   ): Promise<T> {
-    const fork = em.fork();
+    const fork = em.fork()
 
     try {
-      await fork.begin(options);
-      const result = await operation();
-      await fork.commit();
-      return result;
+      await fork.begin(options)
+      const result = await operation()
+      await fork.commit()
+      return result
     } catch (error) {
-      await fork.rollback();
-      throw error;
+      await fork.rollback()
+      throw error
     }
   }
 
@@ -48,23 +48,23 @@ export class DatabaseUtils {
     em: EntityManager,
     entityClass: new () => T,
     data: Partial<T>[],
-    batchSize: number = 1000
+    batchSize = 1000,
   ): Promise<void> {
-    const fork = em.fork();
+    const fork = em.fork()
 
     try {
-      await fork.begin();
+      await fork.begin()
 
       for (let i = 0; i < data.length; i += batchSize) {
-        const batch = data.slice(i, i + batchSize);
-        const entities = batch.map(item => fork.create(entityClass, item));
-        await fork.persistAndFlush(entities);
+        const batch = data.slice(i, i + batchSize)
+        const entities = batch.map((item) => fork.create(entityClass, item))
+        await fork.persistAndFlush(entities)
       }
 
-      await fork.commit();
+      await fork.commit()
     } catch (error) {
-      await fork.rollback();
-      throw error;
+      await fork.rollback()
+      throw error
     }
   }
 
@@ -79,28 +79,28 @@ export class DatabaseUtils {
     em: EntityManager,
     entityClass: new () => T,
     data: Partial<T>[],
-    idField: keyof T = 'id' as keyof T
+    idField: keyof T = 'id' as keyof T,
   ): Promise<void> {
-    const fork = em.fork();
+    const fork = em.fork()
 
     try {
-      await fork.begin();
+      await fork.begin()
 
       for (const item of data) {
-        const id = item[idField];
+        const id = item[idField]
         if (id) {
-          const entity = await fork.findOne(entityClass, { [idField]: id });
+          const entity = await fork.findOne(entityClass, { [idField]: id })
           if (entity) {
-            fork.assign(entity, item as any);
+            fork.assign(entity, item as any)
           }
         }
       }
 
-      await fork.flush();
-      await fork.commit();
+      await fork.flush()
+      await fork.commit()
     } catch (error) {
-      await fork.rollback();
-      throw error;
+      await fork.rollback()
+      throw error
     }
   }
 
@@ -111,28 +111,28 @@ export class DatabaseUtils {
    * @param options 查询选项
    */
   static buildPagination(
-    page: number = 1,
-    limit: number = 10,
+    page = 1,
+    limit = 10,
     options: {
-      maxLimit?: number;
-      defaultLimit?: number;
-    } = {}
+      maxLimit?: number
+      defaultLimit?: number
+    } = {},
   ): {
-    offset: number;
-    limit: number;
-    page: number;
+    offset: number
+    limit: number
+    page: number
   } {
-    const { maxLimit = 100, defaultLimit = 10 } = options;
+    const { maxLimit = 100, defaultLimit = 10 } = options
 
     // 确保页码和限制在合理范围内
-    const validPage = Math.max(1, page);
-    const validLimit = Math.min(Math.max(1, limit), maxLimit);
+    const validPage = Math.max(1, page)
+    const validLimit = Math.min(Math.max(1, limit), maxLimit)
 
     return {
       offset: (validPage - 1) * validLimit,
       limit: validLimit,
       page: validPage,
-    };
+    }
   }
 
   /**
@@ -144,24 +144,25 @@ export class DatabaseUtils {
   static buildSorting(
     sortBy: string,
     sortOrder: 'ASC' | 'DESC' = 'ASC',
-    allowedFields: string[] = []
+    allowedFields: string[] = [],
   ): {
-    sortBy: string;
-    sortOrder: 'ASC' | 'DESC';
+    sortBy: string
+    sortOrder: 'ASC' | 'DESC'
   } {
     // 验证排序字段是否在允许列表中
-    const validSortBy = allowedFields.length === 0 || allowedFields.includes(sortBy)
-      ? sortBy
-      : allowedFields[0];
+    const validSortBy =
+      allowedFields.length === 0 || allowedFields.includes(sortBy)
+        ? sortBy
+        : allowedFields[0]
 
     const validSortOrder = ['ASC', 'DESC'].includes(sortOrder)
       ? sortOrder
-      : 'ASC';
+      : 'ASC'
 
     return {
       sortBy: validSortBy,
       sortOrder: validSortOrder,
-    };
+    }
   }
 
   /**
@@ -171,17 +172,17 @@ export class DatabaseUtils {
    */
   static buildSearchQuery(
     searchTerm: string,
-    searchFields: string[]
+    searchFields: string[],
   ): Record<string, any> {
     if (!searchTerm || searchFields.length === 0) {
-      return {};
+      return {}
     }
 
-    const searchConditions = searchFields.map(field => ({
-      [field]: { $ilike: `%${searchTerm}%` }
-    }));
+    const searchConditions = searchFields.map((field) => ({
+      [field]: { $ilike: `%${searchTerm}%` },
+    }))
 
-    return { $or: searchConditions };
+    return { $or: searchConditions }
   }
 
   /**
@@ -193,39 +194,36 @@ export class DatabaseUtils {
   static buildDateRangeQuery(
     startDate?: Date,
     endDate?: Date,
-    dateField: string = 'createdAt'
+    dateField = 'createdAt',
   ): Record<string, any> {
-    const conditions: Record<string, any> = {};
+    const conditions: Record<string, any> = {}
 
     if (startDate) {
-      conditions[dateField] = { $gte: startDate };
+      conditions[dateField] = { $gte: startDate }
     }
 
     if (endDate) {
       conditions[dateField] = {
         ...conditions[dateField],
-        $lte: endDate
-      };
+        $lte: endDate,
+      }
     }
 
-    return conditions;
+    return conditions
   }
 
   /**
    * @description 构建软删除查询条件
    * @param includeDeleted 是否包含已删除的记录
    */
-  static buildSoftDeleteCondition(includeDeleted: boolean = false): Record<string, any> {
+  static buildSoftDeleteCondition(includeDeleted = false): Record<string, any> {
     if (includeDeleted) {
-      return {};
+      return {}
     }
 
     return {
-      $or: [
-        { deletedAt: null },
-        { deletedAt: { $exists: false } }
-      ]
-    };
+      $or: [{ deletedAt: null }, { deletedAt: { $exists: false } }],
+    }
   }
 
   /**
@@ -236,30 +234,30 @@ export class DatabaseUtils {
   static formatQueryResult<T>(
     data: T[],
     options: {
-      total?: number;
-      page?: number;
-      limit?: number;
-      includeMetadata?: boolean;
-    } = {}
+      total?: number
+      page?: number
+      limit?: number
+      includeMetadata?: boolean
+    } = {},
   ): {
-    data: T[];
+    data: T[]
     metadata?: {
-      total: number;
-      page: number;
-      limit: number;
-      totalPages: number;
-      hasNext: boolean;
-      hasPrev: boolean;
-    };
+      total: number
+      page: number
+      limit: number
+      totalPages: number
+      hasNext: boolean
+      hasPrev: boolean
+    }
   } {
-    const { total, page, limit, includeMetadata = false } = options;
+    const { total, page, limit, includeMetadata = false } = options
 
     if (!includeMetadata || total === undefined) {
-      return { data };
+      return { data }
     }
 
-    const totalPages = Math.ceil(total / limit);
-    const currentPage = page || 1;
+    const totalPages = Math.ceil(total / limit)
+    const currentPage = page || 1
 
     return {
       data,
@@ -271,26 +269,28 @@ export class DatabaseUtils {
         hasNext: currentPage < totalPages,
         hasPrev: currentPage > 1,
       },
-    };
+    }
   }
 
   /**
    * @description 生成UUID
    */
   static generateUuid(): string {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-      const r = Math.random() * 16 | 0;
-      const v = c === 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+      const r = (Math.random() * 16) | 0
+      const v = c === 'x' ? r : (r & 0x3) | 0x8
+      return v.toString(16)
+    })
   }
 
   /**
    * @description 生成短UUID
    */
   static generateShortUuid(): string {
-    return Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
+    return (
+      Math.random().toString(36).substring(2, 15) +
+      Math.random().toString(36).substring(2, 15)
+    )
   }
 
   /**
@@ -298,7 +298,7 @@ export class DatabaseUtils {
    * @param str 原始字符串
    */
   static escapeSqlString(str: string): string {
-    return str.replace(/'/g, "''");
+    return str.replace(/'/g, "''")
   }
 
   /**
@@ -308,10 +308,10 @@ export class DatabaseUtils {
    */
   static buildInCondition(field: string, values: any[]): Record<string, any> {
     if (!values || values.length === 0) {
-      return {};
+      return {}
     }
 
-    return { [field]: { $in: values } };
+    return { [field]: { $in: values } }
   }
 
   /**
@@ -319,11 +319,14 @@ export class DatabaseUtils {
    * @param field 字段名
    * @param values 值数组
    */
-  static buildNotInCondition(field: string, values: any[]): Record<string, any> {
+  static buildNotInCondition(
+    field: string,
+    values: any[],
+  ): Record<string, any> {
     if (!values || values.length === 0) {
-      return {};
+      return {}
     }
 
-    return { [field]: { $nin: values } };
+    return { [field]: { $nin: values } }
   }
-} 
+}

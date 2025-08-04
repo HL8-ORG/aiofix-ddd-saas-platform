@@ -1,10 +1,10 @@
-import { TenantStatusValue, TenantStatus } from '../tenant-status.value-object';
+import { TenantStatus, TenantStatusValue } from '../tenant-status.value-object'
 
 /**
  * @describe TenantStatusValue值对象测试
  * @description
  * 测试TenantStatusValue值对象的业务规则和功能。
- * 
+ *
  * 测试覆盖范围：
  * 1. 构造函数验证
  * 2. 状态查询方法
@@ -20,25 +20,25 @@ describe('TenantStatusValue', () => {
    */
   describe('正常创建', () => {
     it('应该成功创建待激活状态', () => {
-      const status = new TenantStatusValue(TenantStatus.PENDING);
-      expect(status.value).toBe(TenantStatus.PENDING);
-    });
+      const status = new TenantStatusValue(TenantStatus.PENDING)
+      expect(status.value).toBe(TenantStatus.PENDING)
+    })
 
     it('应该成功创建激活状态', () => {
-      const status = new TenantStatusValue(TenantStatus.ACTIVE);
-      expect(status.value).toBe(TenantStatus.ACTIVE);
-    });
+      const status = new TenantStatusValue(TenantStatus.ACTIVE)
+      expect(status.value).toBe(TenantStatus.ACTIVE)
+    })
 
     it('应该成功创建禁用状态', () => {
-      const status = new TenantStatusValue(TenantStatus.SUSPENDED);
-      expect(status.value).toBe(TenantStatus.SUSPENDED);
-    });
+      const status = new TenantStatusValue(TenantStatus.SUSPENDED)
+      expect(status.value).toBe(TenantStatus.SUSPENDED)
+    })
 
     it('应该成功创建已删除状态', () => {
-      const status = new TenantStatusValue(TenantStatus.DELETED);
-      expect(status.value).toBe(TenantStatus.DELETED);
-    });
-  });
+      const status = new TenantStatusValue(TenantStatus.DELETED)
+      expect(status.value).toBe(TenantStatus.DELETED)
+    })
+  })
 
   /**
    * @test 状态查询测试
@@ -46,37 +46,37 @@ describe('TenantStatusValue', () => {
    */
   describe('状态查询', () => {
     it('isPending应该正确识别待激活状态', () => {
-      const status = new TenantStatusValue(TenantStatus.PENDING);
-      expect(status.isPending()).toBe(true);
-      expect(status.isActive()).toBe(false);
-      expect(status.isSuspended()).toBe(false);
-      expect(status.isDeleted()).toBe(false);
-    });
+      const status = new TenantStatusValue(TenantStatus.PENDING)
+      expect(status.isPending()).toBe(true)
+      expect(status.isActive()).toBe(false)
+      expect(status.isSuspended()).toBe(false)
+      expect(status.isDeleted()).toBe(false)
+    })
 
     it('isActive应该正确识别激活状态', () => {
-      const status = new TenantStatusValue(TenantStatus.ACTIVE);
-      expect(status.isPending()).toBe(false);
-      expect(status.isActive()).toBe(true);
-      expect(status.isSuspended()).toBe(false);
-      expect(status.isDeleted()).toBe(false);
-    });
+      const status = new TenantStatusValue(TenantStatus.ACTIVE)
+      expect(status.isPending()).toBe(false)
+      expect(status.isActive()).toBe(true)
+      expect(status.isSuspended()).toBe(false)
+      expect(status.isDeleted()).toBe(false)
+    })
 
     it('isSuspended应该正确识别禁用状态', () => {
-      const status = new TenantStatusValue(TenantStatus.SUSPENDED);
-      expect(status.isPending()).toBe(false);
-      expect(status.isActive()).toBe(false);
-      expect(status.isSuspended()).toBe(true);
-      expect(status.isDeleted()).toBe(false);
-    });
+      const status = new TenantStatusValue(TenantStatus.SUSPENDED)
+      expect(status.isPending()).toBe(false)
+      expect(status.isActive()).toBe(false)
+      expect(status.isSuspended()).toBe(true)
+      expect(status.isDeleted()).toBe(false)
+    })
 
     it('isDeleted应该正确识别已删除状态', () => {
-      const status = new TenantStatusValue(TenantStatus.DELETED);
-      expect(status.isPending()).toBe(false);
-      expect(status.isActive()).toBe(false);
-      expect(status.isSuspended()).toBe(false);
-      expect(status.isDeleted()).toBe(true);
-    });
-  });
+      const status = new TenantStatusValue(TenantStatus.DELETED)
+      expect(status.isPending()).toBe(false)
+      expect(status.isActive()).toBe(false)
+      expect(status.isSuspended()).toBe(false)
+      expect(status.isDeleted()).toBe(true)
+    })
+  })
 
   /**
    * @test 状态转换验证测试
@@ -84,53 +84,53 @@ describe('TenantStatusValue', () => {
    */
   describe('状态转换验证', () => {
     it('canActivate应该正确验证激活权限', () => {
-      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING);
-      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED);
-      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE);
-      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED);
+      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING)
+      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED)
+      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE)
+      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED)
 
-      expect(pendingStatus.canActivate()).toBe(true);
-      expect(suspendedStatus.canActivate()).toBe(true);
-      expect(activeStatus.canActivate()).toBe(false);
-      expect(deletedStatus.canActivate()).toBe(false);
-    });
+      expect(pendingStatus.canActivate()).toBe(true)
+      expect(suspendedStatus.canActivate()).toBe(true)
+      expect(activeStatus.canActivate()).toBe(false)
+      expect(deletedStatus.canActivate()).toBe(false)
+    })
 
     it('canSuspend应该正确验证禁用权限', () => {
-      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING);
-      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE);
-      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED);
-      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED);
+      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING)
+      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE)
+      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED)
+      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED)
 
-      expect(pendingStatus.canSuspend()).toBe(true);
-      expect(activeStatus.canSuspend()).toBe(true);
-      expect(suspendedStatus.canSuspend()).toBe(false);
-      expect(deletedStatus.canSuspend()).toBe(false);
-    });
+      expect(pendingStatus.canSuspend()).toBe(true)
+      expect(activeStatus.canSuspend()).toBe(true)
+      expect(suspendedStatus.canSuspend()).toBe(false)
+      expect(deletedStatus.canSuspend()).toBe(false)
+    })
 
     it('canDelete应该正确验证删除权限', () => {
-      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING);
-      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE);
-      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED);
-      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED);
+      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING)
+      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE)
+      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED)
+      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED)
 
-      expect(pendingStatus.canDelete()).toBe(true);
-      expect(activeStatus.canDelete()).toBe(true);
-      expect(suspendedStatus.canDelete()).toBe(true);
-      expect(deletedStatus.canDelete()).toBe(false);
-    });
+      expect(pendingStatus.canDelete()).toBe(true)
+      expect(activeStatus.canDelete()).toBe(true)
+      expect(suspendedStatus.canDelete()).toBe(true)
+      expect(deletedStatus.canDelete()).toBe(false)
+    })
 
     it('canRestore应该正确验证恢复权限', () => {
-      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING);
-      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE);
-      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED);
-      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED);
+      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING)
+      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE)
+      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED)
+      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED)
 
-      expect(pendingStatus.canRestore()).toBe(false);
-      expect(activeStatus.canRestore()).toBe(false);
-      expect(suspendedStatus.canRestore()).toBe(false);
-      expect(deletedStatus.canRestore()).toBe(true);
-    });
-  });
+      expect(pendingStatus.canRestore()).toBe(false)
+      expect(activeStatus.canRestore()).toBe(false)
+      expect(suspendedStatus.canRestore()).toBe(false)
+      expect(deletedStatus.canRestore()).toBe(true)
+    })
+  })
 
   /**
    * @test 显示名称测试
@@ -142,27 +142,35 @@ describe('TenantStatusValue', () => {
         { status: TenantStatus.PENDING, expected: '待激活' },
         { status: TenantStatus.ACTIVE, expected: '激活' },
         { status: TenantStatus.SUSPENDED, expected: '禁用' },
-        { status: TenantStatus.DELETED, expected: '已删除' }
-      ];
+        { status: TenantStatus.DELETED, expected: '已删除' },
+      ]
 
       testCases.forEach(({ status, expected }) => {
-        const statusValue = new TenantStatusValue(status);
-        expect(statusValue.getDisplayName()).toBe(expected);
-      });
-    });
+        const statusValue = new TenantStatusValue(status)
+        expect(statusValue.getDisplayName()).toBe(expected)
+      })
+    })
 
     it('getDescription应该返回正确的状态描述', () => {
-      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING);
-      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE);
-      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED);
-      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED);
+      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING)
+      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE)
+      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED)
+      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED)
 
-      expect(pendingStatus.getDescription()).toBe('租户已创建但尚未激活，需要管理员审核');
-      expect(activeStatus.getDescription()).toBe('租户已激活，可以正常使用系统功能');
-      expect(suspendedStatus.getDescription()).toBe('租户已被禁用，无法使用系统功能');
-      expect(deletedStatus.getDescription()).toBe('租户已被删除，数据保留但无法访问');
-    });
-  });
+      expect(pendingStatus.getDescription()).toBe(
+        '租户已创建但尚未激活，需要管理员审核',
+      )
+      expect(activeStatus.getDescription()).toBe(
+        '租户已激活，可以正常使用系统功能',
+      )
+      expect(suspendedStatus.getDescription()).toBe(
+        '租户已被禁用，无法使用系统功能',
+      )
+      expect(deletedStatus.getDescription()).toBe(
+        '租户已被删除，数据保留但无法访问',
+      )
+    })
+  })
 
   /**
    * @test 字符串转换测试
@@ -174,21 +182,21 @@ describe('TenantStatusValue', () => {
         { status: TenantStatus.PENDING, expected: 'pending' },
         { status: TenantStatus.ACTIVE, expected: 'active' },
         { status: TenantStatus.SUSPENDED, expected: 'suspended' },
-        { status: TenantStatus.DELETED, expected: 'deleted' }
-      ];
+        { status: TenantStatus.DELETED, expected: 'deleted' },
+      ]
 
       testCases.forEach(({ status, expected }) => {
-        const statusValue = new TenantStatusValue(status);
-        expect(statusValue.toString()).toBe(expected);
-      });
-    });
+        const statusValue = new TenantStatusValue(status)
+        expect(statusValue.toString()).toBe(expected)
+      })
+    })
 
     it('应该支持字符串拼接', () => {
-      const status = new TenantStatusValue(TenantStatus.ACTIVE);
-      const result = `租户状态: ${status}`;
-      expect(result).toBe('租户状态: active');
-    });
-  });
+      const status = new TenantStatusValue(TenantStatus.ACTIVE)
+      const result = `租户状态: ${status}`
+      expect(result).toBe('租户状态: active')
+    })
+  })
 
   /**
    * @test 相等性测试
@@ -196,26 +204,26 @@ describe('TenantStatusValue', () => {
    */
   describe('相等性', () => {
     it('应该正确比较相等的值对象', () => {
-      const status1 = new TenantStatusValue(TenantStatus.ACTIVE);
-      const status2 = new TenantStatusValue(TenantStatus.ACTIVE);
+      const status1 = new TenantStatusValue(TenantStatus.ACTIVE)
+      const status2 = new TenantStatusValue(TenantStatus.ACTIVE)
 
-      expect(status1.equals(status2)).toBe(true);
-    });
+      expect(status1.equals(status2)).toBe(true)
+    })
 
     it('应该正确比较不相等的值对象', () => {
-      const status1 = new TenantStatusValue(TenantStatus.ACTIVE);
-      const status2 = new TenantStatusValue(TenantStatus.SUSPENDED);
+      const status1 = new TenantStatusValue(TenantStatus.ACTIVE)
+      const status2 = new TenantStatusValue(TenantStatus.SUSPENDED)
 
-      expect(status1.equals(status2)).toBe(false);
-    });
+      expect(status1.equals(status2)).toBe(false)
+    })
 
     it('应该处理null和undefined', () => {
-      const status = new TenantStatusValue(TenantStatus.ACTIVE);
+      const status = new TenantStatusValue(TenantStatus.ACTIVE)
 
-      expect(status.equals(null as any)).toBe(false);
-      expect(status.equals(undefined as any)).toBe(false);
-    });
-  });
+      expect(status.equals(null as any)).toBe(false)
+      expect(status.equals(undefined as any)).toBe(false)
+    })
+  })
 
   /**
    * @test 静态方法测试
@@ -227,35 +235,35 @@ describe('TenantStatusValue', () => {
         { input: 'pending', expected: TenantStatus.PENDING },
         { input: 'active', expected: TenantStatus.ACTIVE },
         { input: 'suspended', expected: TenantStatus.SUSPENDED },
-        { input: 'deleted', expected: TenantStatus.DELETED }
-      ];
+        { input: 'deleted', expected: TenantStatus.DELETED },
+      ]
 
       testCases.forEach(({ input, expected }) => {
-        const statusValue = TenantStatusValue.fromString(input);
-        expect(statusValue.value).toBe(expected);
-      });
-    });
+        const statusValue = TenantStatusValue.fromString(input)
+        expect(statusValue.value).toBe(expected)
+      })
+    })
 
     it('fromString应该拒绝无效的状态字符串', () => {
-      const invalidStatuses = ['invalid', 'unknown', 'test', ''];
+      const invalidStatuses = ['invalid', 'unknown', 'test', '']
 
-      invalidStatuses.forEach(invalidStatus => {
+      invalidStatuses.forEach((invalidStatus) => {
         expect(() => TenantStatusValue.fromString(invalidStatus)).toThrow(
-          `无效的租户状态: ${invalidStatus}`
-        );
-      });
-    });
+          `无效的租户状态: ${invalidStatus}`,
+        )
+      })
+    })
 
     it('getAvailableStatuses应该返回所有可用状态', () => {
-      const availableStatuses = TenantStatusValue.getAvailableStatuses();
+      const availableStatuses = TenantStatusValue.getAvailableStatuses()
 
-      expect(availableStatuses).toContain(TenantStatus.PENDING);
-      expect(availableStatuses).toContain(TenantStatus.ACTIVE);
-      expect(availableStatuses).toContain(TenantStatus.SUSPENDED);
-      expect(availableStatuses).toContain(TenantStatus.DELETED);
-      expect(availableStatuses).toHaveLength(4);
-    });
-  });
+      expect(availableStatuses).toContain(TenantStatus.PENDING)
+      expect(availableStatuses).toContain(TenantStatus.ACTIVE)
+      expect(availableStatuses).toContain(TenantStatus.SUSPENDED)
+      expect(availableStatuses).toContain(TenantStatus.DELETED)
+      expect(availableStatuses).toHaveLength(4)
+    })
+  })
 
   /**
    * @test 状态机逻辑测试
@@ -263,33 +271,33 @@ describe('TenantStatusValue', () => {
    */
   describe('状态机逻辑', () => {
     it('应该支持从待激活到激活的转换', () => {
-      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING);
-      expect(pendingStatus.canActivate()).toBe(true);
-    });
+      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING)
+      expect(pendingStatus.canActivate()).toBe(true)
+    })
 
     it('应该支持从禁用到激活的转换', () => {
-      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED);
-      expect(suspendedStatus.canActivate()).toBe(true);
-    });
+      const suspendedStatus = new TenantStatusValue(TenantStatus.SUSPENDED)
+      expect(suspendedStatus.canActivate()).toBe(true)
+    })
 
     it('应该支持从激活到禁用的转换', () => {
-      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE);
-      expect(activeStatus.canSuspend()).toBe(true);
-    });
+      const activeStatus = new TenantStatusValue(TenantStatus.ACTIVE)
+      expect(activeStatus.canSuspend()).toBe(true)
+    })
 
     it('应该支持从待激活到禁用的转换', () => {
-      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING);
-      expect(pendingStatus.canSuspend()).toBe(true);
-    });
+      const pendingStatus = new TenantStatusValue(TenantStatus.PENDING)
+      expect(pendingStatus.canSuspend()).toBe(true)
+    })
 
     it('应该阻止从已删除状态进行任何转换', () => {
-      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED);
-      expect(deletedStatus.canActivate()).toBe(false);
-      expect(deletedStatus.canSuspend()).toBe(false);
-      expect(deletedStatus.canDelete()).toBe(false);
-      expect(deletedStatus.canRestore()).toBe(true);
-    });
-  });
+      const deletedStatus = new TenantStatusValue(TenantStatus.DELETED)
+      expect(deletedStatus.canActivate()).toBe(false)
+      expect(deletedStatus.canSuspend()).toBe(false)
+      expect(deletedStatus.canDelete()).toBe(false)
+      expect(deletedStatus.canRestore()).toBe(true)
+    })
+  })
 
   /**
    * @test 边界条件测试
@@ -297,15 +305,15 @@ describe('TenantStatusValue', () => {
    */
   describe('边界条件', () => {
     it('应该处理大小写不敏感的状态字符串', () => {
-      expect(() => TenantStatusValue.fromString('PENDING')).toThrow();
-      expect(() => TenantStatusValue.fromString('Active')).toThrow();
-    });
+      expect(() => TenantStatusValue.fromString('PENDING')).toThrow()
+      expect(() => TenantStatusValue.fromString('Active')).toThrow()
+    })
 
     it('应该处理空字符串和空白字符串', () => {
-      expect(() => TenantStatusValue.fromString('')).toThrow();
-      expect(() => TenantStatusValue.fromString('   ')).toThrow();
-    });
-  });
+      expect(() => TenantStatusValue.fromString('')).toThrow()
+      expect(() => TenantStatusValue.fromString('   ')).toThrow()
+    })
+  })
 
   /**
    * @test 性能测试
@@ -313,28 +321,28 @@ describe('TenantStatusValue', () => {
    */
   describe('性能', () => {
     it('应该能够快速创建多个状态实例', () => {
-      const startTime = Date.now();
+      const startTime = Date.now()
 
       for (let i = 0; i < 1000; i++) {
-        new TenantStatusValue(TenantStatus.ACTIVE);
+        new TenantStatusValue(TenantStatus.ACTIVE)
       }
 
-      const endTime = Date.now();
-      expect(endTime - startTime).toBeLessThan(1000); // 应该在1秒内完成
-    });
+      const endTime = Date.now()
+      expect(endTime - startTime).toBeLessThan(1000) // 应该在1秒内完成
+    })
 
     it('应该能够快速进行状态查询', () => {
-      const status = new TenantStatusValue(TenantStatus.ACTIVE);
-      const startTime = Date.now();
+      const status = new TenantStatusValue(TenantStatus.ACTIVE)
+      const startTime = Date.now()
 
       for (let i = 0; i < 10000; i++) {
-        status.isActive();
-        status.canActivate();
-        status.getDisplayName();
+        status.isActive()
+        status.canActivate()
+        status.getDisplayName()
       }
 
-      const endTime = Date.now();
-      expect(endTime - startTime).toBeLessThan(1000); // 应该在1秒内完成
-    });
-  });
-}); 
+      const endTime = Date.now()
+      expect(endTime - startTime).toBeLessThan(1000) // 应该在1秒内完成
+    })
+  })
+})

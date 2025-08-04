@@ -1,12 +1,15 @@
-import { Tenant } from '../../domain/entities/tenant.entity';
-import { TenantOrmEntity } from '../entities/tenant.orm.entity';
-import { TenantStatusValue, TenantStatus } from '../../domain/value-objects/tenant-status.value-object';
+import { Tenant } from '../../domain/entities/tenant.entity'
+import {
+  type TenantStatus,
+  TenantStatusValue,
+} from '../../domain/value-objects/tenant-status.value-object'
+import { TenantOrmEntity } from '../entities/tenant.orm.entity'
 
 /**
  * @class TenantMapper
  * @description
  * 租户映射器，专门负责领域实体与数据库实体之间的转换。
- * 
+ *
  * 主要原理与机制：
  * 1. 遵循单一职责原则，只负责映射转换
  * 2. 处理值对象的序列化和反序列化
@@ -28,20 +31,20 @@ export class TenantMapper {
       ormEntity.code,
       ormEntity.adminUserId,
       ormEntity.description,
-      ormEntity.settings
-    );
+      ormEntity.settings,
+    )
 
     // 设置状态
-    tenant.status = new TenantStatusValue(ormEntity.status as TenantStatus);
+    tenant.status = new TenantStatusValue(ormEntity.status as TenantStatus)
 
     // 设置时间戳
-    tenant.createdAt = ormEntity.createdAt;
-    tenant.updatedAt = ormEntity.updatedAt;
+    tenant.createdAt = ormEntity.createdAt
+    tenant.updatedAt = ormEntity.updatedAt
     if (ormEntity.deletedAt) {
-      tenant.deletedAt = ormEntity.deletedAt;
+      tenant.deletedAt = ormEntity.deletedAt
     }
 
-    return tenant;
+    return tenant
   }
 
   /**
@@ -51,20 +54,20 @@ export class TenantMapper {
    * @returns {TenantOrmEntity} 数据库实体
    */
   static toOrm(tenant: Tenant): TenantOrmEntity {
-    const ormEntity = new TenantOrmEntity();
+    const ormEntity = new TenantOrmEntity()
 
-    ormEntity.id = tenant.id;
-    ormEntity.name = tenant.getName();
-    ormEntity.code = tenant.getCode();
-    ormEntity.status = tenant.getStatus();
-    ormEntity.adminUserId = tenant.adminUserId;
-    ormEntity.description = tenant.description;
-    ormEntity.settings = tenant.settings;
-    ormEntity.createdAt = tenant.createdAt;
-    ormEntity.updatedAt = tenant.updatedAt;
-    ormEntity.deletedAt = tenant.deletedAt;
+    ormEntity.id = tenant.id
+    ormEntity.name = tenant.getName()
+    ormEntity.code = tenant.getCode()
+    ormEntity.status = tenant.getStatus()
+    ormEntity.adminUserId = tenant.adminUserId
+    ormEntity.description = tenant.description
+    ormEntity.settings = tenant.settings
+    ormEntity.createdAt = tenant.createdAt
+    ormEntity.updatedAt = tenant.updatedAt
+    ormEntity.deletedAt = tenant.deletedAt
 
-    return ormEntity;
+    return ormEntity
   }
 
   /**
@@ -74,14 +77,14 @@ export class TenantMapper {
    * @param tenant 领域实体
    */
   static updateOrm(ormEntity: TenantOrmEntity, tenant: Tenant): void {
-    ormEntity.name = tenant.getName();
-    ormEntity.code = tenant.getCode();
-    ormEntity.status = tenant.getStatus();
-    ormEntity.adminUserId = tenant.adminUserId;
-    ormEntity.description = tenant.description;
-    ormEntity.settings = tenant.settings;
-    ormEntity.updatedAt = tenant.updatedAt;
-    ormEntity.deletedAt = tenant.deletedAt;
+    ormEntity.name = tenant.getName()
+    ormEntity.code = tenant.getCode()
+    ormEntity.status = tenant.getStatus()
+    ormEntity.adminUserId = tenant.adminUserId
+    ormEntity.description = tenant.description
+    ormEntity.settings = tenant.settings
+    ormEntity.updatedAt = tenant.updatedAt
+    ormEntity.deletedAt = tenant.deletedAt
   }
 
   /**
@@ -91,7 +94,7 @@ export class TenantMapper {
    * @returns {Tenant[]} 领域实体列表
    */
   static toDomainList(ormEntities: TenantOrmEntity[]): Tenant[] {
-    return ormEntities.map(ormEntity => this.toDomain(ormEntity));
+    return ormEntities.map((ormEntity) => this.toDomain(ormEntity))
   }
 
   /**
@@ -101,7 +104,7 @@ export class TenantMapper {
    * @returns {TenantOrmEntity[]} 数据库实体列表
    */
   static toOrmList(tenants: Tenant[]): TenantOrmEntity[] {
-    return tenants.map(tenant => this.toOrm(tenant));
+    return tenants.map((tenant) => this.toOrm(tenant))
   }
 
   /**
@@ -120,7 +123,7 @@ export class TenantMapper {
       settings: tenant.settings,
       updatedAt: tenant.updatedAt,
       deletedAt: tenant.deletedAt,
-    };
+    }
   }
 
   /**
@@ -138,7 +141,7 @@ export class TenantMapper {
       ormEntity.adminUserId &&
       ormEntity.createdAt &&
       ormEntity.updatedAt
-    );
+    )
   }
 
   /**
@@ -157,10 +160,10 @@ export class TenantMapper {
         tenant.adminUserId &&
         tenant.createdAt &&
         tenant.updatedAt
-      );
+      )
     } catch (error) {
       // 如果验证过程中抛出异常，说明实体无效
-      return false;
+      return false
     }
   }
-} 
+}

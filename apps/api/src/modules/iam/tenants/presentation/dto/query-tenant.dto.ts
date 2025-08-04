@@ -1,13 +1,13 @@
-import { IsOptional, IsString, IsEnum, IsInt, Min, Max } from 'class-validator';
-import { ApiPropertyOptional } from '@nestjs/swagger';
-import { Transform, Type } from 'class-transformer';
-import { TenantStatus } from '../../domain/value-objects/tenant-status.value-object';
+import { ApiPropertyOptional } from '@nestjs/swagger'
+import { Transform, Type } from 'class-transformer'
+import { IsEnum, IsInt, IsOptional, IsString, Max, Min } from 'class-validator'
+import { TenantStatus } from '../../domain/value-objects/tenant-status.value-object'
 
 /**
  * @class QueryTenantDto
  * @description
  * 查询租户的数据传输对象，定义查询租户API接口的查询参数数据结构。
- * 
+ *
  * 主要原理与机制：
  * 1. 使用class-validator进行参数验证
  * 2. 使用class-transformer进行数据转换
@@ -30,7 +30,7 @@ export class QueryTenantDto {
   @Type(() => Number)
   @IsInt({ message: '页码必须是整数' })
   @Min(1, { message: '页码必须大于等于1' })
-  page?: number = 1;
+  page?: number = 1
 
   /**
    * @property limit
@@ -49,7 +49,7 @@ export class QueryTenantDto {
   @IsInt({ message: '每页数量必须是整数' })
   @Min(1, { message: '每页数量必须大于等于1' })
   @Max(100, { message: '每页数量不能超过100' })
-  limit?: number = 10;
+  limit?: number = 10
 
   /**
    * @property search
@@ -62,7 +62,7 @@ export class QueryTenantDto {
   })
   @IsOptional()
   @IsString({ message: '搜索关键词必须是字符串' })
-  search?: string;
+  search?: string
 
   /**
    * @property status
@@ -76,7 +76,7 @@ export class QueryTenantDto {
   })
   @IsOptional()
   @IsEnum(TenantStatus, { message: '租户状态无效' })
-  status?: TenantStatus;
+  status?: TenantStatus
 
   /**
    * @property adminUserId
@@ -89,7 +89,7 @@ export class QueryTenantDto {
   })
   @IsOptional()
   @IsString({ message: '管理员用户ID必须是字符串' })
-  adminUserId?: string;
+  adminUserId?: string
 
   /**
    * @property sortBy
@@ -103,7 +103,7 @@ export class QueryTenantDto {
   })
   @IsOptional()
   @IsString({ message: '排序字段必须是字符串' })
-  sortBy?: 'name' | 'code' | 'status' | 'createdAt' | 'updatedAt' = 'createdAt';
+  sortBy?: 'name' | 'code' | 'status' | 'createdAt' | 'updatedAt' = 'createdAt'
 
   /**
    * @property sortOrder
@@ -117,7 +117,7 @@ export class QueryTenantDto {
   })
   @IsOptional()
   @IsString({ message: '排序顺序必须是字符串' })
-  sortOrder?: 'asc' | 'desc' = 'desc';
+  sortOrder?: 'asc' | 'desc' = 'desc'
 
   /**
    * @property startDate
@@ -130,7 +130,7 @@ export class QueryTenantDto {
   })
   @IsOptional()
   @IsString({ message: '开始日期必须是字符串' })
-  startDate?: string;
+  startDate?: string
 
   /**
    * @property endDate
@@ -143,7 +143,7 @@ export class QueryTenantDto {
   })
   @IsOptional()
   @IsString({ message: '结束日期必须是字符串' })
-  endDate?: string;
+  endDate?: string
 
   /**
    * @property includeDeleted
@@ -157,11 +157,11 @@ export class QueryTenantDto {
   })
   @IsOptional()
   @Transform(({ value }) => {
-    if (value === 'true') return true;
-    if (value === 'false') return false;
-    return value;
+    if (value === 'true') return true
+    if (value === 'false') return false
+    return value
   })
-  includeDeleted?: boolean = false;
+  includeDeleted?: boolean = false
 }
 
 /**
@@ -181,7 +181,7 @@ export class TenantStatsQueryDto {
   })
   @IsOptional()
   @IsString({ message: '开始日期必须是字符串' })
-  startDate?: string;
+  startDate?: string
 
   /**
    * @property endDate
@@ -194,7 +194,7 @@ export class TenantStatsQueryDto {
   })
   @IsOptional()
   @IsString({ message: '结束日期必须是字符串' })
-  endDate?: string;
+  endDate?: string
 
   /**
    * @property adminUserId
@@ -207,5 +207,5 @@ export class TenantStatsQueryDto {
   })
   @IsOptional()
   @IsString({ message: '管理员用户ID必须是字符串' })
-  adminUserId?: string;
-} 
+  adminUserId?: string
+}

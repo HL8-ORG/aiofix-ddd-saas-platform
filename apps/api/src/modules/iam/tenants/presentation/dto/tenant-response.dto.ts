@@ -1,11 +1,11 @@
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Expose, Transform } from 'class-transformer';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { Expose, Transform } from 'class-transformer'
 
 /**
  * @class TenantResponseDto
  * @description
  * 租户响应的数据传输对象，定义API接口的响应数据结构。
- * 
+ *
  * 主要原理与机制：
  * 1. 使用class-transformer进行数据序列化
  * 2. 使用Swagger装饰器生成API文档
@@ -23,7 +23,7 @@ export class TenantResponseDto {
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @Expose()
-  id: string;
+  id: string
 
   /**
    * @property name
@@ -35,7 +35,7 @@ export class TenantResponseDto {
     example: '测试租户',
   })
   @Expose()
-  name: string;
+  name: string
 
   /**
    * @property code
@@ -47,7 +47,7 @@ export class TenantResponseDto {
     example: 'test-tenant',
   })
   @Expose()
-  code: string;
+  code: string
 
   /**
    * @property status
@@ -60,7 +60,7 @@ export class TenantResponseDto {
     enum: ['pending', 'active', 'suspended', 'deleted'],
   })
   @Expose()
-  status: string;
+  status: string
 
   /**
    * @property statusDisplayName
@@ -72,7 +72,7 @@ export class TenantResponseDto {
     example: '激活',
   })
   @Expose()
-  statusDisplayName: string;
+  statusDisplayName: string
 
   /**
    * @property adminUserId
@@ -84,7 +84,7 @@ export class TenantResponseDto {
     example: '550e8400-e29b-41d4-a716-446655440000',
   })
   @Expose()
-  adminUserId: string;
+  adminUserId: string
 
   /**
    * @property description
@@ -96,7 +96,7 @@ export class TenantResponseDto {
     example: '这是一个测试租户',
   })
   @Expose()
-  description?: string;
+  description?: string
 
   /**
    * @property settings
@@ -112,14 +112,14 @@ export class TenantResponseDto {
   @Transform(({ value }) => {
     if (typeof value === 'string') {
       try {
-        return JSON.parse(value);
+        return JSON.parse(value)
       } catch {
-        return {};
+        return {}
       }
     }
-    return value || {};
+    return value || {}
   })
-  settings: Record<string, any>;
+  settings: Record<string, any>
 
   /**
    * @property createdAt
@@ -132,7 +132,7 @@ export class TenantResponseDto {
   })
   @Expose()
   @Transform(({ value }) => value?.toISOString())
-  createdAt: Date;
+  createdAt: Date
 
   /**
    * @property updatedAt
@@ -145,7 +145,7 @@ export class TenantResponseDto {
   })
   @Expose()
   @Transform(({ value }) => value?.toISOString())
-  updatedAt: Date;
+  updatedAt: Date
 
   /**
    * @property deletedAt
@@ -158,7 +158,7 @@ export class TenantResponseDto {
   })
   @Expose()
   @Transform(({ value }) => value?.toISOString())
-  deletedAt?: Date;
+  deletedAt?: Date
 }
 
 /**
@@ -176,7 +176,7 @@ export class TenantListResponseDto {
     description: '操作是否成功',
     example: true,
   })
-  success: boolean;
+  success: boolean
 
   /**
    * @property data
@@ -186,7 +186,7 @@ export class TenantListResponseDto {
     description: '租户列表数据',
     type: [TenantResponseDto],
   })
-  data: TenantResponseDto[];
+  data: TenantResponseDto[]
 
   /**
    * @property message
@@ -197,7 +197,7 @@ export class TenantListResponseDto {
     description: '响应消息',
     example: '获取租户列表成功',
   })
-  message: string;
+  message: string
 
   /**
    * @property total
@@ -208,7 +208,7 @@ export class TenantListResponseDto {
     description: '总数量',
     example: 10,
   })
-  total: number;
+  total: number
 }
 
 /**
@@ -226,7 +226,7 @@ export class TenantDetailResponseDto {
     description: '操作是否成功',
     example: true,
   })
-  success: boolean;
+  success: boolean
 
   /**
    * @property data
@@ -236,7 +236,7 @@ export class TenantDetailResponseDto {
     description: '租户详情数据',
     type: TenantResponseDto,
   })
-  data: TenantResponseDto;
+  data: TenantResponseDto
 
   /**
    * @property message
@@ -247,7 +247,7 @@ export class TenantDetailResponseDto {
     description: '响应消息',
     example: '获取租户成功',
   })
-  message: string;
+  message: string
 }
 
 /**
@@ -265,7 +265,7 @@ export class TenantCreateResponseDto {
     description: '操作是否成功',
     example: true,
   })
-  success: boolean;
+  success: boolean
 
   /**
    * @property data
@@ -275,7 +275,7 @@ export class TenantCreateResponseDto {
     description: '新创建的租户数据',
     type: TenantResponseDto,
   })
-  data: TenantResponseDto;
+  data: TenantResponseDto
 
   /**
    * @property message
@@ -286,7 +286,7 @@ export class TenantCreateResponseDto {
     description: '响应消息',
     example: '租户创建成功',
   })
-  message: string;
+  message: string
 }
 
 /**
@@ -304,7 +304,7 @@ export class TenantDeleteResponseDto {
     description: '操作是否成功',
     example: true,
   })
-  success: boolean;
+  success: boolean
 
   /**
    * @property message
@@ -315,5 +315,5 @@ export class TenantDeleteResponseDto {
     description: '响应消息',
     example: '租户删除成功',
   })
-  message: string;
-} 
+  message: string
+}

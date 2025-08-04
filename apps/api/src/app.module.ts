@@ -1,11 +1,11 @@
-import { Module } from '@nestjs/common';
-import { AppController } from 'src/app.controller';
-import { AppService } from 'src/app.service';
-import { ConfigModule } from '@nestjs/config';
-import { ClsModule } from 'nestjs-cls';
-import { LoggerModule } from '@libs/pino-nestjs';
-import pinoLoggerConfig from 'src/shared/infrastructure/config/pino-logger.config';
-import { UsersModule } from './modules/iam/users/users.module';
+import { LoggerModule } from '@libs/pino-nestjs'
+import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config'
+import { ClsModule } from 'nestjs-cls'
+import { AppController } from 'src/app.controller'
+import { AppService } from 'src/app.service'
+import pinoLoggerConfig from 'src/shared/infrastructure/config/pino-logger.config'
+import { UsersModule } from './modules/iam/users/users.module'
 
 /**
  * @module AppModule
@@ -56,10 +56,6 @@ import { UsersModule } from './modules/iam/users/users.module';
     UsersModule,
   ],
   controllers: [AppController],
-  providers: [
-    AppService,
-  ],
+  providers: [AppService],
 })
-export class AppModule { }
-
-
+export class AppModule {}

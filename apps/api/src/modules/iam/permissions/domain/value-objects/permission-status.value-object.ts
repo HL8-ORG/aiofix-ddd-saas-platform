@@ -1,4 +1,4 @@
-import { ValueObject } from '@/shared/domain/value-objects/value-object.base';
+import { ValueObject } from '@/shared/domain/value-objects/value-object.base'
 
 /**
  * @enum PermissionStatus
@@ -8,14 +8,14 @@ export enum PermissionStatus {
   ACTIVE = 'active',
   INACTIVE = 'inactive',
   SUSPENDED = 'suspended',
-  EXPIRED = 'expired'
+  EXPIRED = 'expired',
 }
 
 /**
  * @class PermissionStatusValue
  * @description
  * 权限状态值对象，封装权限状态的验证规则和业务逻辑。
- * 
+ *
  * 主要原理与机制：
  * 1. 继承ValueObject基类，确保值对象的不可变性
  * 2. 实现权限状态的验证规则和业务逻辑
@@ -30,9 +30,9 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @throws {Error} 当权限状态无效时抛出异常
    */
   constructor(status: PermissionStatus) {
-    super();
-    this.validateStatus(status);
-    this._value = status;
+    super()
+    this.validateStatus(status)
+    this._value = status
   }
 
   /**
@@ -41,7 +41,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {PermissionStatus} 权限状态
    */
   getValue(): PermissionStatus {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -52,15 +52,15 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
   getDisplayName(): string {
     switch (this._value) {
       case PermissionStatus.ACTIVE:
-        return '启用';
+        return '启用'
       case PermissionStatus.INACTIVE:
-        return '禁用';
+        return '禁用'
       case PermissionStatus.SUSPENDED:
-        return '暂停';
+        return '暂停'
       case PermissionStatus.EXPIRED:
-        return '过期';
+        return '过期'
       default:
-        return '未知状态';
+        return '未知状态'
     }
   }
 
@@ -72,15 +72,15 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
   getDescription(): string {
     switch (this._value) {
       case PermissionStatus.ACTIVE:
-        return '权限已启用，可以正常使用';
+        return '权限已启用，可以正常使用'
       case PermissionStatus.INACTIVE:
-        return '权限已禁用，暂时无法使用';
+        return '权限已禁用，暂时无法使用'
       case PermissionStatus.SUSPENDED:
-        return '权限已暂停，需要管理员重新启用';
+        return '权限已暂停，需要管理员重新启用'
       case PermissionStatus.EXPIRED:
-        return '权限已过期，需要重新申请';
+        return '权限已过期，需要重新申请'
       default:
-        return '未知状态描述';
+        return '未知状态描述'
     }
   }
 
@@ -90,7 +90,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {boolean} 是否为启用状态
    */
   isActive(): boolean {
-    return this._value === PermissionStatus.ACTIVE;
+    return this._value === PermissionStatus.ACTIVE
   }
 
   /**
@@ -99,7 +99,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {boolean} 是否为禁用状态
    */
   isInactive(): boolean {
-    return this._value === PermissionStatus.INACTIVE;
+    return this._value === PermissionStatus.INACTIVE
   }
 
   /**
@@ -108,7 +108,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {boolean} 是否为暂停状态
    */
   isSuspended(): boolean {
-    return this._value === PermissionStatus.SUSPENDED;
+    return this._value === PermissionStatus.SUSPENDED
   }
 
   /**
@@ -117,7 +117,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {boolean} 是否为过期状态
    */
   isExpired(): boolean {
-    return this._value === PermissionStatus.EXPIRED;
+    return this._value === PermissionStatus.EXPIRED
   }
 
   /**
@@ -126,7 +126,10 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {boolean} 是否可以激活
    */
   canBeActivated(): boolean {
-    return this._value === PermissionStatus.INACTIVE || this._value === PermissionStatus.SUSPENDED;
+    return (
+      this._value === PermissionStatus.INACTIVE ||
+      this._value === PermissionStatus.SUSPENDED
+    )
   }
 
   /**
@@ -135,7 +138,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {boolean} 是否可以暂停
    */
   canBeSuspended(): boolean {
-    return this._value === PermissionStatus.ACTIVE;
+    return this._value === PermissionStatus.ACTIVE
   }
 
   /**
@@ -144,7 +147,10 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {boolean} 是否可以禁用
    */
   canBeDeactivated(): boolean {
-    return this._value === PermissionStatus.ACTIVE || this._value === PermissionStatus.SUSPENDED;
+    return (
+      this._value === PermissionStatus.ACTIVE ||
+      this._value === PermissionStatus.SUSPENDED
+    )
   }
 
   /**
@@ -155,7 +161,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    */
   private validateStatus(status: PermissionStatus): void {
     if (!Object.values(PermissionStatus).includes(status)) {
-      throw new Error(`无效的权限状态: ${status}`);
+      throw new Error(`无效的权限状态: ${status}`)
     }
   }
 
@@ -167,9 +173,9 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    */
   equals(other: PermissionStatusValue): boolean {
     if (!other) {
-      return false;
+      return false
     }
-    return this._value === other._value;
+    return this._value === other._value
   }
 
   /**
@@ -178,7 +184,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {string} 权限状态字符串
    */
   toString(): string {
-    return this._value;
+    return this._value
   }
 
   /**
@@ -187,7 +193,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {PermissionStatusValue} 启用状态值对象
    */
   static getActive(): PermissionStatusValue {
-    return new PermissionStatusValue(PermissionStatus.ACTIVE);
+    return new PermissionStatusValue(PermissionStatus.ACTIVE)
   }
 
   /**
@@ -196,7 +202,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {PermissionStatusValue} 禁用状态值对象
    */
   static getInactive(): PermissionStatusValue {
-    return new PermissionStatusValue(PermissionStatus.INACTIVE);
+    return new PermissionStatusValue(PermissionStatus.INACTIVE)
   }
 
   /**
@@ -205,7 +211,7 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {PermissionStatusValue} 暂停状态值对象
    */
   static getSuspended(): PermissionStatusValue {
-    return new PermissionStatusValue(PermissionStatus.SUSPENDED);
+    return new PermissionStatusValue(PermissionStatus.SUSPENDED)
   }
 
   /**
@@ -214,6 +220,6 @@ export class PermissionStatusValue extends ValueObject<PermissionStatus> {
    * @returns {PermissionStatusValue} 过期状态值对象
    */
   static getExpired(): PermissionStatusValue {
-    return new PermissionStatusValue(PermissionStatus.EXPIRED);
+    return new PermissionStatusValue(PermissionStatus.EXPIRED)
   }
-} 
+}

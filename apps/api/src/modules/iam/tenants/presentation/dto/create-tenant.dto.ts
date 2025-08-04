@@ -1,11 +1,18 @@
-import { IsString, IsNotEmpty, IsOptional, IsUUID, MaxLength, IsObject } from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import {
+  IsNotEmpty,
+  IsObject,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+} from 'class-validator'
 
 /**
  * @class CreateTenantDto
  * @description
  * 创建租户的数据传输对象，定义创建租户API接口的请求数据结构。
- * 
+ *
  * 主要原理与机制：
  * 1. 使用class-validator进行参数验证
  * 2. 使用class-transformer进行数据转换
@@ -27,7 +34,7 @@ export class CreateTenantDto {
   @IsString({ message: '租户名称必须是字符串' })
   @IsNotEmpty({ message: '租户名称不能为空' })
   @MaxLength(100, { message: '租户名称不能超过100个字符' })
-  name: string;
+  name: string
 
   /**
    * @property code
@@ -43,7 +50,7 @@ export class CreateTenantDto {
   @IsString({ message: '租户编码必须是字符串' })
   @IsNotEmpty({ message: '租户编码不能为空' })
   @MaxLength(50, { message: '租户编码不能超过50个字符' })
-  code: string;
+  code: string
 
   /**
    * @property adminUserId
@@ -56,7 +63,7 @@ export class CreateTenantDto {
   })
   @IsUUID('4', { message: '管理员用户ID必须是有效的UUID v4格式' })
   @IsNotEmpty({ message: '管理员用户ID不能为空' })
-  adminUserId: string;
+  adminUserId: string
 
   /**
    * @property description
@@ -71,7 +78,7 @@ export class CreateTenantDto {
   @IsOptional()
   @IsString({ message: '租户描述必须是字符串' })
   @MaxLength(500, { message: '租户描述不能超过500个字符' })
-  description?: string;
+  description?: string
 
   /**
    * @property settings
@@ -85,5 +92,5 @@ export class CreateTenantDto {
   })
   @IsOptional()
   @IsObject({ message: '租户配置必须是对象' })
-  settings?: Record<string, any>;
-} 
+  settings?: Record<string, any>
+}

@@ -1,5 +1,5 @@
-import { registerAs } from '@nestjs/config';
-import { pinoDevConfig, pinoProdConfig } from './logger-options';
+import { registerAs } from '@nestjs/config'
+import { pinoDevConfig, pinoProdConfig } from './logger-options'
 
 /**
  * @constant pinoLoggerConfig
@@ -16,10 +16,10 @@ import { pinoDevConfig, pinoProdConfig } from './logger-options';
  */
 const pinoLoggerConfig = registerAs('pinoLogger', () => {
   if (process.env.NODE_ENV === 'development') {
-    return pinoDevConfig;
+    return pinoDevConfig
   }
   // TODO: 生产环境配置，目前只写了开发和生产环境的配置，继续配置更多的不同环境配置
-  return pinoProdConfig;
-});
+  return pinoProdConfig
+})
 
-export default pinoLoggerConfig;
+export default pinoLoggerConfig

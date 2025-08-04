@@ -1,750 +1,787 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
-import { UsersService } from '../users.service';
-import { UserRepository } from '../../domain/repositories/user.repository';
-import { User } from '../../domain/entities/user.entity';
-import { UserStatusValue } from '../../domain/value-objects/user-status.value-object';
-import { Username } from '../../domain/value-objects/username.value-object';
-import { Email } from '../../domain/value-objects/email.value-object';
-import { Phone } from '../../domain/value-objects/phone.value-object';
-import { generateUuid } from '../../../../../shared/domain/utils/uuid.util';
+import type { UserRepository } from '../../domain/repositories/user.repository'
+import type { AssignRoleToUserUseCase } from '../use-cases/assign-role-to-user.use-case'
+import type { AssignUserToOrganizationUseCase } from '../use-cases/assign-user-to-organization.use-case'
+import type { CreateUserUseCase } from '../use-cases/create-user.use-case'
+import type { DeleteUserUseCase } from '../use-cases/delete-user.use-case'
+import type { GetUserStatisticsUseCase } from '../use-cases/get-user-statistics.use-case'
+import type { GetUserUseCase } from '../use-cases/get-user.use-case'
+import type { GetUsersUseCase } from '../use-cases/get-users.use-case'
+import type { SearchUsersUseCase } from '../use-cases/search-users.use-case'
+import type { UpdateUserStatusUseCase } from '../use-cases/update-user-status.use-case'
+import type { UpdateUserUseCase } from '../use-cases/update-user.use-case'
+import { UsersService } from '../users.service'
 
 /**
- * @description
- * 用户应用服务的单元测试。
- * 
- * 测试覆盖范围：
- * 1. 用户创建功能
- * 2. 用户查询功能
- * 3. 用户更新功能
- * 4. 用户状态管理
- * 5. 用户删除和恢复
- * 6. 错误处理
- * 7. 数据验证
+ * @description UsersService单元测试
  */
 describe('UsersService', () => {
-  let service: UsersService;
-  let mockUserRepository: jest.Mocked<UserRepository>;
-
-  /**
-   * @description 创建测试用户数据
-   */
-  const createMockUser = (overrides: any = {}): User => {
-    const defaultUser = {
-      id: generateUuid(),
-      username: 'testuser',
-      email: 'test@example.com',
-      firstName: 'Test',
-      lastName: 'User',
-      tenantId: 'tenant-123',
-      adminUserId: 'admin-123',
-      passwordHash: 'hashedPassword',
-      phone: '+86-138-0013-8000',
-      displayName: 'Test User',
-      avatar: 'https://example.com/avatar.jpg',
-      organizationIds: ['org-123'],
-      roleIds: ['role-123'],
-      loginAttempts: 0,
-      emailVerified: false,
-      phoneVerified: false,
-      twoFactorEnabled: false,
-      preferences: { theme: 'dark' },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...overrides
-    };
-
-    const user = new User(
-      defaultUser.id,
-      defaultUser.username,
-      defaultUser.email,
-      defaultUser.firstName,
-      defaultUser.lastName,
-      defaultUser.tenantId,
-      defaultUser.adminUserId,
-      defaultUser.passwordHash,
-      defaultUser.phone,
-      defaultUser.displayName,
-      defaultUser.avatar,
-      defaultUser.organizationIds,
-      defaultUser.roleIds,
-      defaultUser.preferences
-    );
-
-    // 设置状态（如果提供了自定义状态）
-    if (overrides.status) {
-      user.status = overrides.status;
-    }
-
-    return user;
-  };
+  let service: UsersService
+  let mockUserRepository: jest.Mocked<UserRepository>
+  let mockCreateUserUseCase: jest.Mocked<CreateUserUseCase>
+  let mockGetUserUseCase: jest.Mocked<GetUserUseCase>
+  let mockGetUsersUseCase: jest.Mocked<GetUsersUseCase>
+  let mockUpdateUserUseCase: jest.Mocked<UpdateUserUseCase>
+  let mockUpdateUserStatusUseCase: jest.Mocked<UpdateUserStatusUseCase>
+  let mockDeleteUserUseCase: jest.Mocked<DeleteUserUseCase>
+  let mockAssignUserToOrganizationUseCase: jest.Mocked<AssignUserToOrganizationUseCase>
+  let mockAssignRoleToUserUseCase: jest.Mocked<AssignRoleToUserUseCase>
+  let mockSearchUsersUseCase: jest.Mocked<SearchUsersUseCase>
+  let mockGetUserStatisticsUseCase: jest.Mocked<GetUserStatisticsUseCase>
 
   beforeEach(async () => {
-    const mockRepository = {
-      save: jest.fn(),
+    // 创建所有 mock 对象
+    mockUserRepository = {
       findById: jest.fn(),
+      findByUsername: jest.fn(),
+      findByEmail: jest.fn(),
+      findAll: jest.fn(),
+      save: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      findWithPagination: jest.fn(),
+      findActive: jest.fn(),
+      findLocked: jest.fn(),
+      findByDateRange: jest.fn(),
+      findByOrganizationId: jest.fn(),
+      findByRoleId: jest.fn(),
+      countByStatus: jest.fn(),
+      countByOrganization: jest.fn(),
+      countByRole: jest.fn(),
+      countByDateRange: jest.fn(),
+      countByTenant: jest.fn(),
+      getActiveUserCount: jest.fn(),
+      getNewUserCount: jest.fn(),
+      getDeletedUserCount: jest.fn(),
+      findBySearch: jest.fn(),
       findByUsernameString: jest.fn(),
       findByEmailString: jest.fn(),
       findByPhoneString: jest.fn(),
-      findAll: jest.fn(),
-      findActive: jest.fn(),
-      existsByUsernameString: jest.fn(),
-      existsByEmailString: jest.fn(),
-      existsByPhoneString: jest.fn(),
-      count: jest.fn(),
-      countByStatus: jest.fn(),
-      findWithPagination: jest.fn(),
-      searchUsers: jest.fn(),
-      getUsersWithPagination: jest.fn(),
-    };
+    } as any
 
-    const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        UsersService,
-        {
-          provide: 'UserRepository',
-          useValue: mockRepository,
-        },
-      ],
-    }).compile();
+    mockCreateUserUseCase = {
+      execute: jest.fn(),
+    } as any
 
-    service = module.get<UsersService>(UsersService);
-    mockUserRepository = module.get('UserRepository');
-  });
+    mockGetUserUseCase = {
+      execute: jest.fn(),
+      executeByUsername: jest.fn(),
+      executeByEmail: jest.fn(),
+    } as any
 
-  afterEach(() => {
-    jest.clearAllMocks();
-  });
+    mockGetUsersUseCase = {
+      execute: jest.fn(),
+      executeAllUsers: jest.fn(),
+      executeActiveUsers: jest.fn(),
+    } as any
+
+    mockUpdateUserUseCase = {
+      execute: jest.fn(),
+    } as any
+
+    mockUpdateUserStatusUseCase = {
+      executeActivate: jest.fn(),
+      executeSuspend: jest.fn(),
+    } as any
+
+    mockDeleteUserUseCase = {
+      execute: jest.fn(),
+      executeRestore: jest.fn(),
+    } as any
+
+    mockAssignUserToOrganizationUseCase = {
+      execute: jest.fn(),
+      executeRemoveFromOrganization: jest.fn(),
+      executeGetUsersByOrganization: jest.fn(),
+      executeGetUserOrganizations: jest.fn(),
+    } as any
+
+    mockAssignRoleToUserUseCase = {
+      execute: jest.fn(),
+      executeRemoveRole: jest.fn(),
+      executeGetUsersByRole: jest.fn(),
+      executeGetUserRoles: jest.fn(),
+    } as any
+
+    mockSearchUsersUseCase = {
+      execute: jest.fn(),
+      executeAdvancedSearch: jest.fn(),
+      executeGetUserSuggestions: jest.fn(),
+    } as any
+
+    mockGetUserStatisticsUseCase = {
+      execute: jest.fn(),
+      executeByStatus: jest.fn(),
+      executeByOrganization: jest.fn(),
+      executeByRole: jest.fn(),
+    } as any
+
+    // 直接创建 UsersService 实例
+    service = new UsersService(
+      mockUserRepository,
+      mockCreateUserUseCase,
+      mockGetUserUseCase,
+      mockGetUsersUseCase,
+      mockUpdateUserUseCase,
+      mockUpdateUserStatusUseCase,
+      mockDeleteUserUseCase,
+      mockAssignUserToOrganizationUseCase,
+      mockAssignRoleToUserUseCase,
+      mockSearchUsersUseCase,
+      mockGetUserStatisticsUseCase,
+    )
+  })
+
+  it('应该被定义', () => {
+    expect(service).toBeDefined()
+  })
 
   describe('createUser', () => {
     it('应该成功创建用户', async () => {
       // Arrange
-      const userData = {
-        username: 'newuser',
-        email: 'newuser@example.com',
-        firstName: 'New',
-        lastName: 'User',
-        tenantId: 'tenant-123',
-        adminUserId: 'admin-123',
-        passwordHash: 'hashedPassword',
-        phone: '+86-138-0013-8000',
-        displayName: 'New User',
-        avatar: 'https://example.com/avatar.jpg',
-        organizationIds: ['org-123'],
-        roleIds: ['role-123'],
-        preferences: { theme: 'light' }
-      };
-
-      const expectedUser = createMockUser(userData);
-      mockUserRepository.existsByUsernameString.mockResolvedValue(false);
-      mockUserRepository.existsByEmailString.mockResolvedValue(false);
-      mockUserRepository.existsByPhoneString.mockResolvedValue(false);
-      mockUserRepository.save.mockResolvedValue(expectedUser);
+      const mockUser = { id: 'user-1' }
+      mockCreateUserUseCase.execute.mockResolvedValue(mockUser as any)
 
       // Act
       const result = await service.createUser(
-        userData.username,
-        userData.email,
-        userData.firstName,
-        userData.lastName,
-        userData.tenantId,
-        userData.adminUserId,
-        userData.passwordHash,
-        userData.phone,
-        userData.displayName,
-        userData.avatar,
-        userData.organizationIds,
-        userData.roleIds,
-        userData.preferences
-      );
+        'testuser',
+        'test@example.com',
+        'Test',
+        'User',
+        'tenant-1',
+        'admin-1',
+        'password-hash',
+      )
 
       // Assert
-      expect(result).toEqual(expectedUser);
-      expect(mockUserRepository.existsByUsernameString).toHaveBeenCalledWith(userData.username, userData.tenantId);
-      expect(mockUserRepository.existsByEmailString).toHaveBeenCalledWith(userData.email, userData.tenantId);
-      expect(mockUserRepository.existsByPhoneString).toHaveBeenCalledWith(userData.phone, userData.tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-
-    it('当用户名已存在时应该抛出ConflictException', async () => {
-      // Arrange
-      mockUserRepository.existsByUsernameString.mockResolvedValue(true);
-
-      // Act & Assert
-      await expect(service.createUser(
-        'existinguser',
-        'test@example.com',
-        'Test',
-        'User',
-        'tenant-123',
-        'admin-123',
-        'hashedPassword'
-      )).rejects.toThrow(ConflictException);
-    });
-
-    it('当邮箱已存在时应该抛出ConflictException', async () => {
-      // Arrange
-      mockUserRepository.existsByUsernameString.mockResolvedValue(false);
-      mockUserRepository.existsByEmailString.mockResolvedValue(true);
-
-      // Act & Assert
-      await expect(service.createUser(
-        'newuser',
-        'existing@example.com',
-        'Test',
-        'User',
-        'tenant-123',
-        'admin-123',
-        'hashedPassword'
-      )).rejects.toThrow(ConflictException);
-    });
-
-    it('当手机号已存在时应该抛出ConflictException', async () => {
-      // Arrange
-      mockUserRepository.existsByUsernameString.mockResolvedValue(false);
-      mockUserRepository.existsByEmailString.mockResolvedValue(false);
-      mockUserRepository.existsByPhoneString.mockResolvedValue(true);
-
-      // Act & Assert
-      await expect(service.createUser(
-        'newuser',
-        'test@example.com',
-        'Test',
-        'User',
-        'tenant-123',
-        'admin-123',
-        'hashedPassword',
-        '+86-138-0013-8000'
-      )).rejects.toThrow(ConflictException);
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockCreateUserUseCase.execute).toHaveBeenCalledWith(
+        {
+          username: 'testuser',
+          email: 'test@example.com',
+          firstName: 'Test',
+          lastName: 'User',
+          passwordHash: 'password-hash',
+          phone: undefined,
+          displayName: undefined,
+          avatar: undefined,
+          organizationIds: undefined,
+          roleIds: undefined,
+          preferences: undefined,
+        },
+        'tenant-1',
+        'admin-1',
+      )
+    })
+  })
 
   describe('getUserById', () => {
-    it('应该成功获取用户', async () => {
+    it('应该成功根据ID获取用户', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const expectedUser = createMockUser({ id: userId, tenantId });
-      mockUserRepository.findById.mockResolvedValue(expectedUser);
+      const mockUser = { id: 'user-1' }
+      mockGetUserUseCase.execute.mockResolvedValue(mockUser as any)
 
       // Act
-      const result = await service.getUserById(userId, tenantId);
+      const result = await service.getUserById('user-1', 'tenant-1')
 
       // Assert
-      expect(result).toEqual(expectedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-    });
-
-    it('当用户不存在时应该抛出NotFoundException', async () => {
-      // Arrange
-      mockUserRepository.findById.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(service.getUserById('nonexistent', 'tenant-123')).rejects.toThrow(NotFoundException);
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockGetUserUseCase.execute).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1',
+      )
+    })
+  })
 
   describe('getUserByUsername', () => {
     it('应该成功根据用户名获取用户', async () => {
       // Arrange
-      const username = 'testuser';
-      const tenantId = 'tenant-123';
-      const expectedUser = createMockUser({ username, tenantId });
-      mockUserRepository.findByUsernameString.mockResolvedValue(expectedUser);
+      const mockUser = { id: 'user-1' }
+      mockGetUserUseCase.executeByUsername.mockResolvedValue(mockUser as any)
 
       // Act
-      const result = await service.getUserByUsername(username, tenantId);
+      const result = await service.getUserByUsername('testuser', 'tenant-1')
 
       // Assert
-      expect(result).toEqual(expectedUser);
-      expect(mockUserRepository.findByUsernameString).toHaveBeenCalledWith(username, tenantId);
-    });
-
-    it('当用户不存在时应该抛出NotFoundException', async () => {
-      // Arrange
-      mockUserRepository.findByUsernameString.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(service.getUserByUsername('nonexistent', 'tenant-123')).rejects.toThrow(NotFoundException);
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockGetUserUseCase.executeByUsername).toHaveBeenCalledWith(
+        'testuser',
+        'tenant-1',
+      )
+    })
+  })
 
   describe('getUserByEmail', () => {
     it('应该成功根据邮箱获取用户', async () => {
       // Arrange
-      const email = 'test@example.com';
-      const tenantId = 'tenant-123';
-      const expectedUser = createMockUser({ email, tenantId });
-      mockUserRepository.findByEmailString.mockResolvedValue(expectedUser);
+      const mockUser = { id: 'user-1' }
+      mockGetUserUseCase.executeByEmail.mockResolvedValue(mockUser as any)
 
       // Act
-      const result = await service.getUserByEmail(email, tenantId);
+      const result = await service.getUserByEmail(
+        'test@example.com',
+        'tenant-1',
+      )
 
       // Assert
-      expect(result).toEqual(expectedUser);
-      expect(mockUserRepository.findByEmailString).toHaveBeenCalledWith(email, tenantId);
-    });
-
-    it('当用户不存在时应该抛出NotFoundException', async () => {
-      // Arrange
-      mockUserRepository.findByEmailString.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(service.getUserByEmail('nonexistent@example.com', 'tenant-123')).rejects.toThrow(NotFoundException);
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockGetUserUseCase.executeByEmail).toHaveBeenCalledWith(
+        'test@example.com',
+        'tenant-1',
+      )
+    })
+  })
 
   describe('getAllUsers', () => {
     it('应该成功获取所有用户', async () => {
       // Arrange
-      const tenantId = 'tenant-123';
-      const expectedUsers = [
-        createMockUser({ id: 'user-1', tenantId }),
-        createMockUser({ id: 'user-2', tenantId }),
-      ];
-      mockUserRepository.findAll.mockResolvedValue(expectedUsers);
+      const mockUsers = [{ id: 'user-1' }, { id: 'user-2' }]
+      mockGetUsersUseCase.executeAllUsers.mockResolvedValue(mockUsers as any)
 
       // Act
-      const result = await service.getAllUsers(tenantId);
+      const result = await service.getAllUsers('tenant-1')
 
       // Assert
-      expect(result).toEqual(expectedUsers);
-      expect(mockUserRepository.findAll).toHaveBeenCalledWith(tenantId);
-    });
-  });
+      expect(result).toEqual(mockUsers)
+      expect(mockGetUsersUseCase.executeAllUsers).toHaveBeenCalledWith(
+        'tenant-1',
+      )
+    })
+  })
 
   describe('getActiveUsers', () => {
-    it('应该成功获取激活状态的用户', async () => {
+    it('应该成功获取激活用户', async () => {
       // Arrange
-      const tenantId = 'tenant-123';
-      const expectedUsers = [
-        createMockUser({ id: 'user-1', tenantId, status: UserStatusValue.active() }),
-        createMockUser({ id: 'user-2', tenantId, status: UserStatusValue.active() }),
-      ];
-      mockUserRepository.findActive.mockResolvedValue(expectedUsers);
+      const mockUsers = [{ id: 'user-1' }]
+      mockGetUsersUseCase.executeActiveUsers.mockResolvedValue(mockUsers as any)
 
       // Act
-      const result = await service.getActiveUsers(tenantId);
+      const result = await service.getActiveUsers('tenant-1')
 
       // Assert
-      expect(result).toEqual(expectedUsers);
-      expect(mockUserRepository.findActive).toHaveBeenCalledWith(tenantId);
-    });
-  });
+      expect(result).toEqual(mockUsers)
+      expect(mockGetUsersUseCase.executeActiveUsers).toHaveBeenCalledWith(
+        'tenant-1',
+      )
+    })
+  })
+
+  describe('getUsersWithPagination', () => {
+    it('应该成功分页获取用户', async () => {
+      // Arrange
+      const mockResult = {
+        users: [{ id: 'user-1' }],
+        total: 1,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      }
+      mockGetUsersUseCase.execute.mockResolvedValue(mockResult as any)
+
+      // Act
+      const result = await service.getUsersWithPagination('tenant-1', 1, 10)
+
+      // Assert
+      expect(result).toEqual(mockResult)
+      expect(mockGetUsersUseCase.execute).toHaveBeenCalledWith(
+        'tenant-1',
+        1,
+        10,
+      )
+    })
+  })
 
   describe('activateUser', () => {
     it('应该成功激活用户', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const user = createMockUser({ id: userId, tenantId, status: UserStatusValue.pending() });
-      const activatedUser = createMockUser({ id: userId, tenantId, status: UserStatusValue.active() });
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(activatedUser);
+      const mockUser = { id: 'user-1' }
+      mockUpdateUserStatusUseCase.executeActivate.mockResolvedValue(
+        mockUser as any,
+      )
 
       // Act
-      const result = await service.activateUser(userId, tenantId);
+      const result = await service.activateUser('user-1', 'tenant-1', 'admin-1')
 
       // Assert
-      expect(result).toEqual(activatedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-
-    it('当用户不存在时应该抛出NotFoundException', async () => {
-      // Arrange
-      mockUserRepository.findById.mockResolvedValue(null);
-
-      // Act & Assert
-      await expect(service.activateUser('nonexistent', 'tenant-123')).rejects.toThrow(NotFoundException);
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockUpdateUserStatusUseCase.executeActivate).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1',
+        'admin-1',
+      )
+    })
+  })
 
   describe('suspendUser', () => {
     it('应该成功禁用用户', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const user = createMockUser({ id: userId, tenantId });
-      // 确保用户状态为激活状态
-      user.status = UserStatusValue.active();
-      const suspendedUser = createMockUser({ id: userId, tenantId });
-      suspendedUser.status = UserStatusValue.suspended();
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(suspendedUser);
+      const mockUser = { id: 'user-1' }
+      mockUpdateUserStatusUseCase.executeSuspend.mockResolvedValue(
+        mockUser as any,
+      )
 
       // Act
-      const result = await service.suspendUser(userId, tenantId);
+      const result = await service.suspendUser(
+        'user-1',
+        'tenant-1',
+        'admin-1',
+        '违反使用条款',
+      )
 
       // Assert
-      expect(result).toEqual(suspendedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockUpdateUserStatusUseCase.executeSuspend).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1',
+        'admin-1',
+        '违反使用条款',
+      )
+    })
+  })
 
   describe('updateUserInfo', () => {
-    it('应该成功更新用户信息', async () => {
+    it('应该成功更新用户基本信息', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const user = createMockUser({ id: userId, tenantId });
-      const updatedUser = createMockUser({
-        id: userId,
-        tenantId,
-        firstName: 'Updated',
-        lastName: 'Name',
-        displayName: 'Updated Name',
-        avatar: 'https://example.com/new-avatar.jpg'
-      });
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(updatedUser);
+      const mockUser = { id: 'user-1' }
+      mockUpdateUserUseCase.execute.mockResolvedValue(mockUser as any)
 
       // Act
       const result = await service.updateUserInfo(
-        userId,
-        tenantId,
+        'user-1',
+        'tenant-1',
         'Updated',
-        'Name',
-        'Updated Name',
-        'https://example.com/new-avatar.jpg'
-      );
+        'User',
+        'Updated User',
+        'https://example.com/avatar.jpg',
+      )
 
       // Assert
-      expect(result).toEqual(updatedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockUpdateUserUseCase.execute).toHaveBeenCalledWith(
+        'user-1',
+        {
+          firstName: 'Updated',
+          lastName: 'User',
+          displayName: 'Updated User',
+          avatar: 'https://example.com/avatar.jpg',
+        },
+        'tenant-1',
+      )
+    })
+  })
 
   describe('updateUserContactInfo', () => {
     it('应该成功更新用户联系信息', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const user = createMockUser({ id: userId, tenantId });
-      const updatedUser = createMockUser({
-        id: userId,
-        tenantId,
-        email: 'newemail@example.com',
-        phone: '+86-139-0013-9000'
-      });
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.existsByEmailString.mockResolvedValue(false);
-      mockUserRepository.existsByPhoneString.mockResolvedValue(false);
-      mockUserRepository.save.mockResolvedValue(updatedUser);
+      const mockUser = { id: 'user-1' }
+      mockUpdateUserUseCase.execute.mockResolvedValue(mockUser as any)
 
       // Act
       const result = await service.updateUserContactInfo(
-        userId,
-        tenantId,
-        'newemail@example.com',
-        '+86-139-0013-9000'
-      );
+        'user-1',
+        'tenant-1',
+        'new@example.com',
+        '13987654321',
+      )
 
       // Assert
-      expect(result).toEqual(updatedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.existsByEmailString).toHaveBeenCalledWith('newemail@example.com', tenantId, userId);
-      expect(mockUserRepository.existsByPhoneString).toHaveBeenCalledWith('+86-139-0013-9000', tenantId, userId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-
-    it('当新邮箱已存在时应该抛出ConflictException', async () => {
-      // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const user = createMockUser({ id: userId, tenantId });
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.existsByEmailString.mockResolvedValue(true);
-
-      // Act & Assert
-      await expect(service.updateUserContactInfo(
-        userId,
-        tenantId,
-        'existing@example.com',
-        '+86-139-0013-9000'
-      )).rejects.toThrow(ConflictException);
-    });
-  });
-
-  describe('updateUserPassword', () => {
-    it('应该成功更新用户密码', async () => {
-      // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const user = createMockUser({ id: userId, tenantId });
-      const updatedUser = createMockUser({
-        id: userId,
-        tenantId,
-        passwordHash: 'newHashedPassword'
-      });
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(updatedUser);
-
-      // Act
-      const result = await service.updateUserPassword(userId, tenantId, 'newHashedPassword');
-
-      // Assert
-      expect(result).toEqual(updatedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockUpdateUserUseCase.execute).toHaveBeenCalledWith(
+        'user-1',
+        { email: 'new@example.com', phone: '13987654321' },
+        'tenant-1',
+      )
+    })
+  })
 
   describe('deleteUser', () => {
     it('应该成功删除用户', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const user = createMockUser({ id: userId, tenantId });
-      // 确保用户状态为激活状态，可以删除
-      user.status = UserStatusValue.active();
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(user);
+      mockDeleteUserUseCase.execute.mockResolvedValue(true)
 
       // Act
-      const result = await service.deleteUser(userId, tenantId);
+      const result = await service.deleteUser('user-1', 'tenant-1', 'admin-1')
 
       // Assert
-      expect(result).toBe(true);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-  });
+      expect(result).toBe(true)
+      expect(mockDeleteUserUseCase.execute).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1',
+        'admin-1',
+      )
+    })
+  })
 
   describe('restoreUser', () => {
     it('应该成功恢复用户', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const user = createMockUser({ id: userId, tenantId });
-      // 确保用户状态为已删除状态，可以恢复
-      user.status = UserStatusValue.deleted();
-      const restoredUser = createMockUser({ id: userId, tenantId });
-      restoredUser.status = UserStatusValue.suspended();
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(restoredUser);
+      mockDeleteUserUseCase.executeRestore.mockResolvedValue(true)
 
       // Act
-      const result = await service.restoreUser(userId, tenantId);
+      const result = await service.restoreUser('user-1', 'tenant-1', 'admin-1')
 
       // Assert
-      expect(result).toEqual(restoredUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-  });
+      expect(result).toBe(true)
+      expect(mockDeleteUserUseCase.executeRestore).toHaveBeenCalledWith(
+        'user-1',
+        'tenant-1',
+        'admin-1',
+      )
+    })
+  })
 
   describe('assignUserToOrganization', () => {
-    it('应该成功将用户分配到组织', async () => {
+    it('应该成功分配用户到组织', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const organizationId = 'org-456';
-      const user = createMockUser({ id: userId, tenantId });
-      const updatedUser = createMockUser({
-        id: userId,
-        tenantId,
-        organizationIds: ['org-123', organizationId]
-      });
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(updatedUser);
+      const mockUser = { id: 'user-1' }
+      mockAssignUserToOrganizationUseCase.execute.mockResolvedValue(
+        mockUser as any,
+      )
 
       // Act
-      const result = await service.assignUserToOrganization(userId, tenantId, organizationId);
+      const result = await service.assignUserToOrganization(
+        'user-1',
+        'tenant-1',
+        'org-1',
+        'admin-1',
+      )
 
       // Assert
-      expect(result).toEqual(updatedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockAssignUserToOrganizationUseCase.execute).toHaveBeenCalledWith(
+        'user-1',
+        'org-1',
+        'tenant-1',
+        'admin-1',
+      )
+    })
+  })
 
   describe('removeUserFromOrganization', () => {
     it('应该成功从组织移除用户', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const organizationId = 'org-123';
-      const user = createMockUser({ id: userId, tenantId, organizationIds: ['org-123', 'org-456'] });
-      const updatedUser = createMockUser({
-        id: userId,
-        tenantId,
-        organizationIds: ['org-456']
-      });
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(updatedUser);
+      const mockUser = { id: 'user-1' }
+      mockAssignUserToOrganizationUseCase.executeRemoveFromOrganization.mockResolvedValue(
+        mockUser as any,
+      )
 
       // Act
-      const result = await service.removeUserFromOrganization(userId, tenantId, organizationId);
+      const result = await service.removeUserFromOrganization(
+        'user-1',
+        'tenant-1',
+        'org-1',
+        'admin-1',
+      )
 
       // Assert
-      expect(result).toEqual(updatedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(
+        mockAssignUserToOrganizationUseCase.executeRemoveFromOrganization,
+      ).toHaveBeenCalledWith('user-1', 'org-1', 'tenant-1', 'admin-1')
+    })
+  })
 
   describe('assignRoleToUser', () => {
-    it('应该成功为用户分配角色', async () => {
+    it('应该成功分配角色给用户', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const roleId = 'role-456';
-      const user = createMockUser({ id: userId, tenantId });
-      const updatedUser = createMockUser({
-        id: userId,
-        tenantId,
-        roleIds: ['role-123', roleId]
-      });
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(updatedUser);
+      const mockUser = { id: 'user-1' }
+      mockAssignRoleToUserUseCase.execute.mockResolvedValue(mockUser as any)
 
       // Act
-      const result = await service.assignRoleToUser(userId, tenantId, roleId);
+      const result = await service.assignRoleToUser(
+        'user-1',
+        'tenant-1',
+        'role-1',
+        'admin-1',
+      )
 
       // Assert
-      expect(result).toEqual(updatedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(mockAssignRoleToUserUseCase.execute).toHaveBeenCalledWith(
+        'user-1',
+        'role-1',
+        'tenant-1',
+        'admin-1',
+      )
+    })
+  })
 
   describe('removeRoleFromUser', () => {
     it('应该成功移除用户角色', async () => {
       // Arrange
-      const userId = 'user-123';
-      const tenantId = 'tenant-123';
-      const roleId = 'role-123';
-      const user = createMockUser({ id: userId, tenantId, roleIds: ['role-123', 'role-456'] });
-      const updatedUser = createMockUser({
-        id: userId,
-        tenantId,
-        roleIds: ['role-456']
-      });
-
-      mockUserRepository.findById.mockResolvedValue(user);
-      mockUserRepository.save.mockResolvedValue(updatedUser);
+      const mockUser = { id: 'user-1' }
+      mockAssignRoleToUserUseCase.executeRemoveRole.mockResolvedValue(
+        mockUser as any,
+      )
 
       // Act
-      const result = await service.removeRoleFromUser(userId, tenantId, roleId);
+      const result = await service.removeRoleFromUser(
+        'user-1',
+        'tenant-1',
+        'role-1',
+        'admin-1',
+      )
 
       // Assert
-      expect(result).toEqual(updatedUser);
-      expect(mockUserRepository.findById).toHaveBeenCalledWith(userId, tenantId);
-      expect(mockUserRepository.save).toHaveBeenCalled();
-    });
-  });
-
-  describe('getUserStats', () => {
-    it('应该成功获取用户统计信息', async () => {
-      // Arrange
-      const tenantId = 'tenant-123';
-      const expectedStats = {
-        total: 100,
-        active: 80,
-        pending: 10,
-        suspended: 5,
-        deleted: 5
-      };
-
-      mockUserRepository.count.mockResolvedValue(expectedStats.total);
-      mockUserRepository.countByStatus.mockResolvedValueOnce(expectedStats.active);
-      mockUserRepository.countByStatus.mockResolvedValueOnce(expectedStats.pending);
-      mockUserRepository.countByStatus.mockResolvedValueOnce(expectedStats.suspended);
-      mockUserRepository.countByStatus.mockResolvedValueOnce(expectedStats.deleted);
-
-      // Act
-      const result = await service.getUserStats(tenantId);
-
-      // Assert
-      expect(result).toEqual(expectedStats);
-      expect(mockUserRepository.count).toHaveBeenCalledWith(tenantId);
-      expect(mockUserRepository.countByStatus).toHaveBeenCalledTimes(4);
-    });
-  });
+      expect(result).toEqual(mockUser)
+      expect(
+        mockAssignRoleToUserUseCase.executeRemoveRole,
+      ).toHaveBeenCalledWith('user-1', 'role-1', 'tenant-1', 'admin-1')
+    })
+  })
 
   describe('searchUsers', () => {
     it('应该成功搜索用户', async () => {
       // Arrange
-      const searchTerm = 'test';
-      const tenantId = 'tenant-123';
-      const page = 1;
-      const limit = 10;
-      const expectedResult = {
-        users: [createMockUser({ tenantId })],
+      const mockResult = {
+        users: [{ id: 'user-1' }],
         total: 1,
-        page,
-        limit,
-        totalPages: 1
-      };
-
-      mockUserRepository.findWithPagination.mockResolvedValue(expectedResult);
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      }
+      mockSearchUsersUseCase.execute.mockResolvedValue(mockResult as any)
 
       // Act
-      const result = await service.searchUsers(searchTerm, tenantId, page, limit);
+      const result = await service.searchUsers('test', 'tenant-1', 1, 10)
 
       // Assert
-      expect(result).toEqual(expectedResult);
-      expect(mockUserRepository.findWithPagination).toHaveBeenCalledWith(
-        page,
-        limit,
-        tenantId,
-        { search: searchTerm }
-      );
-    });
-  });
+      expect(result).toEqual(mockResult)
+      expect(mockSearchUsersUseCase.execute).toHaveBeenCalledWith(
+        'test',
+        'tenant-1',
+        1,
+        10,
+      )
+    })
+  })
 
-  describe('getUsersWithPagination', () => {
-    it('应该成功分页获取用户列表', async () => {
+  describe('searchUsersAdvanced', () => {
+    it('应该成功执行高级搜索', async () => {
       // Arrange
-      const tenantId = 'tenant-123';
-      const page = 1;
-      const limit = 10;
-      const filters = {
-        status: UserStatusValue.active(),
-        organizationId: 'org-123',
-        roleId: 'role-123',
-        search: 'test'
-      };
-      const sort = {
-        field: 'createdAt' as const,
-        order: 'desc' as const
-      };
-      const expectedResult = {
-        users: [createMockUser({ tenantId })],
+      const searchCriteria = {
+        keyword: 'test',
+        status: 'ACTIVE',
+        organizationId: 'org-1',
+        roleId: 'role-1',
+      }
+      const mockResult = {
+        users: [{ id: 'user-1' }],
         total: 1,
-        page,
-        limit,
-        totalPages: 1
-      };
-
-      mockUserRepository.findWithPagination.mockResolvedValue(expectedResult);
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      }
+      mockSearchUsersUseCase.executeAdvancedSearch.mockResolvedValue(
+        mockResult as any,
+      )
 
       // Act
-      const result = await service.getUsersWithPagination(tenantId, page, limit, filters, sort);
+      const result = await service.searchUsersAdvanced(
+        searchCriteria,
+        'tenant-1',
+        1,
+        10,
+      )
 
       // Assert
-      expect(result).toEqual(expectedResult);
-      expect(mockUserRepository.findWithPagination).toHaveBeenCalledWith(
-        page,
-        limit,
-        tenantId,
-        filters,
-        sort
-      );
-    });
-  });
-}); 
+      expect(result).toEqual(mockResult)
+      expect(mockSearchUsersUseCase.executeAdvancedSearch).toHaveBeenCalledWith(
+        searchCriteria,
+        'tenant-1',
+        1,
+        10,
+      )
+    })
+  })
+
+  describe('getUserSuggestions', () => {
+    it('应该成功获取用户建议', async () => {
+      // Arrange
+      const mockSuggestions = [
+        {
+          id: 'user-1',
+          username: 'testuser',
+          displayName: 'Test User',
+          email: 'test@example.com',
+        },
+      ]
+      mockSearchUsersUseCase.executeGetUserSuggestions.mockResolvedValue(
+        mockSuggestions,
+      )
+
+      // Act
+      const result = await service.getUserSuggestions('test', 'tenant-1', 5)
+
+      // Assert
+      expect(result).toEqual(mockSuggestions)
+      expect(
+        mockSearchUsersUseCase.executeGetUserSuggestions,
+      ).toHaveBeenCalledWith('test', 'tenant-1', 5)
+    })
+  })
+
+  describe('getUsersByOrganization', () => {
+    it('应该成功获取组织下的用户', async () => {
+      // Arrange
+      const mockUsers = [{ id: 'user-1' }]
+      mockAssignUserToOrganizationUseCase.executeGetUsersByOrganization.mockResolvedValue(
+        mockUsers as any,
+      )
+
+      // Act
+      const result = await service.getUsersByOrganization('org-1', 'tenant-1')
+
+      // Assert
+      expect(result).toEqual(mockUsers)
+      expect(
+        mockAssignUserToOrganizationUseCase.executeGetUsersByOrganization,
+      ).toHaveBeenCalledWith('org-1', 'tenant-1')
+    })
+  })
+
+  describe('getUsersByRole', () => {
+    it('应该成功获取拥有角色的用户', async () => {
+      // Arrange
+      const mockUsers = [{ id: 'user-1' }]
+      mockAssignRoleToUserUseCase.executeGetUsersByRole.mockResolvedValue(
+        mockUsers as any,
+      )
+
+      // Act
+      const result = await service.getUsersByRole('role-1', 'tenant-1')
+
+      // Assert
+      expect(result).toEqual(mockUsers)
+      expect(
+        mockAssignRoleToUserUseCase.executeGetUsersByRole,
+      ).toHaveBeenCalledWith('role-1', 'tenant-1')
+    })
+  })
+
+  describe('getUserOrganizations', () => {
+    it('应该成功获取用户所属组织', async () => {
+      // Arrange
+      const mockOrganizations = ['org-1', 'org-2']
+      mockAssignUserToOrganizationUseCase.executeGetUserOrganizations.mockResolvedValue(
+        mockOrganizations,
+      )
+
+      // Act
+      const result = await service.getUserOrganizations('user-1', 'tenant-1')
+
+      // Assert
+      expect(result).toEqual(mockOrganizations)
+      expect(
+        mockAssignUserToOrganizationUseCase.executeGetUserOrganizations,
+      ).toHaveBeenCalledWith('user-1', 'tenant-1')
+    })
+  })
+
+  describe('getUserRoles', () => {
+    it('应该成功获取用户角色', async () => {
+      // Arrange
+      const mockRoles = ['role-1', 'role-2']
+      mockAssignRoleToUserUseCase.executeGetUserRoles.mockResolvedValue(
+        mockRoles,
+      )
+
+      // Act
+      const result = await service.getUserRoles('user-1', 'tenant-1')
+
+      // Assert
+      expect(result).toEqual(mockRoles)
+      expect(
+        mockAssignRoleToUserUseCase.executeGetUserRoles,
+      ).toHaveBeenCalledWith('user-1', 'tenant-1')
+    })
+  })
+
+  describe('getUserStatistics', () => {
+    it('应该成功获取用户统计信息', async () => {
+      // Arrange
+      const mockStats = {
+        totalUsers: 100,
+        activeUsers: 80,
+        pendingUsers: 10,
+        suspendedUsers: 5,
+        deletedUsers: 5,
+        lockedUsers: 2,
+        usersWithFailedLoginAttempts: 3,
+        recentUsers: 15,
+        userGrowthRate: 0.05,
+      }
+      mockGetUserStatisticsUseCase.execute.mockResolvedValue(mockStats)
+
+      // Act
+      const result = await service.getUserStatistics('tenant-1')
+
+      // Assert
+      expect(result).toEqual(mockStats)
+      expect(mockGetUserStatisticsUseCase.execute).toHaveBeenCalledWith(
+        'tenant-1',
+      )
+    })
+  })
+
+  describe('getUserStatisticsByStatus', () => {
+    it('应该成功获取按状态分组的统计信息', async () => {
+      // Arrange
+      const mockStats = [
+        { status: 'ACTIVE', count: 80, percentage: 80 },
+        { status: 'SUSPENDED', count: 5, percentage: 5 },
+      ]
+      mockGetUserStatisticsUseCase.executeByStatus.mockResolvedValue(mockStats)
+
+      // Act
+      const result = await service.getUserStatisticsByStatus('tenant-1')
+
+      // Assert
+      expect(result).toEqual(mockStats)
+      expect(mockGetUserStatisticsUseCase.executeByStatus).toHaveBeenCalledWith(
+        'tenant-1',
+      )
+    })
+  })
+
+  describe('getUserStatisticsByOrganization', () => {
+    it('应该成功获取按组织分组的统计信息', async () => {
+      // Arrange
+      const mockStats = [
+        { organizationId: 'org-1', userCount: 50 },
+        { organizationId: 'org-2', userCount: 30 },
+      ]
+      mockGetUserStatisticsUseCase.executeByOrganization.mockResolvedValue(
+        mockStats,
+      )
+
+      // Act
+      const result = await service.getUserStatisticsByOrganization('tenant-1')
+
+      // Assert
+      expect(result).toEqual(mockStats)
+      expect(
+        mockGetUserStatisticsUseCase.executeByOrganization,
+      ).toHaveBeenCalledWith('tenant-1')
+    })
+  })
+
+  describe('getUserStatisticsByRole', () => {
+    it('应该成功获取按角色分组的统计信息', async () => {
+      // Arrange
+      const mockStats = [
+        { roleId: 'role-1', userCount: 40 },
+        { roleId: 'role-2', userCount: 30 },
+      ]
+      mockGetUserStatisticsUseCase.executeByRole.mockResolvedValue(mockStats)
+
+      // Act
+      const result = await service.getUserStatisticsByRole('tenant-1')
+
+      // Assert
+      expect(result).toEqual(mockStats)
+      expect(mockGetUserStatisticsUseCase.executeByRole).toHaveBeenCalledWith(
+        'tenant-1',
+      )
+    })
+  })
+})
