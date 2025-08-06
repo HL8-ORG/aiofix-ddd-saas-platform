@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { GetPermissionUseCase } from '../use-cases/get-permission.use-case'
-import type { PermissionRepository } from '../../domain/repositories/permission.repository'
-import { PermissionType } from '../../domain/value-objects/permission-type.value-object'
-import { PermissionAction } from '../../domain/value-objects/permission-action.value-object'
-import { PermissionStatus } from '../../domain/value-objects/permission-status.value-object'
+import { GetPermissionUseCase } from '../../use-cases/get-permission.use-case'
+import type { PermissionRepository } from '../../../domain/repositories/permission.repository'
+import { PermissionType } from '../../../domain/value-objects/permission-type.value-object'
+import { PermissionAction } from '../../../domain/value-objects/permission-action.value-object'
+import { PermissionStatus } from '../../../domain/value-objects/permission-status.value-object'
 
 describe('GetPermissionUseCase', () => {
   let useCase: GetPermissionUseCase

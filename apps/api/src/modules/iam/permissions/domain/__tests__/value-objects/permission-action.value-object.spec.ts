@@ -1,144 +1,285 @@
-import { PermissionAction } from '../permission-action.value-object'
+import {
+  PermissionAction,
+  PermissionActionValue,
+} from '../../value-objects/permission-action.value-object'
 
-/**
- * @description 权限操作值对象测试
- * 测试权限操作枚举的创建、验证和比较功能
- */
-describe('权限操作值对象测试', () => {
-  describe('PermissionAction枚举', () => {
-    it('应该包含所有预定义的权限操作', () => {
-      expect(PermissionAction.CREATE).toBe('create')
-      expect(PermissionAction.READ).toBe('read')
-      expect(PermissionAction.UPDATE).toBe('update')
-      expect(PermissionAction.DELETE).toBe('delete')
-      expect(PermissionAction.MANAGE).toBe('manage')
-      expect(PermissionAction.APPROVE).toBe('approve')
-      expect(PermissionAction.EXPORT).toBe('export')
-      expect(PermissionAction.IMPORT).toBe('import')
+describe('PermissionActionValue', () => {
+  describe('constructor', () => {
+    it('应该成功创建管理操作', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.MANAGE,
+      )
+      expect(permissionAction.getValue()).toBe(PermissionAction.MANAGE)
     })
 
-    it('应该包含所有权限操作值', () => {
-      const allActions = Object.values(PermissionAction)
-      expect(allActions).toContain('create')
-      expect(allActions).toContain('read')
-      expect(allActions).toContain('update')
-      expect(allActions).toContain('delete')
-      expect(allActions).toContain('manage')
-      expect(allActions).toContain('approve')
-      expect(allActions).toContain('export')
-      expect(allActions).toContain('import')
+    it('应该成功创建创建操作', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.CREATE,
+      )
+      expect(permissionAction.getValue()).toBe(PermissionAction.CREATE)
     })
 
-    it('应该包含8个权限操作', () => {
-      const allActions = Object.values(PermissionAction)
-      expect(allActions).toHaveLength(8)
+    it('应该成功创建读取操作', () => {
+      const permissionAction = new PermissionActionValue(PermissionAction.READ)
+      expect(permissionAction.getValue()).toBe(PermissionAction.READ)
+    })
+
+    it('应该成功创建更新操作', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.UPDATE,
+      )
+      expect(permissionAction.getValue()).toBe(PermissionAction.UPDATE)
+    })
+
+    it('应该成功创建删除操作', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.DELETE,
+      )
+      expect(permissionAction.getValue()).toBe(PermissionAction.DELETE)
     })
   })
 
-  describe('权限操作验证', () => {
-    it('应该验证有效的权限操作', () => {
-      const validActions = [
-        PermissionAction.CREATE,
-        PermissionAction.READ,
-        PermissionAction.UPDATE,
-        PermissionAction.DELETE,
-        PermissionAction.MANAGE,
-        PermissionAction.APPROVE,
-        PermissionAction.EXPORT,
-        PermissionAction.IMPORT,
-      ]
-
-      validActions.forEach(action => {
-        expect(Object.values(PermissionAction)).toContain(action)
-      })
-    })
-
+  describe('validation', () => {
     it('应该拒绝无效的权限操作', () => {
-      const invalidActions = ['invalid', 'test', 'unknown', '']
-      
-      invalidActions.forEach(action => {
-        expect(Object.values(PermissionAction)).not.toContain(action)
-      })
+      expect(() => new PermissionActionValue('invalid' as any)).toThrow(
+        '无效的权限操作: invalid',
+      )
     })
   })
 
-  describe('权限操作比较', () => {
-    it('应该正确比较相同的权限操作', () => {
-      expect(PermissionAction.CREATE).toBe(PermissionAction.CREATE)
-      expect(PermissionAction.READ).toBe(PermissionAction.READ)
-      expect(PermissionAction.UPDATE).toBe(PermissionAction.UPDATE)
-    })
-
-    it('应该正确比较不同的权限操作', () => {
-      expect(PermissionAction.CREATE).not.toBe(PermissionAction.READ)
-      expect(PermissionAction.UPDATE).not.toBe(PermissionAction.DELETE)
-      expect(PermissionAction.MANAGE).not.toBe(PermissionAction.APPROVE)
-    })
-  })
-
-  describe('权限操作分类', () => {
-    it('应该正确分类CRUD操作', () => {
-      const crudActions = [
-        PermissionAction.CREATE,
-        PermissionAction.READ,
-        PermissionAction.UPDATE,
-        PermissionAction.DELETE,
-      ]
-
-      crudActions.forEach(action => {
-        expect(Object.values(PermissionAction)).toContain(action)
-      })
-    })
-
-    it('应该正确分类管理操作', () => {
-      const managementActions = [
+  describe('getValue', () => {
+    it('应该返回权限操作值', () => {
+      const permissionAction = new PermissionActionValue(
         PermissionAction.MANAGE,
+      )
+      expect(permissionAction.getValue()).toBe(PermissionAction.MANAGE)
+    })
+  })
+
+  describe('getDisplayName', () => {
+    it('应该返回管理操作的显示名称', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.MANAGE,
+      )
+      expect(permissionAction.getDisplayName()).toBe('管理')
+    })
+
+    it('应该返回创建操作的显示名称', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.CREATE,
+      )
+      expect(permissionAction.getDisplayName()).toBe('创建')
+    })
+
+    it('应该返回读取操作的显示名称', () => {
+      const permissionAction = new PermissionActionValue(PermissionAction.READ)
+      expect(permissionAction.getDisplayName()).toBe('读取')
+    })
+
+    it('应该返回更新操作的显示名称', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.UPDATE,
+      )
+      expect(permissionAction.getDisplayName()).toBe('更新')
+    })
+
+    it('应该返回删除操作的显示名称', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.DELETE,
+      )
+      expect(permissionAction.getDisplayName()).toBe('删除')
+    })
+
+    it('应该返回发布操作的显示名称', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.PUBLISH,
+      )
+      expect(permissionAction.getDisplayName()).toBe('发布')
+    })
+
+    it('应该返回审批操作的显示名称', () => {
+      const permissionAction = new PermissionActionValue(
         PermissionAction.APPROVE,
-      ]
-
-      managementActions.forEach(action => {
-        expect(Object.values(PermissionAction)).toContain(action)
-      })
-    })
-
-    it('应该正确分类数据操作', () => {
-      const dataActions = [
-        PermissionAction.EXPORT,
-        PermissionAction.IMPORT,
-      ]
-
-      dataActions.forEach(action => {
-        expect(Object.values(PermissionAction)).toContain(action)
-      })
+      )
+      expect(permissionAction.getDisplayName()).toBe('审批')
     })
   })
 
-  describe('权限操作字符串表示', () => {
-    it('应该正确转换为字符串', () => {
-      expect(String(PermissionAction.CREATE)).toBe('create')
-      expect(String(PermissionAction.READ)).toBe('read')
-      expect(String(PermissionAction.UPDATE)).toBe('update')
-      expect(String(PermissionAction.DELETE)).toBe('delete')
+  describe('getDescription', () => {
+    it('应该返回管理操作的描述', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.MANAGE,
+      )
+      expect(permissionAction.getDescription()).toBe(
+        '允许完全管理资源（包含所有操作）',
+      )
     })
 
-    it('应该正确进行JSON序列化', () => {
-      const action = PermissionAction.MANAGE
-      const serialized = JSON.stringify(action)
-      expect(serialized).toBe('"manage"')
+    it('应该返回创建操作的描述', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.CREATE,
+      )
+      expect(permissionAction.getDescription()).toBe('允许创建新的资源')
+    })
+
+    it('应该返回读取操作的描述', () => {
+      const permissionAction = new PermissionActionValue(PermissionAction.READ)
+      expect(permissionAction.getDescription()).toBe('允许读取资源信息')
+    })
+
+    it('应该返回更新操作的描述', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.UPDATE,
+      )
+      expect(permissionAction.getDescription()).toBe('允许更新现有资源')
+    })
+
+    it('应该返回删除操作的描述', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.DELETE,
+      )
+      expect(permissionAction.getDescription()).toBe('允许删除资源')
     })
   })
 
-  describe('权限操作类型安全', () => {
-    it('应该确保所有操作都是字符串类型', () => {
-      Object.values(PermissionAction).forEach(action => {
-        expect(typeof action).toBe('string')
-      })
+  describe('action checking methods', () => {
+    it('应该正确识别管理操作', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.MANAGE,
+      )
+      expect(permissionAction.isManage()).toBe(true)
+      expect(permissionAction.isCreate()).toBe(false)
+      expect(permissionAction.isRead()).toBe(false)
+      expect(permissionAction.isUpdate()).toBe(false)
+      expect(permissionAction.isDelete()).toBe(false)
     })
 
-    it('应该确保所有操作都是小写', () => {
-      Object.values(PermissionAction).forEach(action => {
-        expect(action).toBe(action.toLowerCase())
-      })
+    it('应该正确识别创建操作', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.CREATE,
+      )
+      expect(permissionAction.isManage()).toBe(false)
+      expect(permissionAction.isCreate()).toBe(true)
+      expect(permissionAction.isRead()).toBe(false)
+      expect(permissionAction.isUpdate()).toBe(false)
+      expect(permissionAction.isDelete()).toBe(false)
+    })
+
+    it('应该正确识别读取操作', () => {
+      const permissionAction = new PermissionActionValue(PermissionAction.READ)
+      expect(permissionAction.isManage()).toBe(false)
+      expect(permissionAction.isCreate()).toBe(false)
+      expect(permissionAction.isRead()).toBe(true)
+      expect(permissionAction.isUpdate()).toBe(false)
+      expect(permissionAction.isDelete()).toBe(false)
+    })
+
+    it('应该正确识别更新操作', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.UPDATE,
+      )
+      expect(permissionAction.isManage()).toBe(false)
+      expect(permissionAction.isCreate()).toBe(false)
+      expect(permissionAction.isRead()).toBe(false)
+      expect(permissionAction.isUpdate()).toBe(true)
+      expect(permissionAction.isDelete()).toBe(false)
+    })
+
+    it('应该正确识别删除操作', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.DELETE,
+      )
+      expect(permissionAction.isManage()).toBe(false)
+      expect(permissionAction.isCreate()).toBe(false)
+      expect(permissionAction.isRead()).toBe(false)
+      expect(permissionAction.isUpdate()).toBe(false)
+      expect(permissionAction.isDelete()).toBe(true)
     })
   })
-}) 
+
+  describe('business logic methods', () => {
+    it('应该正确识别危险操作', () => {
+      const manageAction = new PermissionActionValue(PermissionAction.MANAGE)
+      const deleteAction = new PermissionActionValue(PermissionAction.DELETE)
+      const rejectAction = new PermissionActionValue(PermissionAction.REJECT)
+      const createAction = new PermissionActionValue(PermissionAction.CREATE)
+      const readAction = new PermissionActionValue(PermissionAction.READ)
+
+      expect(manageAction.isDangerous()).toBe(true)
+      expect(deleteAction.isDangerous()).toBe(true)
+      expect(rejectAction.isDangerous()).toBe(true)
+      expect(createAction.isDangerous()).toBe(false)
+      expect(readAction.isDangerous()).toBe(false)
+    })
+
+    it('应该正确判断是否需要确认', () => {
+      const manageAction = new PermissionActionValue(PermissionAction.MANAGE)
+      const deleteAction = new PermissionActionValue(PermissionAction.DELETE)
+      const createAction = new PermissionActionValue(PermissionAction.CREATE)
+
+      expect(manageAction.requiresConfirmation()).toBe(true)
+      expect(deleteAction.requiresConfirmation()).toBe(true)
+      expect(createAction.requiresConfirmation()).toBe(false)
+    })
+  })
+
+  describe('equals', () => {
+    it('应该正确比较两个相同的权限操作', () => {
+      const action1 = new PermissionActionValue(PermissionAction.MANAGE)
+      const action2 = new PermissionActionValue(PermissionAction.MANAGE)
+      expect(action1.equals(action2)).toBe(true)
+    })
+
+    it('应该正确比较两个不同的权限操作', () => {
+      const action1 = new PermissionActionValue(PermissionAction.MANAGE)
+      const action2 = new PermissionActionValue(PermissionAction.CREATE)
+      expect(action1.equals(action2)).toBe(false)
+    })
+
+    it('应该处理null比较', () => {
+      const action1 = new PermissionActionValue(PermissionAction.MANAGE)
+      expect(action1.equals(null as any)).toBe(false)
+    })
+  })
+
+  describe('toString', () => {
+    it('应该返回权限操作字符串', () => {
+      const permissionAction = new PermissionActionValue(
+        PermissionAction.MANAGE,
+      )
+      expect(permissionAction.toString()).toBe(PermissionAction.MANAGE)
+    })
+  })
+
+  describe('static factory methods', () => {
+    it('应该通过静态方法创建管理操作', () => {
+      const permissionAction = PermissionActionValue.getManage()
+      expect(permissionAction.getValue()).toBe(PermissionAction.MANAGE)
+      expect(permissionAction.isManage()).toBe(true)
+    })
+
+    it('应该通过静态方法创建创建操作', () => {
+      const permissionAction = PermissionActionValue.getCreate()
+      expect(permissionAction.getValue()).toBe(PermissionAction.CREATE)
+      expect(permissionAction.isCreate()).toBe(true)
+    })
+
+    it('应该通过静态方法创建读取操作', () => {
+      const permissionAction = PermissionActionValue.getRead()
+      expect(permissionAction.getValue()).toBe(PermissionAction.READ)
+      expect(permissionAction.isRead()).toBe(true)
+    })
+
+    it('应该通过静态方法创建更新操作', () => {
+      const permissionAction = PermissionActionValue.getUpdate()
+      expect(permissionAction.getValue()).toBe(PermissionAction.UPDATE)
+      expect(permissionAction.isUpdate()).toBe(true)
+    })
+
+    it('应该通过静态方法创建删除操作', () => {
+      const permissionAction = PermissionActionValue.getDelete()
+      expect(permissionAction.getValue()).toBe(PermissionAction.DELETE)
+      expect(permissionAction.isDelete()).toBe(true)
+    })
+  })
+})

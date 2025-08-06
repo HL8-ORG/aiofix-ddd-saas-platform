@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { DeletePermissionUseCase } from '../use-cases/delete-permission.use-case'
-import type { PermissionRepository } from '../../domain/repositories/permission.repository'
+import { DeletePermissionUseCase } from '../../use-cases/delete-permission.use-case'
+import type { PermissionRepository } from '../../../domain/repositories/permission.repository'
 
 describe('DeletePermissionUseCase', () => {
   let useCase: DeletePermissionUseCase

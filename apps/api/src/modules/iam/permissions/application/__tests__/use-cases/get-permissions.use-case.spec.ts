@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { GetPermissionsUseCase, type GetPermissionsRequest } from '../use-cases/get-permissions.use-case'
-import type { PermissionRepository } from '../../domain/repositories/permission.repository'
+import { GetPermissionsUseCase, type GetPermissionsRequest } from '../../use-cases/get-permissions.use-case'
+import type { PermissionRepository } from '../../../domain/repositories/permission.repository'
 
 describe('GetPermissionsUseCase', () => {
   let useCase: GetPermissionsUseCase

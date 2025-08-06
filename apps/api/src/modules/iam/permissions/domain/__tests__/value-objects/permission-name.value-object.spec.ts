@@ -1,4 +1,4 @@
-import { PermissionName } from '../permission-name.value-object'
+import { PermissionName } from '../../value-objects/permission-name.value-object'
 
 describe('PermissionName', () => {
   describe('constructor', () => {

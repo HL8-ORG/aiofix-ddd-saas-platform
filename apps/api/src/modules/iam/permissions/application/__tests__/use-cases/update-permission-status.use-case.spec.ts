@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { UpdatePermissionStatusUseCase } from '../use-cases/update-permission-status.use-case'
-import type { PermissionRepository } from '../../domain/repositories/permission.repository'
+import { UpdatePermissionStatusUseCase } from '../../use-cases/update-permission-status.use-case'
+import type { PermissionRepository } from '../../../domain/repositories/permission.repository'
 
 describe('UpdatePermissionStatusUseCase', () => {
   let useCase: UpdatePermissionStatusUseCase

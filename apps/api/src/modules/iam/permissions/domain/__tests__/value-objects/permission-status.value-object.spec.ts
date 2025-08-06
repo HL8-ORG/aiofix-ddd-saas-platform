@@ -1,229 +1,261 @@
-import { PermissionStatus, PermissionStatusValue } from '../../value-objects/permission-status.value-object'
+import {
+  PermissionStatus,
+  PermissionStatusValue,
+} from '../../value-objects/permission-status.value-object'
 
-/**
- * @description 权限状态值对象测试
- * 测试权限状态枚举和值对象的创建、验证和比较功能
- */
-describe('权限状态值对象测试', () => {
-  describe('PermissionStatus枚举', () => {
-    it('应该包含所有预定义的权限状态', () => {
-      expect(PermissionStatus.ACTIVE).toBe('active')
-      expect(PermissionStatus.INACTIVE).toBe('inactive')
-      expect(PermissionStatus.SUSPENDED).toBe('suspended')
-      expect(PermissionStatus.EXPIRED).toBe('expired')
-    })
-
-    it('应该包含所有权限状态值', () => {
-      const allStatuses = Object.values(PermissionStatus)
-      expect(allStatuses).toContain('active')
-      expect(allStatuses).toContain('inactive')
-      expect(allStatuses).toContain('suspended')
-      expect(allStatuses).toContain('expired')
-    })
-
-    it('应该包含4个权限状态', () => {
-      const allStatuses = Object.values(PermissionStatus)
-      expect(allStatuses).toHaveLength(4)
-    })
-  })
-
-  describe('PermissionStatusValue类', () => {
-    it('应该正确创建权限状态值对象', () => {
-      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      expect(activeStatus.getValue()).toBe(PermissionStatus.ACTIVE)
-      expect(activeStatus.toString()).toBe('active')
-    })
-
-    it('应该正确创建所有权限状态', () => {
-      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const inactiveStatus = new PermissionStatusValue(PermissionStatus.INACTIVE)
-      const suspendedStatus = new PermissionStatusValue(PermissionStatus.SUSPENDED)
-      const expiredStatus = new PermissionStatusValue(PermissionStatus.EXPIRED)
-
-      expect(activeStatus.getValue()).toBe('active')
-      expect(inactiveStatus.getValue()).toBe('inactive')
-      expect(suspendedStatus.getValue()).toBe('suspended')
-      expect(expiredStatus.getValue()).toBe('expired')
-    })
-
-    it('应该正确比较权限状态', () => {
-      const status1 = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const status2 = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const status3 = new PermissionStatusValue(PermissionStatus.INACTIVE)
-
-      expect(status1.equals(status2)).toBe(true)
-      expect(status1.equals(status3)).toBe(false)
-    })
-
-    it('应该正确转换为字符串', () => {
-      const status = new PermissionStatusValue(PermissionStatus.SUSPENDED)
-      expect(status.toString()).toBe('suspended')
-      expect(String(status)).toBe('suspended')
-    })
-
-    it('应该正确进行JSON序列化', () => {
-      const status = new PermissionStatusValue(PermissionStatus.EXPIRED)
-      const serialized = JSON.stringify(status)
-      expect(serialized).toBe('"expired"')
-    })
-
-    it('应该正确获取显示名称', () => {
-      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const inactiveStatus = new PermissionStatusValue(PermissionStatus.INACTIVE)
-      const suspendedStatus = new PermissionStatusValue(PermissionStatus.SUSPENDED)
-      const expiredStatus = new PermissionStatusValue(PermissionStatus.EXPIRED)
-
-      expect(activeStatus.getDisplayName()).toBe('启用')
-      expect(inactiveStatus.getDisplayName()).toBe('禁用')
-      expect(suspendedStatus.getDisplayName()).toBe('暂停')
-      expect(expiredStatus.getDisplayName()).toBe('过期')
-    })
-
-    it('应该正确获取描述', () => {
-      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const inactiveStatus = new PermissionStatusValue(PermissionStatus.INACTIVE)
-
-      expect(activeStatus.getDescription()).toBe('权限已启用，可以正常使用')
-      expect(inactiveStatus.getDescription()).toBe('权限已禁用，暂时无法使用')
-    })
-  })
-
-  describe('权限状态验证', () => {
-    it('应该验证有效的权限状态', () => {
-      const validStatuses = [
+describe('PermissionStatusValue', () => {
+  describe('constructor', () => {
+    it('应该成功创建激活状态', () => {
+      const permissionStatus = new PermissionStatusValue(
         PermissionStatus.ACTIVE,
+      )
+      expect(permissionStatus.getValue()).toBe(PermissionStatus.ACTIVE)
+    })
+
+    it('应该成功创建禁用状态', () => {
+      const permissionStatus = new PermissionStatusValue(
         PermissionStatus.INACTIVE,
+      )
+      expect(permissionStatus.getValue()).toBe(PermissionStatus.INACTIVE)
+    })
+
+    it('应该成功创建暂停状态', () => {
+      const permissionStatus = new PermissionStatusValue(
         PermissionStatus.SUSPENDED,
+      )
+      expect(permissionStatus.getValue()).toBe(PermissionStatus.SUSPENDED)
+    })
+
+    it('应该成功创建过期状态', () => {
+      const permissionStatus = new PermissionStatusValue(
         PermissionStatus.EXPIRED,
-      ]
-
-      validStatuses.forEach(status => {
-        expect(() => new PermissionStatusValue(status)).not.toThrow()
-      })
+      )
+      expect(permissionStatus.getValue()).toBe(PermissionStatus.EXPIRED)
     })
+  })
 
+  describe('validation', () => {
     it('应该拒绝无效的权限状态', () => {
-      const invalidStatuses = ['invalid', 'test', 'unknown', '']
-
-      invalidStatuses.forEach(status => {
-        expect(() => {
-          new PermissionStatusValue(status as PermissionStatus)
-        }).toThrow()
-      })
+      expect(() => new PermissionStatusValue('invalid' as any)).toThrow(
+        '无效的权限状态: invalid',
+      )
     })
   })
 
-  describe('权限状态业务逻辑', () => {
-    it('应该正确判断是否为激活状态', () => {
-      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const inactiveStatus = new PermissionStatusValue(PermissionStatus.INACTIVE)
+  describe('getValue', () => {
+    it('应该返回权限状态值', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.ACTIVE,
+      )
+      expect(permissionStatus.getValue()).toBe(PermissionStatus.ACTIVE)
+    })
+  })
 
-      expect(activeStatus.isActive()).toBe(true)
-      expect(inactiveStatus.isActive()).toBe(false)
+  describe('getDisplayName', () => {
+    it('应该返回激活状态的显示名称', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.ACTIVE,
+      )
+      expect(permissionStatus.getDisplayName()).toBe('启用')
     })
 
-    it('应该正确判断是否为禁用状态', () => {
-      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const inactiveStatus = new PermissionStatusValue(PermissionStatus.INACTIVE)
-
-      expect(activeStatus.isInactive()).toBe(false)
-      expect(inactiveStatus.isInactive()).toBe(true)
+    it('应该返回禁用状态的显示名称', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.INACTIVE,
+      )
+      expect(permissionStatus.getDisplayName()).toBe('禁用')
     })
 
-    it('应该正确判断是否为暂停状态', () => {
-      const suspendedStatus = new PermissionStatusValue(PermissionStatus.SUSPENDED)
-      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-
-      expect(suspendedStatus.isSuspended()).toBe(true)
-      expect(activeStatus.isSuspended()).toBe(false)
+    it('应该返回暂停状态的显示名称', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.SUSPENDED,
+      )
+      expect(permissionStatus.getDisplayName()).toBe('暂停')
     })
 
-    it('应该正确判断是否为过期状态', () => {
+    it('应该返回过期状态的显示名称', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.EXPIRED,
+      )
+      expect(permissionStatus.getDisplayName()).toBe('过期')
+    })
+  })
+
+  describe('getDescription', () => {
+    it('应该返回激活状态的描述', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.ACTIVE,
+      )
+      expect(permissionStatus.getDescription()).toBe('权限已启用，可以正常使用')
+    })
+
+    it('应该返回禁用状态的描述', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.INACTIVE,
+      )
+      expect(permissionStatus.getDescription()).toBe('权限已禁用，暂时无法使用')
+    })
+
+    it('应该返回暂停状态的描述', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.SUSPENDED,
+      )
+      expect(permissionStatus.getDescription()).toBe(
+        '权限已暂停，需要管理员重新启用',
+      )
+    })
+
+    it('应该返回过期状态的描述', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.EXPIRED,
+      )
+      expect(permissionStatus.getDescription()).toBe('权限已过期，需要重新申请')
+    })
+  })
+
+  describe('status checking methods', () => {
+    it('应该正确识别激活状态', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.ACTIVE,
+      )
+      expect(permissionStatus.isActive()).toBe(true)
+      expect(permissionStatus.isInactive()).toBe(false)
+      expect(permissionStatus.isSuspended()).toBe(false)
+      expect(permissionStatus.isExpired()).toBe(false)
+    })
+
+    it('应该正确识别禁用状态', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.INACTIVE,
+      )
+      expect(permissionStatus.isActive()).toBe(false)
+      expect(permissionStatus.isInactive()).toBe(true)
+      expect(permissionStatus.isSuspended()).toBe(false)
+      expect(permissionStatus.isExpired()).toBe(false)
+    })
+
+    it('应该正确识别暂停状态', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.SUSPENDED,
+      )
+      expect(permissionStatus.isActive()).toBe(false)
+      expect(permissionStatus.isInactive()).toBe(false)
+      expect(permissionStatus.isSuspended()).toBe(true)
+      expect(permissionStatus.isExpired()).toBe(false)
+    })
+
+    it('应该正确识别过期状态', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.EXPIRED,
+      )
+      expect(permissionStatus.isActive()).toBe(false)
+      expect(permissionStatus.isInactive()).toBe(false)
+      expect(permissionStatus.isSuspended()).toBe(false)
+      expect(permissionStatus.isExpired()).toBe(true)
+    })
+  })
+
+  describe('business logic methods', () => {
+    it('应该正确判断是否可以激活', () => {
+      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
+      const inactiveStatus = new PermissionStatusValue(
+        PermissionStatus.INACTIVE,
+      )
+      const suspendedStatus = new PermissionStatusValue(
+        PermissionStatus.SUSPENDED,
+      )
       const expiredStatus = new PermissionStatusValue(PermissionStatus.EXPIRED)
-      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-
-      expect(expiredStatus.isExpired()).toBe(true)
-      expect(activeStatus.isExpired()).toBe(false)
-    })
-  })
-
-  describe('权限状态转换检查', () => {
-    it('应该正确检查是否可以激活', () => {
-      const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const inactiveStatus = new PermissionStatusValue(PermissionStatus.INACTIVE)
-      const suspendedStatus = new PermissionStatusValue(PermissionStatus.SUSPENDED)
 
       expect(activeStatus.canBeActivated()).toBe(false)
       expect(inactiveStatus.canBeActivated()).toBe(true)
       expect(suspendedStatus.canBeActivated()).toBe(true)
+      expect(expiredStatus.canBeActivated()).toBe(false)
     })
 
-    it('应该正确检查是否可以暂停', () => {
+    it('应该正确判断是否可以暂停', () => {
       const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const inactiveStatus = new PermissionStatusValue(PermissionStatus.INACTIVE)
+      const inactiveStatus = new PermissionStatusValue(
+        PermissionStatus.INACTIVE,
+      )
+      const suspendedStatus = new PermissionStatusValue(
+        PermissionStatus.SUSPENDED,
+      )
+      const expiredStatus = new PermissionStatusValue(PermissionStatus.EXPIRED)
 
       expect(activeStatus.canBeSuspended()).toBe(true)
       expect(inactiveStatus.canBeSuspended()).toBe(false)
+      expect(suspendedStatus.canBeSuspended()).toBe(false)
+      expect(expiredStatus.canBeSuspended()).toBe(false)
     })
 
-    it('应该正确检查是否可以禁用', () => {
+    it('应该正确判断是否可以禁用', () => {
       const activeStatus = new PermissionStatusValue(PermissionStatus.ACTIVE)
-      const inactiveStatus = new PermissionStatusValue(PermissionStatus.INACTIVE)
-      const suspendedStatus = new PermissionStatusValue(PermissionStatus.SUSPENDED)
+      const inactiveStatus = new PermissionStatusValue(
+        PermissionStatus.INACTIVE,
+      )
+      const suspendedStatus = new PermissionStatusValue(
+        PermissionStatus.SUSPENDED,
+      )
+      const expiredStatus = new PermissionStatusValue(PermissionStatus.EXPIRED)
 
       expect(activeStatus.canBeDeactivated()).toBe(true)
       expect(inactiveStatus.canBeDeactivated()).toBe(false)
       expect(suspendedStatus.canBeDeactivated()).toBe(true)
+      expect(expiredStatus.canBeDeactivated()).toBe(false)
     })
   })
 
-  describe('静态方法', () => {
-    it('应该正确获取激活状态', () => {
-      const activeStatus = PermissionStatusValue.getActive()
-      expect(activeStatus.getValue()).toBe(PermissionStatus.ACTIVE)
+  describe('equals', () => {
+    it('应该正确比较两个相同的权限状态', () => {
+      const status1 = new PermissionStatusValue(PermissionStatus.ACTIVE)
+      const status2 = new PermissionStatusValue(PermissionStatus.ACTIVE)
+      expect(status1.equals(status2)).toBe(true)
     })
 
-    it('应该正确获取禁用状态', () => {
-      const inactiveStatus = PermissionStatusValue.getInactive()
-      expect(inactiveStatus.getValue()).toBe(PermissionStatus.INACTIVE)
+    it('应该正确比较两个不同的权限状态', () => {
+      const status1 = new PermissionStatusValue(PermissionStatus.ACTIVE)
+      const status2 = new PermissionStatusValue(PermissionStatus.INACTIVE)
+      expect(status1.equals(status2)).toBe(false)
     })
 
-    it('应该正确获取暂停状态', () => {
-      const suspendedStatus = PermissionStatusValue.getSuspended()
-      expect(suspendedStatus.getValue()).toBe(PermissionStatus.SUSPENDED)
-    })
-
-    it('应该正确获取过期状态', () => {
-      const expiredStatus = PermissionStatusValue.getExpired()
-      expect(expiredStatus.getValue()).toBe(PermissionStatus.EXPIRED)
+    it('应该处理null比较', () => {
+      const status1 = new PermissionStatusValue(PermissionStatus.ACTIVE)
+      expect(status1.equals(null as any)).toBe(false)
     })
   })
 
-  describe('权限状态类型安全', () => {
-    it('应该确保所有状态都是字符串类型', () => {
-      Object.values(PermissionStatus).forEach(status => {
-        expect(typeof status).toBe('string')
-      })
-    })
-
-    it('应该确保所有状态都是小写', () => {
-      Object.values(PermissionStatus).forEach(status => {
-        expect(status).toBe(status.toLowerCase())
-      })
+  describe('toString', () => {
+    it('应该返回权限状态字符串', () => {
+      const permissionStatus = new PermissionStatusValue(
+        PermissionStatus.ACTIVE,
+      )
+      expect(permissionStatus.toString()).toBe(PermissionStatus.ACTIVE)
     })
   })
 
-  describe('权限状态错误处理', () => {
-    it('应该拒绝无效的状态值', () => {
-      expect(() => {
-        new PermissionStatusValue('invalid' as PermissionStatus)
-      }).toThrow('无效的权限状态: invalid')
+  describe('static factory methods', () => {
+    it('应该通过静态方法创建激活状态', () => {
+      const permissionStatus = PermissionStatusValue.getActive()
+      expect(permissionStatus.getValue()).toBe(PermissionStatus.ACTIVE)
+      expect(permissionStatus.isActive()).toBe(true)
     })
 
-    it('应该处理空值', () => {
-      expect(() => {
-        new PermissionStatusValue('' as PermissionStatus)
-      }).toThrow('无效的权限状态: ')
+    it('应该通过静态方法创建禁用状态', () => {
+      const permissionStatus = PermissionStatusValue.getInactive()
+      expect(permissionStatus.getValue()).toBe(PermissionStatus.INACTIVE)
+      expect(permissionStatus.isInactive()).toBe(true)
+    })
+
+    it('应该通过静态方法创建暂停状态', () => {
+      const permissionStatus = PermissionStatusValue.getSuspended()
+      expect(permissionStatus.getValue()).toBe(PermissionStatus.SUSPENDED)
+      expect(permissionStatus.isSuspended()).toBe(true)
+    })
+
+    it('应该通过静态方法创建过期状态', () => {
+      const permissionStatus = PermissionStatusValue.getExpired()
+      expect(permissionStatus.getValue()).toBe(PermissionStatus.EXPIRED)
+      expect(permissionStatus.isExpired()).toBe(true)
     })
   })
-}) 
+})

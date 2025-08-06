@@ -3,7 +3,7 @@ import { PermissionAction } from '../../value-objects/permission-action.value-ob
 import type { PermissionConditionData } from '../../value-objects/permission-condition.value-object'
 import { PermissionStatus } from '../../value-objects/permission-status.value-object'
 import { PermissionType } from '../../value-objects/permission-type.value-object'
-import { Permission } from '../permission.entity'
+import { Permission } from '../../entities/permission.entity'
 
 describe('Permission', () => {
   let permission: Permission

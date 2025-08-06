@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { SearchPermissionsUseCase, type SearchPermissionsRequest, type AdvancedSearchRequest } from '../use-cases/search-permissions.use-case'
-import type { PermissionRepository } from '../../domain/repositories/permission.repository'
+import { SearchPermissionsUseCase, type SearchPermissionsRequest, type AdvancedSearchRequest } from '../../use-cases/search-permissions.use-case'
+import type { PermissionRepository } from '../../../domain/repositories/permission.repository'
 
 describe('SearchPermissionsUseCase', () => {
   let useCase: SearchPermissionsUseCase

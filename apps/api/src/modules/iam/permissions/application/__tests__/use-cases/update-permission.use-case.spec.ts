@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { UpdatePermissionUseCase, type UpdatePermissionRequest } from '../use-cases/update-permission.use-case'
-import type { PermissionRepository } from '../../domain/repositories/permission.repository'
-import { PermissionType } from '../../domain/value-objects/permission-type.value-object'
-import { PermissionAction } from '../../domain/value-objects/permission-action.value-object'
-import type { PermissionConditionData } from '../../domain/value-objects/permission-condition.value-object'
+import { UpdatePermissionUseCase, type UpdatePermissionRequest } from '../../use-cases/update-permission.use-case'
+import type { PermissionRepository } from '../../../domain/repositories/permission.repository'
+import { PermissionType } from '../../../domain/value-objects/permission-type.value-object'
+import { PermissionAction } from '../../../domain/value-objects/permission-action.value-object'
+import type { PermissionConditionData } from '../../../domain/value-objects/permission-condition.value-object'
 
 describe('UpdatePermissionUseCase', () => {
   let useCase: UpdatePermissionUseCase
