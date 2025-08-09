@@ -1,88 +1,185 @@
-import { Expose, Transform } from 'class-transformer'
-import { IsDate, IsOptional, IsUUID } from 'class-validator'
-
 /**
- * @abstract class BaseEntity
+ * @class BaseEntity
  * @description
- * 基础实体类，为所有领域实体提供通用属性和方法。
- * 这是一个纯领域对象，不包含任何ORM装饰器或数据库依赖。
+ * 基础实体类，定义所有领域实体的通用属性和方法。
+ * 该实体采用DDD设计模式，作为所有聚合根和实体的基类，
+ * 提供ID、创建时间、更新时间、删除时间等通用属性，
+ * 以及软删除、审计等通用方法。
  *
  * 主要原理与机制：
- * 1. 使用class-validator装饰器进行数据校验，确保数据完整性
- * 2. 使用class-transformer装饰器控制序列化安全性
- * 3. 提供通用的实体生命周期管理方法
- * 4. 所有实体继承此类，确保领域对象的一致性
- * 5. 通过Expose装饰器控制序列化时哪些字段会被包含
+ * 1. 使用抽象类定义通用属性和方法，子类继承获得基础功能
+ * 2. 提供软删除机制，通过deletedAt字段标记删除状态
+ * 3. 支持审计功能，记录创建和更新时间
+ * 4. 实现相等性比较，基于ID进行实体比较
+ * 5. 提供克隆方法，支持实体的深度复制
  */
 export abstract class BaseEntity {
   /**
    * @property id
-   * @description 实体主键，使用UUID格式
+   * @description 实体唯一标识符
    */
-  @IsUUID('4', { message: 'ID必须是有效的UUID v4格式' })
-  @Expose()
   id: string
 
   /**
    * @property createdAt
    * @description 创建时间
    */
-  @IsDate()
-  @Expose()
-  @Transform(({ value }) => (value instanceof Date ? value : new Date(value)))
   createdAt: Date
 
   /**
    * @property updatedAt
    * @description 更新时间
    */
-  @IsDate()
-  @Expose()
-  @Transform(({ value }) => (value instanceof Date ? value : new Date(value)))
   updatedAt: Date
 
   /**
    * @property deletedAt
-   * @description 软删除时间，用于软删除功能
+   * @description 删除时间（软删除）
    */
-  @IsOptional()
-  @IsDate()
-  @Expose()
-  @Transform(({ value }) =>
-    value ? (value instanceof Date ? value : new Date(value)) : undefined,
-  )
   deletedAt?: Date
+
+  /**
+   * @property version
+   * @description 实体版本号，用于乐观锁
+   */
+  version = 1
+
+  /**
+   * @property tenantId
+   * @description 租户ID，用于多租户数据隔离
+   */
+  tenantId: string
+
+  /**
+   * @property createdBy
+   * @description 创建者ID
+   */
+  createdBy?: string
+
+  /**
+   * @property updatedBy
+   * @description 更新者ID
+   */
+  updatedBy?: string
+
+  /**
+   * @constructor
+   * @description 构造函数，初始化基础属性
+   */
+  constructor(id?: string) {
+    if (id) {
+      this.id = id
+    }
+    this.createdAt = new Date()
+    this.updatedAt = new Date()
+  }
 
   /**
    * @method isDeleted
    * @description 检查实体是否已被软删除
-   * @returns {boolean} 如果已删除返回true，否则返回false
+   * @returns {boolean} 是否已删除
    */
   isDeleted(): boolean {
-    return this.deletedAt !== null && this.deletedAt !== undefined
+    return this.deletedAt !== undefined && this.deletedAt !== null
   }
 
   /**
    * @method softDelete
-   * @description 软删除实体，设置删除时间但不物理删除数据
+   * @description 软删除实体
+   * @param deletedBy {string} 删除者ID
    */
-  softDelete(): void {
+  softDelete(deletedBy?: string): void {
     this.deletedAt = new Date()
+    this.updatedAt = new Date()
+    this.updatedBy = deletedBy
   }
 
   /**
    * @method restore
-   * @description 恢复软删除的实体，清除删除时间
+   * @description 恢复已软删除的实体
+   * @param restoredBy {string} 恢复者ID
    */
-  restore(): void {
+  restore(restoredBy?: string): void {
     this.deletedAt = undefined
+    this.updatedAt = new Date()
+    this.updatedBy = restoredBy
   }
 
   /**
-   * @method updateTimestamp
-   * @description 更新实体的时间戳
+   * @method updateVersion
+   * @description 更新实体版本号
    */
-  updateTimestamp(): void {
+  updateVersion(): void {
+    this.version += 1
     this.updatedAt = new Date()
   }
+
+  /**
+   * @method markAsUpdated
+   * @description 标记实体为已更新
+   * @param updatedBy {string} 更新者ID
+   */
+  markAsUpdated(updatedBy?: string): void {
+    this.updateVersion()
+    this.updatedBy = updatedBy
+  }
+
+  /**
+   * @method equals
+   * @description 比较两个实体是否相等
+   * @param other {BaseEntity} 另一个实体
+   * @returns {boolean} 是否相等
+   */
+  equals(other: BaseEntity): boolean {
+    if (other === null || other === undefined) {
+      return false
+    }
+    if (this === other) {
+      return true
+    }
+    return this.id === other.id && this.constructor === other.constructor
+  }
+
+  /**
+   * @method clone
+   * @description 克隆实体
+   * @returns {BaseEntity} 克隆后的实体
+   */
+  clone(): BaseEntity {
+    const cloned = Object.create(this.constructor.prototype)
+    Object.assign(cloned, this)
+    return cloned
+  }
+
+  /**
+   * @method toJSON
+   * @description 将实体转换为JSON对象
+   * @returns {object} JSON对象
+   */
+  toJSON(): object {
+    return {
+      id: this.id,
+      createdAt: this.createdAt,
+      updatedAt: this.updatedAt,
+      deletedAt: this.deletedAt,
+      version: this.version,
+      tenantId: this.tenantId,
+      createdBy: this.createdBy,
+      updatedBy: this.updatedBy,
+    }
+  }
+
+  /**
+   * @method validate
+   * @description 验证实体状态
+   * @throws {Error} 验证失败时抛出异常
+   */
+  abstract validate(): void
+
+  /**
+   * @method getBusinessKey
+   * @description 获取业务键，用于业务唯一性检查
+   * @returns {string} 业务键
+   */
+  abstract getBusinessKey(): string
 }

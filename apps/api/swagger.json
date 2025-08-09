@@ -10,7 +10,145 @@
             "description": ""
           }
         },
-        "tags": ["App"]
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/v1/v1/tenants": {
+      "post": {
+        "operationId": "TenantsController_create_v1",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "租户创建成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误"
+          },
+          "409": {
+            "description": "租户名称或编码已存在"
+          }
+        },
+        "summary": "创建租户",
+        "tags": [
+          "租户管理"
+        ]
+      }
+    },
+    "/v1/v1/tenants/{id}": {
+      "get": {
+        "operationId": "TenantsController_findById_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "获取成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "租户不存在"
+          }
+        },
+        "summary": "根据ID获取租户",
+        "tags": [
+          "租户管理"
+        ]
+      }
+    },
+    "/v1/v1/tenants/{id}/activate": {
+      "put": {
+        "operationId": "TenantsController_activate_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "激活成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "租户状态不允许激活"
+          },
+          "404": {
+            "description": "租户不存在"
+          }
+        },
+        "summary": "激活租户",
+        "tags": [
+          "租户管理"
+        ]
+      }
+    },
+    "/v1/v1/tenants/{id}/suspend": {
+      "put": {
+        "operationId": "TenantsController_suspend_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "暂停成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TenantDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "租户状态不允许暂停"
+          },
+          "404": {
+            "description": "租户不存在"
+          }
+        },
+        "summary": "暂停租户",
+        "tags": [
+          "租户管理"
+        ]
       }
     }
   },
@@ -30,6 +168,11 @@
         "type": "http"
       }
     },
-    "schemas": {}
+    "schemas": {
+      "TenantDto": {
+        "type": "object",
+        "properties": {}
+      }
+    }
   }
 }

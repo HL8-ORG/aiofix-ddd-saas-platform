@@ -1,7 +1,7 @@
 import { FastifyRequest } from 'fastify'
 // import { User } from 'src/entities/user.entity';
 import pino from 'pino'
-import { REQUEST_ID_HEADER } from 'src/shared/domain/constants/app.constants'
+import { REQUEST_ID_HEADER } from 'src/shared/infrastructure/constants/app.constants'
 
 /**
  * @constant pinoDevConfig
@@ -20,7 +20,7 @@ import { REQUEST_ID_HEADER } from 'src/shared/domain/constants/app.constants'
  *
  * 该配置通过pinoHttp插件集成到Fastify/NestJS应用中，实现结构化、可追溯的开发环境日志。
  */
-export const pinoDevConfig: { pinoHttp: any } = {
+export const pinoDevConfig: { pinoHttp: Record<string, unknown> } = {
   pinoHttp: {
     // 日志级别，优先读取环境变量
     level: process.env.LOG_LEVEL || 'debug',
@@ -74,14 +74,14 @@ export const pinoDevConfig: { pinoHttp: any } = {
        * 请求对象序列化器。提取并格式化请求的关键信息，便于日志追踪。
        */
       req: (req: {
-        id: any
-        method: any
-        url: any
-        headers: { [x: string]: any }
-        ip: any
-        body: any
-        query: any
-        params: any
+        id: string
+        method: string
+        url: string
+        headers: { [x: string]: string | undefined }
+        ip: string
+        body: unknown
+        query: unknown
+        params: unknown
       }) => {
         return {
           [REQUEST_ID_HEADER]: req.id,
@@ -100,7 +100,7 @@ export const pinoDevConfig: { pinoHttp: any } = {
        * @description
        * 响应对象序列化器，仅输出状态码，简化日志内容。
        */
-      res: (res: { statusCode: any }) => {
+      res: (res: { statusCode: number }) => {
         return {
           statusCode: res.statusCode,
         }

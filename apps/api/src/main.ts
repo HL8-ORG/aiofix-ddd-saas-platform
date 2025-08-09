@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs'
+import { writeFileSync } from 'node:fs'
 import { Logger } from '@libs/pino-nestjs'
 import { ValidationPipe, VersioningType } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
@@ -9,7 +9,7 @@ import {
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { useContainer } from 'class-validator'
 import { REQUEST_ID_HEADER } from 'src/shared/domain/constants/app.constants'
-import { v4 as uuidv4 } from 'uuid'
+import { generateUuid } from '@/shared/utils/uuid.util'
 import { AppModule } from './app.module'
 /**
  * @function bootstrap
@@ -41,13 +41,13 @@ async function bootstrap() {
   const fastifyAdapter = new FastifyAdapter({
     trustProxy: true,
     // 重写fastify的genReqId方法，自定义请求 ID 生成逻辑，而不是使用fastify默认的递增整型ID
-    genReqId: (req: { headers: { [x: string]: any } }) => {
+    genReqId: (req: any) => {
       // 优先使用客户端传递的请求 ID，否则自动生成, 需要与前端约定好请求头字段名 REQUEST_ID_HEADER
       const userRequestId = req.headers[REQUEST_ID_HEADER]
       if (userRequestId) {
         return userRequestId
       }
-      return uuidv4()
+      return generateUuid()
     },
   })
 

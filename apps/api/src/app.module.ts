@@ -2,10 +2,18 @@ import { LoggerModule } from '@libs/pino-nestjs'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { ClsModule } from 'nestjs-cls'
+import * as Joi from 'joi'
 import { AppController } from 'src/app.controller'
 import { AppService } from 'src/app.service'
+import { cacheConfig, cacheValidationSchema } from 'src/shared/infrastructure/config/cache.config'
+import { databaseConfig, databaseValidationSchema } from 'src/shared/infrastructure/config/database.config'
+import { envConfig, envValidationSchema } from 'src/shared/infrastructure/config/env.config'
 import pinoLoggerConfig from 'src/shared/infrastructure/config/pino-logger.config'
-import { UsersModule } from './modules/iam/users/users.module'
+import { AppCacheModule } from 'src/shared/infrastructure/cache/cache.module'
+import { DatabaseModule } from 'src/shared/infrastructure/database/database.module'
+import { TenantsModule } from 'src/tenants/tenants.module'
+import { UsersModule } from 'src/users/users.module'
+import { AuthModule } from 'src/auth/auth.module'
 
 /**
  * @module AppModule
@@ -46,16 +54,35 @@ import { UsersModule } from './modules/iam/users/users.module'
     }),
     // 全局配置模块，支持多环境和自定义配置工厂
     ConfigModule.forRoot({
-      envFilePath: ['.env.development.local', '.env'],
+      envFilePath: [
+        `.env.${process.env.NODE_ENV || 'development'}.local`,
+        `.env.${process.env.NODE_ENV || 'development'}`,
+        '.env',
+      ],
       isGlobal: true,
-      load: [pinoLoggerConfig],
+      load: [envConfig, databaseConfig, cacheConfig, pinoLoggerConfig],
+      validationSchema: Joi.object({
+        ...envValidationSchema.keys,
+        ...databaseValidationSchema.keys,
+        ...cacheValidationSchema.keys,
+      }),
+      validationOptions: {
+        abortEarly: true,
+        allowUnknown: true,
+      },
     }),
+    // 数据库模块
+    DatabaseModule,
+    // 缓存模块
+    AppCacheModule,
     // 日志模块
     LoggerModule.forRootAsync(pinoLoggerConfig.asProvider()),
     // 业务模块
+    TenantsModule,
     UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
